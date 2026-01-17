@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import "../../App.css";
 import { removeLoaderIfExists, exportSQL, exportHTML, exportPDF, exportCSV, exportTXT } from "../../utils/table-export";
 import { addAuthUserApi, deleteAuthUserApi, getAuthUsersListApi, updateAuthUserApi } from "../../api/auth-users-api";
+import profileImg from '../../assets/img/profile-img.jpg';
 
 const AuthUserView = () => {
 
@@ -66,8 +67,23 @@ const AuthUserView = () => {
         e.preventDefault();
         setLoading(true);
 
-        if (!authUserName || !authUserEmail || !authUserPhone || !authUserType || !authUserActive) {
+        if (!authUserName.trim() || !authUserEmail.trim() || !authUserPhone.trim() || !authUserType || !authUserActive) {
             toast.error("Please fill all required fields.");
+            setLoading(false);
+            return;
+        }
+        if (!validateEmail(authUserEmail.trim())) {
+            toast.error("Invalid email address.");
+            setLoading(false);
+            return;
+        }
+        if (!validatePhoneNumber(authUserPhone.trim())) {
+            toast.error("Invalid phone number. It should be 10 digits.");
+            setLoading(false);
+            return;
+        }
+        if (isAddModal && !validatePassword(authUserPassword.trim())) {
+            toast.error("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
             setLoading(false);
             return;
         }
@@ -102,6 +118,21 @@ const AuthUserView = () => {
             setLoading(false);
         }
     };
+
+    const validateEmail = (email) => {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(String(email).toLowerCase());
+    };
+
+    const validatePhoneNumber = (phoneNumber) => {
+        const re = /^\d{10}$/;
+        return re.test(String(phoneNumber));
+    }
+
+    const validatePassword = (password) => {
+        const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        return re.test(String(password));
+    }
 
     // RESET FORM
     const resetForm = () => {
@@ -217,7 +248,9 @@ const AuthUserView = () => {
                                             authUsersList.map((row, index) => (
                                                 <tr key={`${row.authUserId}-${row.authUserCreatedAt}`}>
                                                     <td>{index + 1}</td>
-                                                    <td>{row.authUserImage}</td>
+                                                    <td>
+                                                        <img src={row.authUserImage ? `${process.env.VITE_API_BASE}/uploads/${row.authUserImage}` : profileImg} style={{ maxHeight: "70px", maxWidth: "80px" }} alt="authImage" />
+                                                    </td>
                                                     <td>{row.authUserName}</td>
                                                     <td>{row.authUserEmailAddress}</td>
                                                     <td>{row.authUserPhoneNumber}</td>
