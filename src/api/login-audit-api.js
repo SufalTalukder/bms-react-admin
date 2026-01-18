@@ -1,6 +1,8 @@
-import api from "./axios";
+import { BASE_URLS, handleApi } from "./axios";
+
+const authApi = handleApi(BASE_URLS.AUTH);
 
 // GET API
 export const getLoginAuditApi = () =>
-    api.get("/get-auth-login-audit-details");
+    authApi.get("/get-auth-login-audit-details");
 

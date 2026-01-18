@@ -1,136 +1,349 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import DashboardLayout from "../../DashboardLayout";
+import { DataTable } from "simple-datatables";
+import "simple-datatables/dist/style.css";
+import { toast } from "react-toastify";
+import "../../App.css";
+import { removeLoaderIfExists, exportCSV, exportPDF, exportHTML, exportTXT, exportSQL } from "../../utils/table-export";
+import { addUserApi, getUsersListApi, updateUserApi, deleteUserApi } from "../../api/users-api";
+import profileImg from '../../assets/img/profile-img.jpg';
+import { formatDateTime, getActiveStatus } from "./FunctionHelper";
 
 const UserView = () => {
 
+    // STATE VARIABLES
+    const [isAddModal, setIsAddModal] = useState(true);
+    const [modalTitle, setModalTitle] = useState("Add User");
+    const [modalBtnText, setModalBtnText] = useState("Saving...");
+    const [userId, setUserId] = useState(null);
+    const [fullName, setUserName] = useState("");
+    const [emailAddress, setUserEmail] = useState("");
+    const [phoneNumber, setUserPhone] = useState("");
+    const [dob, setUserDob] = useState("");
+    const [userAddress, setUserAddress] = useState("");
+    const [userActive, setUserActive] = useState("YES");
+    const [userImage, setUserImage] = useState(null);
+    const [usersList, setUsersList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const dataTableRef = useRef(null);
+    const hasFetched = useRef(false);
+    const tableRef = useRef(null);
+
     useEffect(() => {
         document.title = "Manage Users | Admin Panel";
+        if (hasFetched.current) return;
+        hasFetched.current = true;
+        fetchUsers();
     }, []);
+
+    // FETCH ALL USERS
+    const fetchUsers = async () => {
+        try {
+            setLoading(true);
+            const res = await getUsersListApi();
+            setUsersList(res.data.content || []);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!loading && usersList.length > 0) {
+            if (dataTableRef.current) {
+                dataTableRef.current.destroy();
+            }
+
+            dataTableRef.current = new DataTable("#demo-table", {
+                searchable: true,
+                sortable: true,
+                perPage: 10,
+                // fixedHeight: true
+            });
+        }
+    }, [loading, usersList]);
+
+    // HANDLE SUBMIT FOR ADD/UPDATE
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        if (!fullName.trim() || !emailAddress.trim() || !phoneNumber.trim() || !userAddress.trim() || !dob.trim() || !userActive) {
+            toast.error("Please fill all required fields.");
+            setLoading(false);
+            return;
+        }
+        if (!validateEmail(emailAddress.trim())) {
+            toast.error("Invalid email address.");
+            setLoading(false);
+            return;
+        }
+        if (!validatePhoneNumber(phoneNumber.trim())) {
+            toast.error("Invalid phone number. It should be 10 digits.");
+            setLoading(false);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("fullName", fullName);
+        formData.append("phoneNumber", phoneNumber);
+        formData.append("emailAddress", emailAddress);
+        formData.append("dob", dob);
+        formData.append("userAddress", userAddress);
+        formData.append("userActive", userActive);
+        if (userImage) formData.append("userImage", userImage);
+
+        try {
+            if (isAddModal) {
+                await addUserApi(formData);
+                toast.success("User added successfully!");
+            } else {
+                await updateUserApi(userId, formData);
+                toast.success("User updated successfully!");
+            }
+            setTimeout(() => {
+                resetForm();
+                // fetchUsers();
+                location.reload();
+                window.bootstrap.Modal.getInstance(document.getElementById("addUpdateModal")).hide();
+            }, 1000);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to save user.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const validateEmail = (email) => {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(String(email).toLowerCase());
+    };
+
+    const validatePhoneNumber = (phoneNumber) => {
+        const re = /^\d{10}$/;
+        return re.test(String(phoneNumber));
+    }
+
+    // RESET FORM
+    const resetForm = () => {
+        setUserId(null);
+        setUserName("");
+        setUserEmail("");
+        setUserPhone("");
+        setUserDob("");
+        setUserAddress("");
+        setUserActive("YES");
+        setUserImage(null);
+        setIsAddModal(true);
+        setModalTitle("Add User");
+    };
+
+    // EDIT AUTH USER
+    const handleEdit = (user) => {
+        setIsAddModal(false);
+        setModalTitle("Update User");
+        setModalBtnText("Updating...");
+        setUserId(user.userId);
+        setUserName(user.fullName);
+        setUserEmail(user.emailAddress);
+        setUserPhone(user.phoneNumber);
+        setUserDob(user.dob);
+        setUserAddress(user.userAddress);
+        setUserActive(user.userActive);
+        setUserImage(null);
+        const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
+        modal.show();
+    };
+
+    // DELETE AUTH USER
+    const handleDelete = async (id) => {
+        try {
+            await deleteUserApi(id);
+            toast.success("User deleted successfully!");
+
+            setTimeout(() => {
+                window.bootstrap.Modal
+                    .getInstance(document.getElementById("deleteModal"))
+                    ?.hide();
+                // fetchUsers();
+                location.reload();
+            }, 1000);
+        } catch (error) {
+            toast.error("Failed to delete user.");
+        }
+    };
 
     return (
         <DashboardLayout>
             <div className="dashboard-layout">
                 <main id="main" className="main">
                     <div className="pagetitle d-flex justify-content-between align-items-center">
-                        <h1 className="mb-0">Manage Users</h1>
-                        <button type="button" className="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addUpdateModal">
+                        <h1 className="toggle-heading">Manage Users</h1>
+                        <button
+                            className="btn btn-secondary"
+                            onClick={() => {
+                                resetForm();
+                                const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
+                                modal.show();
+                            }}>
                             + Add Record
                         </button>
                     </div>
-                    <section className="section">
-                        <div className="row">
-                            <div className="col-lg-12 px-0">
-                                <div className="card">
-                                    <div className="card-body">
-                                        <div className="datatable-top d-flex gap-2 pt-3">
-                                            <button className="btn btn-sm btn-outline-primary" id="export-csv">Export CSV</button>
-                                            <button className="btn btn-sm btn-outline-success" id="export-excel">ExportExcel</button>
-                                            <button className="btn btn-sm btn-outline-danger" id="export-pdf">Export PDF</button>
-                                            <button className="btn btn-sm btn-outline-info" id="export-doc">Export DOC</button>
-                                            <button className="btn btn-sm btn-outline-warning" id="export-txt">Export TXT</button>
-                                            <button className="btn btn-sm btn-outline-dark" id="export-sql">Export SQL</button>
-                                        </div>
-                                        <table className="table table-hover table-sm mt-2" id="demo-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Sr. No.</th>
-                                                    <th>Image</th>
-                                                    <th>Name</th>
-                                                    <th>Ph. No.</th>
-                                                    <th>Email</th>
-                                                    <th>DOB</th>
-                                                    <th>Address</th>
-                                                    <th>Referral Code</th>
-                                                    <th>Action By</th>
-                                                    <th>Created At</th>
-                                                    <th>Updated At</th>
-                                                    <th>Active</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="tcategory">
-                                                <tr id="loader-row">
-                                                    <td colSpan="13" className="text-center py-4">
-                                                        <div className="spinner-border spinner-border-sm"></div>
-                                                        <strong className="ms-2">User(s) Loading...</strong>
+
+                    <div className="card shadow-sm mt-3">
+                        <div className="card-body p-0">
+                            <div className="datatable-top d-flex gap-2 pb-4">
+                                <button className="btn btn-sm btn-outline-primary" onClick={() => { removeLoaderIfExists(tableRef); exportCSV(dataTableRef); }}>Export CSV</button>
+                                <button className="btn btn-sm btn-outline-success" onClick={() => exportHTML(tableRef, "xls")}>Export Excel</button>
+                                <button className="btn btn-sm btn-outline-danger" onClick={() => exportPDF(tableRef)}>Export PDF</button>
+                                <button className="btn btn-sm btn-outline-info" onClick={() => exportHTML(tableRef, "doc", "application/msword")}>Export DOC</button>
+                                <button className="btn btn-sm btn-outline-warning" onClick={() => { removeLoaderIfExists(tableRef); exportTXT(dataTableRef); }}>Export TXT</button>
+                                <button className="btn btn-sm btn-outline-dark" onClick={() => exportSQL(tableRef)}>Export SQL</button>
+                            </div>
+                            <div className="table-responsive system-log-table">
+                                <table
+                                    ref={tableRef}
+                                    className="table table-hover table-sm mb-0"
+                                    id="demo-table"
+                                >
+                                    <thead className="table-light">
+                                        <tr>
+                                            <th>Sr. No.</th>
+                                            <th>Image</th>
+                                            <th>Name</th>
+                                            <th>Ph. No.</th>
+                                            <th>Email</th>
+                                            <th>DOB</th>
+                                            <th>Address</th>
+                                            <th>Referral Code</th>
+                                            <th>Action By</th>
+                                            <th>Created At</th>
+                                            <th>Active</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody key={usersList.length}>
+                                        {loading ? (
+                                            <tr>
+                                                <td colSpan="12" className="text-center py-4">
+                                                    <div className="spinner-border spinner-border-sm"></div>
+                                                    <strong className="ms-2">User(s) Loading...</strong>
+                                                </td>
+                                            </tr>
+                                        ) : usersList.length === 0 ? (
+                                            <tr>
+                                                <td colSpan="12" className="text-center py-4">
+                                                    No user(s) found.
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            usersList.map((row, index) => (
+                                                <tr key={`${row.userId}-${row.userCreatedAt}`}>
+                                                    <td>{index + 1}</td>
+                                                    <td>
+                                                        <img src={row.userImage ? `${import.meta.env.VITE_8081_API_BASE}/uploads/${row.userImage}` : profileImg} style={{ maxHeight: "70px", maxWidth: "80px" }} alt="userImage" />
+                                                    </td>
+                                                    <td>{row.fullName}</td>
+                                                    <td>{row.phoneNumber}</td>
+                                                    <td className="text-truncate" style={{ maxWidth: 250 }}>
+                                                        {row.emailAddress}
+                                                    </td>
+                                                    <td>{row.dob}</td>
+                                                    <td>{row.userAddress}</td>
+                                                    <td>
+                                                        <span className="badge bg-primary rounded">{row.userReferralCode}</span>
+                                                    </td>
+                                                    <td>{row.authUserInfo?.authUserName ?? '--'}</td>
+                                                    <td>{formatDateTime(row.userCreatedAt)}</td>
+                                                    <td>{getActiveStatus(row.userActive)}</td>
+                                                    <td>
+                                                        <button className="btn btn-sm btn-info rounded-pill me-1"
+                                                            onClick={() => handleEdit(row)}>
+                                                            ✏️
+                                                        </button>
+                                                        <button className="btn btn-sm btn-danger rounded-pill"
+                                                            onClick={() => {
+                                                                setUserId(row.userId);
+                                                                setUserName(row.fullName);
+                                                                const modal = new window.bootstrap.Modal(document.getElementById("deleteModal"));
+                                                                modal.show();
+                                                            }}>
+                                                            🗑
+                                                        </button>
                                                     </td>
                                                 </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                    </section>
+                    </div>
                 </main>
             </div>
 
             {/* ADD MODAL */}
             {/* OR, UPDATE MODAL */}
             <div className="modal fade" id="addUpdateModal" tabIndex={-1} aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-                <div className="modal-dialog modal-dialog-scrollable" style={{ maxHeight: "65vh" }}>
+                <div className="modal-dialog modal-xl modal-dialog-scrollable" style={{ maxHeight: "65vh" }}>
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" id="addModalTitle">Add User</h5>
-                            <h5 className="modal-title" id="updateModalTitle" style={{ display: "none" }}>Update User</h5>
+                            <h5 className="modal-title">{modalTitle}</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" />
                         </div>
-                        <div className="modal-body">
-                            <div className="card">
-                                <div className="card-body">
-                                    <div className="row mb-3">
-                                        <label className="col-sm-12 col-form-label">Name *</label>
-                                        <div className="col-sm-12">
-                                            <input type="text" className="form-control" name="addName" id="addName" maxLength={100} autoComplete="new-name" required />
-                                        </div>
+                        <form className="row g-3 needs-validation" onSubmit={handleSubmit} noValidate>
+                            <div className="modal-body">
+                                <div className="row g-3 p-3">
+                                    <div className="col-md-4" style={{ textAlign: "left" }}>
+                                        <label className="form-label">Name *</label>
+                                        <input type="text" className="form-control" maxLength="100" value={fullName} onChange={(e) => setUserName(e.target.value)} autoComplete="new-name" required />
                                     </div>
-                                    <div className="row mb-3">
-                                        <label className="col-sm-12 col-form-label">Email Address *</label>
-                                        <div className="col-sm-12">
-                                            <input type="email" className="form-control" name="addEmail" id="addEmail" maxLength={50} autoComplete="new-email" required />
-                                        </div>
+                                    <div className="col-md-4" style={{ textAlign: "left" }}>
+                                        <label className="form-label">Email *</label>
+                                        <input type="email" className="form-control" maxLength="50" value={emailAddress} onChange={(e) => setUserEmail(e.target.value)} autoComplete="new-email" required />
                                     </div>
-                                    <div className="row mb-3">
-                                        <label className="col-sm-12 col-form-label">Phone Number *</label>
-                                        <div className="col-sm-12">
-                                            <input type="text" className="form-control" name="addPhoneNumber" id="addPhoneNumber" minLength={10} maxLength={10} autoComplete="new-phone-number" required />
-                                        </div>
+                                    <div className="col-md-4" style={{ textAlign: "left" }}>
+                                        <label className="form-label">Phone Number *</label>
+                                        <input type="text" className="form-control" minLength="10" maxLength="10" value={phoneNumber} onChange={(e) => setUserPhone(e.target.value)} autoComplete="new-phone-number" required />
                                     </div>
-                                    <div className="row mb-3">
-                                        <label className="col-sm-12 col-form-label">Date of Birth *</label>
-                                        <div className="col-sm-12">
-                                            <input type="date" className="form-control" name="addDOB" id="addDOB" autoComplete="new-dob" required />
-                                        </div>
+                                    <div className="col-md-4" style={{ textAlign: "left" }}>
+                                        <label className="form-label">Date of Birth *</label>
+                                        <input type="date" className="form-control" value={dob} onChange={(e) => setUserDob(e.target.value)} required />
                                     </div>
-                                    <div className="row mb-3">
-                                        <label className="col-sm-12 col-form-label">Address *</label>
-                                        <div className="col-sm-12">
-                                            <input type="text" className="form-control" name="addAddress" id="addAddress" maxLength="100" autoComplete="new-address" required />
-                                        </div>
+                                    <div className="col-md-4" style={{ textAlign: "left" }}>
+                                        <label className="form-label">Address *</label>
+                                        <input type="text" className="form-control" maxLength="50" value={userAddress} onChange={(e) => setUserAddress(e.target.value)} autoComplete="new-address" required />
                                     </div>
-                                    <div className="row mb-3">
-                                        <label className="col-sm-12 col-form-label">Active *</label>
-                                        <div className="col-sm-12">
-                                            <select className="form-select" name="addActive" id="addActive" required>
-                                                <option value="">-- Select --</option>
-                                                <option value="YES">Yes</option>
-                                                <option value="NO">No</option>
-                                            </select>
-                                        </div>
+                                    <div className="col-md-4" style={{ textAlign: "left" }}>
+                                        <label className="form-label">Active *</label>
+                                        <select className="form-select" value={userActive} onChange={(e) => setUserActive(e.target.value)} required>
+                                            <option value="">-- Select --</option>
+                                            <option value="YES">Yes</option>
+                                            <option value="NO">No</option>
+                                        </select>
                                     </div>
-                                </div>
-                                <div className="modal-footer">
-                                    <button type="button" className="btn btn-primary" id="addBtn">
-                                        <span className="spinner-border spinner-border-sm me-2" style={{ display: "none" }} />
-                                        Save
-                                    </button>
-                                    <button type="button" className="btn btn-primary" id="editBtn" style={{ display: "none" }}>
-                                        <span className="spinner-border spinner-border-sm me-2" style={{ display: "none" }} />
-                                        Update
-                                    </button>
+                                    <div className="col-md-4" style={{ textAlign: "left" }}>
+                                        <label className="form-label">Upload Image</label>
+                                        <input
+                                            type="file"
+                                            className="form-control"
+                                            onChange={(e) => setUserImage(e.target.files[0])}
+                                            accept=".jpg,.jpeg,.png"
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" disabled={loading}>Cancel</button>
+                                <button type="submit" className="btn btn-primary" disabled={loading}>
+                                    {loading ? <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> : isAddModal ? "Save" : "Update"}
+                                    {loading ? modalBtnText : ""}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -145,12 +358,12 @@ const UserView = () => {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <p>Are you sure you want to delete this User?</p>
+                            <p>Are you sure you want to delete this "{fullName}" User?</p>
                             <input type="hidden" name="" value="" />
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                            <button type="button" className="btn btn-danger" id="confirmDelete">Yes</button>
+                            <button type="button" className="btn btn-danger" onClick={() => handleDelete(userId)}>Yes</button>
                         </div>
                     </div>
                 </div>

@@ -1,26 +1,44 @@
 import axios from "axios";
 
-// Create a new Axios instance
-const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE,
-});
+/**
+ * Centralized service base URLs
+ */
+export const BASE_URLS = {
+    AUTH: import.meta.env.VITE_8082_API_BASE,
+    USER: import.meta.env.VITE_8081_API_BASE,
+};
 
-// Intercept every request and add headers
-api.interceptors.request.use(
-    (config) => {
-        const token = sessionStorage.getItem("authToken");
-        if (token) {
-            config.headers["authToken"] = token;
-        }
+/**
+ * Common interceptor logic
+ */
+const applyInterceptors = (instance) => {
+    instance.interceptors.request.use(
+        (config) => {
+            const token = sessionStorage.getItem("authToken");
 
-        config.headers["x-api-key"] = import.meta.env.VITE_API_KEY;
-        config.headers["x-api-secret"] = import.meta.env.VITE_API_SECRET;
+            if (token) {
+                config.headers.authToken = token;
+            }
 
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
+            config.headers["x-api-key"] = import.meta.env.VITE_API_KEY;
+            config.headers["x-api-secret"] = import.meta.env.VITE_API_SECRET;
 
-export default api;
+            return config;
+        },
+        (error) => Promise.reject(error)
+    );
+
+    return instance;
+};
+
+/**
+ * Axios factory function
+ */
+export const handleApi = (baseURL) => {
+    const instance = axios.create({
+        baseURL,
+        timeout: 15000,
+    });
+
+    return applyInterceptors(instance);
+};

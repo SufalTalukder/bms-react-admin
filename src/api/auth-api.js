@@ -1,8 +1,10 @@
-import api from "./axios";
+import { BASE_URLS, handleApi } from "./axios";
+
+const authApi = handleApi(BASE_URLS.AUTH);
 
 // POST API
 export const loginApi = (email, password) =>
-    api.post("/login", null, {
+    authApi.post("/login", null, {
         params: {
             authUserEmailAddress: email,
             authUserPassword: password,
@@ -11,4 +13,4 @@ export const loginApi = (email, password) =>
 
 // GET API
 export const getAuthUserApi = () =>
-    api.get("/get-auth");
+    authApi.get("/get-auth");

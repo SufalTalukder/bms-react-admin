@@ -7,12 +7,14 @@ import "../../App.css";
 import { removeLoaderIfExists, exportSQL, exportHTML, exportPDF, exportCSV, exportTXT } from "../../utils/table-export";
 import { addAuthUserApi, deleteAuthUserApi, getAuthUsersListApi, updateAuthUserApi } from "../../api/auth-users-api";
 import profileImg from '../../assets/img/profile-img.jpg';
+import { formatDateTime, getActiveStatus, getAuthUserType } from "./FunctionHelper";
 
 const AuthUserView = () => {
 
     // STATE VARIABLES
     const [isAddModal, setIsAddModal] = useState(true);
     const [modalTitle, setModalTitle] = useState("Add Auth User");
+    const [modalBtnText, setModalBtnText] = useState("Saving...");
     const [authUserId, setAuthUserId] = useState(null);
     const [authUserName, setAuthUserName] = useState("");
     const [authUserEmail, setAuthUserEmail] = useState("");
@@ -152,6 +154,7 @@ const AuthUserView = () => {
     const handleEdit = (user) => {
         setIsAddModal(false);
         setModalTitle("Update Auth User");
+        setModalBtnText("Updating...");
         setAuthUserId(user.authUserId);
         setAuthUserName(user.authUserName);
         setAuthUserEmail(user.authUserEmailAddress);
@@ -249,15 +252,15 @@ const AuthUserView = () => {
                                                 <tr key={`${row.authUserId}-${row.authUserCreatedAt}`}>
                                                     <td>{index + 1}</td>
                                                     <td>
-                                                        <img src={row.authUserImage ? `${process.env.VITE_API_BASE}/uploads/${row.authUserImage}` : profileImg} style={{ maxHeight: "70px", maxWidth: "80px" }} alt="authImage" />
+                                                        <img src={row.authUserImage ? `${import.meta.env.VITE_8082_API_BASE}/uploads/${row.authUserImage}` : profileImg} style={{ maxHeight: "70px", maxWidth: "80px" }} alt="authImage" />
                                                     </td>
                                                     <td>{row.authUserName}</td>
                                                     <td>{row.authUserEmailAddress}</td>
                                                     <td>{row.authUserPhoneNumber}</td>
-                                                    <td>{row.authUserType}</td>
+                                                    <td>{getAuthUserType(row.authUserType)}</td>
                                                     <td>{row.actionByUserInfo?.authUserName}</td>
-                                                    <td>{row.authUserCreatedAt}</td>
-                                                    <td>{row.authUserActive}</td>
+                                                    <td>{formatDateTime(row.authUserCreatedAt)}</td>
+                                                    <td>{getActiveStatus(row.authUserActive)}</td>
                                                     <td>
                                                         <button className="btn btn-sm btn-info rounded-pill me-1"
                                                             onClick={() => handleEdit(row)}>
@@ -342,8 +345,8 @@ const AuthUserView = () => {
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" disabled={loading}>Cancel</button>
                                 <button type="submit" className="btn btn-primary" disabled={loading}>
-                                    {loading ? <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> : "Save"}
-                                    {loading ? "Saving..." : ""}
+                                    {loading ? <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> : isAddModal ? "Save" : "Update"}
+                                    {loading ? modalBtnText : ""}
                                 </button>
                             </div>
                         </form>

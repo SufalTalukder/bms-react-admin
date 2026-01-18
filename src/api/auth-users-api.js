@@ -1,27 +1,29 @@
-import api from "./axios";
+import { handleApi, BASE_URLS } from "./axios";
 
-// ADD API
+const authApi = handleApi(BASE_URLS.AUTH);
+
+// ADD
 export const addAuthUserApi = (data) =>
-    api.post("/create", data);
+    authApi.post("/create", data);
 
-// GET ALL API
+// GET ALL
 export const getAuthUsersListApi = () =>
-    api.get("/get-all-auth-users");
+    authApi.get("/get-all-auth-users");
 
-// GET API
+// GET
 export const getAuthUserDetailsApi = (authUserId) =>
-    api.get("/get-auth-details", {
+    authApi.get("/get-auth-details", {
         params: { authUserId },
     });
 
-// UPDATE API
+// UPDATE
 export const updateAuthUserApi = (authUserId, data) =>
-    api.put("/update-details", data, {
-        params: { authUserId }
+    authApi.put("/update-details", data, {
+        params: { authUserId },
     });
 
-// DELETE API
+// DELETE
 export const deleteAuthUserApi = (rqstAuthUserId) =>
-    api.delete("/delete", {
+    authApi.delete("/delete", {
         params: { rqstAuthUserId },
     });

@@ -5,6 +5,7 @@ import { DataTable } from "simple-datatables";
 import "simple-datatables/dist/style.css";
 import "../../App.css";
 import { removeLoaderIfExists, exportSQL, exportHTML, exportPDF, exportCSV, exportTXT } from "../../utils/table-export";
+import { formatDateTime } from "./FunctionHelper";
 
 const TrackSystemActivityView = () => {
 
@@ -111,10 +112,10 @@ const TrackSystemActivityView = () => {
                                                     <td>{row.browser}</td>
                                                     <td>{row.operatingSystem}</td>
                                                     <td>{row.deviceType}</td>
-                                                    <td>{row.possibleIncognito ? "Yes" : "No"}</td>
-                                                    <td>{row.loginTime}</td>
+                                                    <td>{row.possibleIncognito ? <span className="badge bg-success rounded">Yes</span> : <span className="badge bg-danger rounded">No</span>}</td>
+                                                    <td>{formatDateTime(row.loginTime)}</td>
                                                     <td>{row.authUserInfo?.authUserName}</td>
-                                                    <td>{row.createdAt}</td>
+                                                    <td>{formatDateTime(row.createdAt)}</td>
                                                 </tr>
                                             ))
                                         )}
