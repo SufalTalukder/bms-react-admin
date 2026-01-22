@@ -1,7 +1,7 @@
 import React from "react";
-import Navbar from "./ui-components/layout/navbar";
-import Sidebar from "./ui-components/layout/sidebar";
-import Footer from "./ui-components/layout/footer";
+import Navbar from "./ui-components/page-layout/Navbar";
+import Sidebar from "./ui-components/page-layout/Sidebar";
+import Footer from "./ui-components/page-layout/Footer";
 
 const DashboardLayout = ({ children }) => {
     return (

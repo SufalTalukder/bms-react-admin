@@ -5,9 +5,10 @@ import "simple-datatables/dist/style.css";
 import { toast } from "react-toastify";
 import "../../App.css";
 import { removeLoaderIfExists, exportCSV, exportPDF, exportHTML, exportTXT, exportSQL } from "../../utils/table-export";
-import { addUserApi, getUsersListApi, updateUserApi, deleteUserApi } from "../../api/users-api";
+import { addUserApi, getUsersListApi, updateUserApi, deleteUserApi, getUserDetailsApi } from "../../api/users-api";
 import profileImg from '../../assets/img/profile-img.jpg';
-import { formatDateTime, getActiveStatus } from "./FunctionHelper";
+import { formatDateTime, formatDOB, getActiveStatus } from "./FunctionHelper";
+import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 
 const UserView = () => {
 
@@ -21,8 +22,10 @@ const UserView = () => {
     const [phoneNumber, setUserPhone] = useState("");
     const [dob, setUserDob] = useState("");
     const [userAddress, setUserAddress] = useState("");
+    const [userReferralCode, setUserReferralCode] = useState("");
     const [userActive, setUserActive] = useState("YES");
     const [userImage, setUserImage] = useState(null);
+    const [userCreatedAt, setUserCreatedAt] = useState("");
     const [usersList, setUsersList] = useState([]);
     const [loading, setLoading] = useState(true);
     const dataTableRef = useRef(null);
@@ -44,6 +47,7 @@ const UserView = () => {
             setUsersList(res.data.content || []);
         } catch (e) {
             console.error(e);
+            toast.error("Failed to fetch users.");
         } finally {
             setLoading(false);
         }
@@ -81,6 +85,11 @@ const UserView = () => {
         }
         if (!validatePhoneNumber(phoneNumber.trim())) {
             toast.error("Invalid phone number. It should be 10 digits.");
+            setLoading(false);
+            return;
+        }
+        if (!validateDOB(dob.trim())) {
+            toast.error("User must be at least 18 years old.");
             setLoading(false);
             return;
         }
@@ -126,6 +135,14 @@ const UserView = () => {
         return re.test(String(phoneNumber));
     }
 
+    const validateDOB = (dob) => {
+        const date = new Date(dob);
+        const ageDiff = Date.now() - date.getTime();
+        const ageDate = new Date(ageDiff);
+        const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+        return age >= 18;
+    };
+
     // RESET FORM
     const resetForm = () => {
         setUserId(null);
@@ -140,7 +157,7 @@ const UserView = () => {
         setModalTitle("Add User");
     };
 
-    // EDIT AUTH USER
+    // EDIT USER
     const handleEdit = (user) => {
         setIsAddModal(false);
         setModalTitle("Update User");
@@ -152,12 +169,12 @@ const UserView = () => {
         setUserDob(user.dob);
         setUserAddress(user.userAddress);
         setUserActive(user.userActive);
-        setUserImage(null);
+        setUserImage(user.userImage);
         const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
         modal.show();
     };
 
-    // DELETE AUTH USER
+    // DELETE USER
     const handleDelete = async (id) => {
         try {
             await deleteUserApi(id);
@@ -172,6 +189,39 @@ const UserView = () => {
             }, 1000);
         } catch (error) {
             toast.error("Failed to delete user.");
+        }
+    };
+
+    // VIEW USER
+    const handleView = async (id) => {
+        try {
+            setLoading(true);
+            const res = await getUserDetailsApi(id);
+            const user = res.data.content;
+            if (user) {
+                setIsAddModal(false);
+                setModalTitle("View User Details");
+                setModalBtnText("Ok");
+                setUserId(user.userId);
+                setUserName(user.fullName);
+                setUserEmail(user.emailAddress);
+                setUserPhone(user.phoneNumber);
+                setUserDob(user.dob);
+                setUserAddress(user.userAddress);
+                setUserReferralCode(user.userReferralCode);
+                setUserActive(user.userActive);
+                setUserImage(user.userImage);
+                setUserCreatedAt(user.userCreatedAt);
+                const modal = new window.bootstrap.Modal(document.getElementById("viewModal"));
+                modal.show();
+            } else {
+                toast.error("User not found.");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to fetch user details.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -251,7 +301,7 @@ const UserView = () => {
                                                     <td className="text-truncate" style={{ maxWidth: 250 }}>
                                                         {row.emailAddress}
                                                     </td>
-                                                    <td>{row.dob}</td>
+                                                    <td>{formatDOB(row.dob)}</td>
                                                     <td>{row.userAddress}</td>
                                                     <td>
                                                         <span className="badge bg-primary rounded">{row.userReferralCode}</span>
@@ -272,6 +322,12 @@ const UserView = () => {
                                                                 modal.show();
                                                             }}>
                                                             🗑
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-sm btn-info rounded-pill me-1"
+                                                            onClick={() => handleView(row.userId)}
+                                                        >
+                                                            👁️
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -336,14 +392,80 @@ const UserView = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" disabled={loading}>Cancel</button>
-                                <button type="submit" className="btn btn-primary" disabled={loading}>
-                                    {loading ? <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> : isAddModal ? "Save" : "Update"}
-                                    {loading ? modalBtnText : ""}
-                                </button>
-                            </div>
+                            <ReusableModalButtons
+                                loading={loading}
+                                mode={isAddModal ? "add" : "edit"}
+                                onCancel={resetForm}
+                                submitText={isAddModal ? "Save" : "Update"}
+                                loadingButtonText={modalBtnText}
+                            />
                         </form>
+                    </div>
+                </div>
+            </div>
+
+            {/* VIEW MODAL */}
+            <div className="modal fade" id="viewModal" tabIndex={-1} aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                <div className="modal-dialog modal-dialog-scrollable" style={{ maxHeight: "65vh" }}>
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">{modalTitle}</h5>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" />
+                        </div>
+                        <div className="modal-body">
+                            <div className="row g-3 p-3">
+                                <div className="tab-content pt-2">
+                                    <div className="tab-pane fade show active profile-overview">
+                                        <h5 className="card-title text-center fw-bold mb-3">
+                                            Profile Details
+                                        </h5>
+                                        <div className="d-flex justify-content-center mb-4">
+                                            <img src={userImage ? `${import.meta.env.VITE_8081_API_BASE}/uploads/${userImage}` : profileImg} alt="Profile" className="rounded-circle border" style={{ width: "110px", height: "110px", objectFit: "cover" }} />
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-3 col-md-4 fw-bold">Full Name</div>
+                                            <div className="col-lg-9 col-md-8">{fullName}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-3 col-md-4 fw-bold">Phone Number</div>
+                                            <div className="col-lg-9 col-md-8">{phoneNumber}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-3 col-md-4 fw-bold">Email Address</div>
+                                            <div className="col-lg-9 col-md-8">{emailAddress}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-3 col-md-4 fw-bold">Date of Birth</div>
+                                            <div className="col-lg-9 col-md-8">{formatDOB(dob)}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-3 col-md-4 fw-bold">Address</div>
+                                            <div className="col-lg-9 col-md-8">{userAddress}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-3 col-md-4 fw-bold">Referral Code</div>
+                                            <div className="col-lg-9 col-md-8">
+                                                <span className="badge bg-primary rounded">{userReferralCode}</span>
+                                            </div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-3 col-md-4 fw-bold">Active</div>
+                                            <div className="col-lg-9 col-md-8">{getActiveStatus(userActive)}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-3 col-md-4 fw-bold">Created At</div>
+                                            <div className="col-lg-9 col-md-8">{formatDateTime(userCreatedAt)}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <ReusableModalButtons
+                            loading={loading}
+                            mode="view"
+                            onCancel={() => { }}
+                            submitText="view"
+                        />
                     </div>
                 </div>
             </div>
@@ -359,12 +481,15 @@ const UserView = () => {
                         </div>
                         <div className="modal-body">
                             <p>Are you sure you want to delete this "{fullName}" User?</p>
-                            <input type="hidden" name="" value="" />
                         </div>
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                            <button type="button" className="btn btn-danger" onClick={() => handleDelete(userId)}>Yes</button>
-                        </div>
+                        <ReusableModalButtons
+                            loading={loading}
+                            mode="delete"
+                            onCancel={() => { }}
+                            submitText="Yes"
+                            loadingButtonText="Deleting..."
+                            onSubmit={() => handleDelete(userId)}
+                        />
                     </div>
                 </div>
             </div>

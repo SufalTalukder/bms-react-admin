@@ -53,3 +53,27 @@ body.toggle-sidebar .card {
 body.toggle-sidebar .toggle-heading {
   margin-left: -100px !important;
 }
+
+/* 19-01-2026 */
+.modal-body .row {
+  align-items: center;
+}
+
+.modal-body .fw-bold {
+  color: #333;
+}
+
+/* 21-01-2026 */
+.rotate-logo {
+  animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

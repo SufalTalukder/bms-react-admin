@@ -4,25 +4,32 @@ import { DataTable } from "simple-datatables";
 import "simple-datatables/dist/style.css";
 import { toast } from "react-toastify";
 import "../../App.css";
-import { removeLoaderIfExists, exportSQL, exportHTML, exportPDF, exportCSV, exportTXT } from "../../utils/table-export";
-import { addAuthUserApi, deleteAuthUserApi, getAuthUsersListApi, updateAuthUserApi } from "../../api/auth-users-api";
+import { addAuthUserApi, deleteAuthUserApi, getAuthUserDetailsApi, getAuthUsersListApi, updateAuthUserApi } from "../../api/auth-users-api";
 import profileImg from '../../assets/img/profile-img.jpg';
 import { formatDateTime, getActiveStatus, getAuthUserType } from "./FunctionHelper";
+import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
+import {
+    ADD_RECORD, AUTH_USER_ADD_AUTH_USER, AUTH_USER_ADDED_SUCCESSFULLY, AUTH_USER_AUTH_USERS_LOADING, AUTH_USER_DELETED_SUCCESSFULLY, AUTH_USER_EDIT_AUTH_USER, AUTH_USER_FAILED_TO_DELETE, AUTH_USER_FAILED_TO_FETCH_USERS, AUTH_USER_FAILED_TO_SAVE, AUTH_USER_FILL_ALL_REQUIRED_FIELDS, AUTH_USER_INVALID_EMAIL_ADDRESS, AUTH_USER_INVALID_PASSWORD, AUTH_USER_INVALID_PHONE_NUMBER, AUTH_USER_MANAGE_AUTH_USERS, AUTH_USER_NO_AUTH_USERS_FOUND, AUTH_USER_SAVING, AUTH_USER_TITLE, AUTH_USER_UPDATED_SUCCESSFULLY, AUTH_USER_UPDATING,
+    PROFILE_DETAILS
+} from "../../lang-dump/lang";
+import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 
 const AuthUserView = () => {
 
     // STATE VARIABLES
     const [isAddModal, setIsAddModal] = useState(true);
-    const [modalTitle, setModalTitle] = useState("Add Auth User");
-    const [modalBtnText, setModalBtnText] = useState("Saving...");
+    const [modalTitle, setModalTitle] = useState(AUTH_USER_ADD_AUTH_USER);
+    const [modalBtnText, setModalBtnText] = useState(AUTH_USER_SAVING);
     const [authUserId, setAuthUserId] = useState(null);
     const [authUserName, setAuthUserName] = useState("");
+    const [actionBy, setActionBy] = useState("");
     const [authUserEmail, setAuthUserEmail] = useState("");
     const [authUserPhone, setAuthUserPhone] = useState("");
     const [authUserPassword, setAuthUserPassword] = useState("");
     const [authUserType, setAuthUserType] = useState("");
     const [authUserActive, setAuthUserActive] = useState("YES");
     const [authUserImage, setAuthUserImage] = useState(null);
+    const [authUserCreatedAt, setAuthUserCreatedAt] = useState("");
     const [authUsersList, setAuthUsersList] = useState([]);
     const [loading, setLoading] = useState(true);
     const dataTableRef = useRef(null);
@@ -30,7 +37,7 @@ const AuthUserView = () => {
     const tableRef = useRef(null);
 
     useEffect(() => {
-        document.title = "Manage Auth Users | Admin Panel";
+        document.title = AUTH_USER_TITLE;
         if (hasFetched.current) return;
         hasFetched.current = true;
         fetchAuthUsers();
@@ -44,25 +51,51 @@ const AuthUserView = () => {
             setAuthUsersList(res.data.content || []);
         } catch (e) {
             console.error(e);
+            toast.error(AUTH_USER_FAILED_TO_FETCH_USERS);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        if (!loading && authUsersList.length > 0) {
-            if (dataTableRef.current) {
-                dataTableRef.current.destroy();
-            }
-
+        if (!dataTableRef.current && authUsersList.length > 0) {
             dataTableRef.current = new DataTable("#demo-table", {
                 searchable: true,
                 sortable: true,
-                perPage: 10,
-                // fixedHeight: true
+                perPage: 10
             });
         }
-    }, [loading, authUsersList]);
+    }, [authUsersList.length]);
+
+    // VIEW AUTH USER
+    const handleView = async (id) => {
+        try {
+            const res = await getAuthUserDetailsApi(id);
+            const authUser = res.data.content;
+            if (authUser) {
+                setIsAddModal(false);
+                setModalTitle("View Auth Details");
+                setModalBtnText("Ok");
+                setAuthUserId(authUser.authUserId);
+                setAuthUserName(authUser.authUserName);
+                setActionBy(authUser.actionByUserInfo?.authUserName);
+                setAuthUserEmail(authUser.authUserEmailAddress);
+                setAuthUserPhone(authUser.authUserPhoneNumber);
+                setAuthUserType(authUser.authUserType);
+                setAuthUserActive(authUser.authUserActive);
+                setAuthUserCreatedAt(authUser.authUserCreatedAt);
+                const modal = new window.bootstrap.Modal(document.getElementById("viewModal"));
+                modal.show();
+            } else {
+                toast.error("Auth user not found.");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to fetch auth user details.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // HANDLE SUBMIT FOR ADD/UPDATE
     const handleSubmit = async (e) => {
@@ -70,22 +103,22 @@ const AuthUserView = () => {
         setLoading(true);
 
         if (!authUserName.trim() || !authUserEmail.trim() || !authUserPhone.trim() || !authUserType || !authUserActive) {
-            toast.error("Please fill all required fields.");
+            toast.error(AUTH_USER_FILL_ALL_REQUIRED_FIELDS);
             setLoading(false);
             return;
         }
         if (!validateEmail(authUserEmail.trim())) {
-            toast.error("Invalid email address.");
+            toast.error(AUTH_USER_INVALID_EMAIL_ADDRESS);
             setLoading(false);
             return;
         }
         if (!validatePhoneNumber(authUserPhone.trim())) {
-            toast.error("Invalid phone number. It should be 10 digits.");
+            toast.error(AUTH_USER_INVALID_PHONE_NUMBER);
             setLoading(false);
             return;
         }
         if (isAddModal && !validatePassword(authUserPassword.trim())) {
-            toast.error("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
+            toast.error(AUTH_USER_INVALID_PASSWORD);
             setLoading(false);
             return;
         }
@@ -102,20 +135,20 @@ const AuthUserView = () => {
         try {
             if (isAddModal) {
                 await addAuthUserApi(formData);
-                toast.success("Auth user added successfully!");
+                toast.success(AUTH_USER_ADDED_SUCCESSFULLY);
             } else {
                 await updateAuthUserApi(authUserId, formData);
-                toast.success("Auth user updated successfully!");
+                toast.success(AUTH_USER_UPDATED_SUCCESSFULLY);
             }
             setTimeout(() => {
                 resetForm();
-                // fetchAuthUsers();
-                location.reload();
+                fetchAuthUsers();
+                // location.reload();
                 window.bootstrap.Modal.getInstance(document.getElementById("addUpdateModal")).hide();
             }, 1000);
         } catch (error) {
             console.error(error);
-            toast.error("Failed to save auth user.");
+            toast.error(AUTH_USER_FAILED_TO_SAVE);
         } finally {
             setLoading(false);
         }
@@ -147,21 +180,21 @@ const AuthUserView = () => {
         setAuthUserActive("YES");
         setAuthUserImage(null);
         setIsAddModal(true);
-        setModalTitle("Add Auth User");
+        setModalTitle(AUTH_USER_ADD_AUTH_USER);
     };
 
     // EDIT AUTH USER
-    const handleEdit = (user) => {
+    const handleEdit = (authUser) => {
         setIsAddModal(false);
-        setModalTitle("Update Auth User");
-        setModalBtnText("Updating...");
-        setAuthUserId(user.authUserId);
-        setAuthUserName(user.authUserName);
-        setAuthUserEmail(user.authUserEmailAddress);
-        setAuthUserPhone(user.authUserPhoneNumber);
+        setModalTitle(AUTH_USER_EDIT_AUTH_USER);
+        setModalBtnText(AUTH_USER_UPDATING);
+        setAuthUserId(authUser.authUserId);
+        setAuthUserName(authUser.authUserName);
+        setAuthUserEmail(authUser.authUserEmailAddress);
+        setAuthUserPhone(authUser.authUserPhoneNumber);
         setAuthUserPassword("");
-        setAuthUserType(user.authUserType);
-        setAuthUserActive(user.authUserActive);
+        setAuthUserType(authUser.authUserType);
+        setAuthUserActive(authUser.authUserActive);
         setAuthUserImage(null);
         const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
         modal.show();
@@ -171,17 +204,17 @@ const AuthUserView = () => {
     const handleDelete = async (id) => {
         try {
             await deleteAuthUserApi(id);
-            toast.success("Auth user deleted successfully!");
+            toast.success(AUTH_USER_DELETED_SUCCESSFULLY);
 
             setTimeout(() => {
                 window.bootstrap.Modal
                     .getInstance(document.getElementById("deleteModal"))
                     ?.hide();
-                // fetchAuthUsers();
-                location.reload();
+                fetchAuthUsers();
+                // location.reload();
             }, 1000);
         } catch (error) {
-            toast.error("Failed to delete auth user.");
+            toast.error(AUTH_USER_FAILED_TO_DELETE);
         }
     };
 
@@ -190,7 +223,7 @@ const AuthUserView = () => {
             <div className="dashboard-layout">
                 <main id="main" className="main">
                     <div className="pagetitle d-flex justify-content-between align-items-center">
-                        <h1 className="toggle-heading">Manage Auth Users</h1>
+                        <h1 className="toggle-heading">{AUTH_USER_MANAGE_AUTH_USERS}</h1>
                         <button
                             className="btn btn-secondary"
                             onClick={() => {
@@ -198,20 +231,16 @@ const AuthUserView = () => {
                                 const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
                                 modal.show();
                             }}>
-                            + Add Record
+                            {ADD_RECORD}
                         </button>
                     </div>
 
                     <div className="card shadow-sm mt-3">
                         <div className="card-body p-0">
-                            <div className="datatable-top d-flex gap-2 pb-4">
-                                <button className="btn btn-sm btn-outline-primary" onClick={() => { removeLoaderIfExists(tableRef); exportCSV(dataTableRef); }}>Export CSV</button>
-                                <button className="btn btn-sm btn-outline-success" onClick={() => exportHTML(tableRef, "xls")}>Export Excel</button>
-                                <button className="btn btn-sm btn-outline-danger" onClick={() => exportPDF(tableRef)}>Export PDF</button>
-                                <button className="btn btn-sm btn-outline-info" onClick={() => exportHTML(tableRef, "doc", "application/msword")}>Export DOC</button>
-                                <button className="btn btn-sm btn-outline-warning" onClick={() => { removeLoaderIfExists(tableRef); exportTXT(dataTableRef); }}>Export TXT</button>
-                                <button className="btn btn-sm btn-outline-dark" onClick={() => exportSQL(tableRef)}>Export SQL</button>
-                            </div>
+                            <ReusableExportTable
+                                tableRef={tableRef}
+                                dataTableRef={dataTableRef}
+                            />
                             <div className="table-responsive system-log-table">
                                 <table
                                     ref={tableRef}
@@ -238,13 +267,13 @@ const AuthUserView = () => {
                                             <tr>
                                                 <td colSpan="10" className="text-center py-4">
                                                     <div className="spinner-border spinner-border-sm"></div>
-                                                    <strong className="ms-2">Auth User(s) Loading...</strong>
+                                                    <strong className="ms-2">{AUTH_USER_AUTH_USERS_LOADING}</strong>
                                                 </td>
                                             </tr>
                                         ) : authUsersList.length === 0 ? (
                                             <tr>
                                                 <td colSpan="10" className="text-center py-4">
-                                                    No auth user(s) found.
+                                                    {AUTH_USER_NO_AUTH_USERS_FOUND}
                                                 </td>
                                             </tr>
                                         ) : (
@@ -262,6 +291,12 @@ const AuthUserView = () => {
                                                     <td>{formatDateTime(row.authUserCreatedAt)}</td>
                                                     <td>{getActiveStatus(row.authUserActive)}</td>
                                                     <td>
+                                                        <button
+                                                            className="btn btn-sm btn-success rounded-pill me-1"
+                                                            onClick={() => handleView(row.authUserId)}
+                                                        >
+                                                            👁️
+                                                        </button>
                                                         <button className="btn btn-sm btn-info rounded-pill me-1"
                                                             onClick={() => handleEdit(row)}>
                                                             ✏️
@@ -287,9 +322,66 @@ const AuthUserView = () => {
                 </main>
             </div>
 
+            {/* VIEW MODAL */}
+            <div className="modal fade" id="viewModal" tabIndex={-1} aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                <div className="modal-dialog modal-dialog-scrollable" style={{ maxHeight: "65vh" }}>
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">{modalTitle}</h5>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" />
+                        </div>
+                        <div className="modal-body">
+                            <div className="row g-3 p-3">
+                                <div className="tab-content pt-0">
+                                    <div className="tab-pane fade show active profile-overview">
+                                        <div className="d-flex justify-content-center mb-4">
+                                            <img src={authUserImage ? `${import.meta.env.VITE_8081_API_BASE}/uploads/${authUserImage}` : profileImg} alt="Profile" className="rounded-circle border" style={{ width: "150px", height: "150px", objectFit: "cover" }} />
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-3 col-md-4 fw-bold">Full Name</div>
+                                            <div className="col-lg-9 col-md-8">{authUserName}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-3 col-md-4 fw-bold">Email</div>
+                                            <div className="col-lg-9 col-md-8">{authUserEmail}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-3 col-md-4 fw-bold">Phone</div>
+                                            <div className="col-lg-9 col-md-8">{authUserPhone}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-3 col-md-4 fw-bold">Action By</div>
+                                            <div className="col-lg-9 col-md-8">{actionBy}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-3 col-md-4 fw-bold">Type</div>
+                                            <div className="col-lg-9 col-md-8">{getAuthUserType(authUserType)}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-3 col-md-4 fw-bold">Active</div>
+                                            <div className="col-lg-9 col-md-8">{getActiveStatus(authUserActive)}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-3 col-md-4 fw-bold">Created At</div>
+                                            <div className="col-lg-9 col-md-8">{formatDateTime(authUserCreatedAt)}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <ReusableModalButtons
+                            loading={loading}
+                            mode="view"
+                            onCancel={() => { }}
+                            submitText="view"
+                        />
+                    </div>
+                </div>
+            </div>
+
             {/* ADD MODAL */}
             {/* OR, UPDATE MODAL */}
-            <div className="modal fade" id="addUpdateModal" tabIndex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div className="modal fade" id="addUpdateModal" tabIndex={-1} aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
                 <div className="modal-dialog modal-xl modal-dialog-scrollable">
                     <div className="modal-content">
                         <div className="modal-header">
@@ -342,13 +434,12 @@ const AuthUserView = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" disabled={loading}>Cancel</button>
-                                <button type="submit" className="btn btn-primary" disabled={loading}>
-                                    {loading ? <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> : isAddModal ? "Save" : "Update"}
-                                    {loading ? modalBtnText : ""}
-                                </button>
-                            </div>
+                            <ReusableModalButtons
+                                loading={loading}
+                                mode={isAddModal ? "add" : "edit"}
+                                onCancel={resetForm}
+                                submitText={isAddModal ? "Save" : "Update"}
+                            />
                         </form>
                     </div>
                 </div>
@@ -366,10 +457,12 @@ const AuthUserView = () => {
                         <div className="modal-body">
                             <p>Are you sure you want to delete this "{authUserName}" Auth?</p>
                         </div>
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                            <button type="button" className="btn btn-danger" onClick={() => handleDelete(authUserId)}>Yes</button>
-                        </div>
+                        <ReusableModalButtons
+                            mode="delete"
+                            onCancel={() => { }}
+                            submitText="Yes"
+                            onSubmit={() => handleDelete(authUserId)}
+                        />
                     </div>
                 </div>
             </div>

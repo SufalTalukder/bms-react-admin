@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import reactLogo from "../../assets/react.svg";
+import "../../App.css";
 
 const Navbar = () => {
+
     const navigate = useNavigate();
 
     const [isOffline, setIsOffline] = useState(!navigator.onLine);
@@ -75,7 +77,7 @@ const Navbar = () => {
         <header id="header" className="header fixed-top d-flex align-items-center">
             <div className="d-flex align-items-center justify-content-between">
                 <Link to="/admin/track-your-activity" className="logo d-flex align-items-center">
-                    <img src={reactLogo} alt="Admin Logo" />
+                    <img src={reactLogo} alt="Admin Logo" className="rotate-logo" />
                     <span className="d-none d-lg-block ms-2">Admin Panel</span>
                 </Link>
                 <i className="bi bi-list toggle-sidebar-btn" role="button" aria-label="Toggle sidebar" onClick={toggleSidebar}></i>

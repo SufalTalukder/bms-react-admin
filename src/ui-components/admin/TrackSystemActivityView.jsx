@@ -4,8 +4,13 @@ import { getLoginAuditApi } from "../../api/login-audit-api";
 import { DataTable } from "simple-datatables";
 import "simple-datatables/dist/style.css";
 import "../../App.css";
-import { removeLoaderIfExists, exportSQL, exportHTML, exportPDF, exportCSV, exportTXT } from "../../utils/table-export";
 import { formatDateTime } from "./FunctionHelper";
+import { toast } from "react-toastify";
+import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
+import {
+    TRACK_SYSTEM_ACTIVITY_FAILED_TO_FETCH_LOGS,
+    TRACK_SYSTEM_ACTIVITY_NO_SYSTEM_LOGS_FOUND, TRACK_SYSTEM_ACTIVITY_SYSTEM_LOGS_LOADING, TRACK_SYSTEM_ACTIVITY_SYSTEMS_ACTIVITY, TRACK_SYSTEM_ACTIVITY_TITLE
+} from "../../lang-dump/lang";
 
 const TrackSystemActivityView = () => {
 
@@ -16,7 +21,7 @@ const TrackSystemActivityView = () => {
     const tableRef = useRef(null);
 
     useEffect(() => {
-        document.title = "Track Systems Activity | Admin Panel";
+        document.title = TRACK_SYSTEM_ACTIVITY_TITLE;
         if (hasFetched.current) return;
         hasFetched.current = true;
         fetchLogs();
@@ -28,6 +33,7 @@ const TrackSystemActivityView = () => {
             setLogs(res.data.content || []);
         } catch (e) {
             console.error(e);
+            toast.error(TRACK_SYSTEM_ACTIVITY_FAILED_TO_FETCH_LOGS);
         } finally {
             setLoading(false);
         }
@@ -53,19 +59,15 @@ const TrackSystemActivityView = () => {
             <div className="dashboard-layout">
                 <main id="main" className="main">
                     <div className="pagetitle d-flex justify-content-between align-items-center">
-                        <h1 className="toggle-heading">Track Systems Activity</h1>
+                        <h1 className="toggle-heading">{TRACK_SYSTEM_ACTIVITY_SYSTEMS_ACTIVITY}</h1>
                     </div>
 
                     <div className="card shadow-sm mt-3">
                         <div className="card-body p-0">
-                            <div className="datatable-top d-flex gap-2 pb-4">
-                                <button className="btn btn-sm btn-outline-primary" onClick={() => { removeLoaderIfExists(tableRef); exportCSV(dataTableRef); }}>Export CSV</button>
-                                <button className="btn btn-sm btn-outline-success" onClick={() => exportHTML(tableRef, "xls")}>Export Excel</button>
-                                <button className="btn btn-sm btn-outline-danger" onClick={() => exportPDF(tableRef)}>Export PDF</button>
-                                <button className="btn btn-sm btn-outline-info" onClick={() => exportHTML(tableRef, "doc", "application/msword")}>Export DOC</button>
-                                <button className="btn btn-sm btn-outline-warning" onClick={() => { removeLoaderIfExists(tableRef); exportTXT(dataTableRef); }}>Export TXT</button>
-                                <button className="btn btn-sm btn-outline-dark" onClick={() => exportSQL(tableRef)}>Export SQL</button>
-                            </div>
+                            <ReusableExportTable
+                                tableRef={tableRef}
+                                dataTableRef={dataTableRef}
+                            />
                             <div className="table-responsive system-log-table">
                                 <table
                                     ref={tableRef}
@@ -92,13 +94,13 @@ const TrackSystemActivityView = () => {
                                             <tr>
                                                 <td colSpan="10" className="text-center py-4">
                                                     <div className="spinner-border spinner-border-sm"></div>
-                                                    <strong className="ms-2">System Log(s) Loading...</strong>
+                                                    <strong className="ms-2">{TRACK_SYSTEM_ACTIVITY_SYSTEM_LOGS_LOADING}</strong>
                                                 </td>
                                             </tr>
                                         ) : logs.length === 0 ? (
                                             <tr>
                                                 <td colSpan="10" className="text-center py-4">
-                                                    No system log(s) found.
+                                                    {TRACK_SYSTEM_ACTIVITY_NO_SYSTEM_LOGS_FOUND}
                                                 </td>
                                             </tr>
                                         ) : (

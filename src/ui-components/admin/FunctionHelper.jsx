@@ -20,6 +20,38 @@ export const getAuthUserType = ($userType) => {
     }
 };
 
+// Format DOB as "Dec 25, 2023"
+export const formatDOB = (dateString) => {
+    if (dateString === null || dateString === undefined) {
+        return "Invalid date";
+    }
+
+    dateString = String(dateString).trim();
+
+    if (dateString === "" || dateString.toLowerCase() === "null") {
+        return "Invalid date";
+    }
+
+    let date;
+    if (/^-?\d+$/.test(dateString)) {
+        const timestamp = Number(dateString);
+        if (!isNaN(timestamp)) {
+            date = new Date(timestamp * 1000);
+        }
+    }
+    if (!date || isNaN(date.getTime())) {
+        date = new Date(dateString);
+    }
+    if (isNaN(date.getTime())) {
+        return "Invalid date";
+    }
+    return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+    });
+}
+
 // Format as "Dec 25, 2023 • 03:30 PM"
 export const formatDateTime = (dateTimeString) => {
     if (dateTimeString === null || dateTimeString === undefined) {

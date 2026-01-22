@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -20,6 +21,51 @@ import { AuthProvider } from "./context/AuthContext";
 import PublicRoute from "./PublicRoute";
 
 function App() {
+
+  useEffect(() => {
+    const canvas = document.createElement("canvas");
+    const size = 64;
+    canvas.width = size;
+    canvas.height = size;
+
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.src = "/src/assets/react.svg";
+
+    let angle = 0;
+    let animationId;
+
+    img.onload = () => {
+      const animate = () => {
+        ctx.clearRect(0, 0, size, size);
+
+        ctx.save();
+        ctx.translate(size / 2, size / 2);
+        ctx.rotate(angle);
+        ctx.drawImage(img, -size / 2, -size / 2, size, size);
+        ctx.restore();
+
+        let link = document.querySelector("link[rel='icon']");
+        if (!link) {
+          link = document.createElement("link");
+          link.rel = "icon";
+          document.head.appendChild(link);
+        }
+
+        link.href = canvas.toDataURL("image/png");
+
+        angle += 0.01; // speed control
+        animationId = requestAnimationFrame(animate);
+      };
+
+      animate();
+    };
+
+    return () => {
+      cancelAnimationFrame(animationId);
+    };
+  }, []);
+
   return (
     <BrowserRouter>
       <AuthProvider>
