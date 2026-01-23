@@ -11,6 +11,7 @@ export const EXPORT_TABLE_EXPORT_SQL = `Export SQL`;
 // COMMON MESSAGES
 export const ADD_RECORD = `+ Add Record`;
 export const PROFILE_DETAILS = `Profile Details`;
+export const CONFIRM_DELETION = `Confirm Deletion`;
 
 // LOGIN PAGE
 export const AUTH_LOGIN_TITLE = `Auth Login | ${SITE_TITLE}`;
@@ -52,3 +53,17 @@ export const AUTH_USER_FAILED_TO_DELETE = `Failed to delete auth user.`;
 export const AUTH_USER_MANAGE_AUTH_USERS = `Manage Auth Users`;
 export const AUTH_USER_AUTH_USERS_LOADING = `Auth User(s) Loading...`;
 export const AUTH_USER_NO_AUTH_USERS_FOUND = `No auth user(s) found.`;
+
+// BANNER PAGE
+export const BANNER_TITLE = `Manage Banners | ${SITE_TITLE}`;
+export const BANNER_FAILED_TO_FETCH_BANNERS = `Failed to fetch banners.`;
+export const BANNER_MODAL_SELECT_BANNER_IMAGES = `Please select banner image(s).`;
+export const BANNER_MODAL_SELECT_ACTIVE_STATUS = `Please select active status.`;
+export const BANNER_UPLOADING_SUCCESSFULLY = `Banner(s) uploaded successfully!`;
+export const BANNER_FAILED_TO_UPLOAD = `Failed to upload banner(s).`;
+export const BANNER_UPLOAD = `Upload Banner(s)`;
+export const BANNER_DELETED_SUCCESSFULLY = `Banner deleted successfully!`;
+export const BANNER_FAILED_TO_DELETE = `Failed to delete banner.`;
+export const BANNER_HEADING_MANAGE_BANNERS = `Manage Banners`;
+export const BANNER_LOADING = `Banner(s) Loading...`;
+export const BANNER_NOT_FOUND = `No banner(s) found.`;
