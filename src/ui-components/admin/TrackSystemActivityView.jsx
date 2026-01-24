@@ -8,8 +8,11 @@ import { formatDateTime } from "./FunctionHelper";
 import { toast } from "react-toastify";
 import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
 import {
+    TRACK_SYSTEM_ACTIVITY_AUDIT_DETAILS_NOT_FOUND,
+    TRACK_SYSTEM_ACTIVITY_FAILED_TO_FETCH_LOGIN_AUDIT_DETAILS,
     TRACK_SYSTEM_ACTIVITY_FAILED_TO_FETCH_LOGS,
-    TRACK_SYSTEM_ACTIVITY_NO_SYSTEM_LOGS_FOUND, TRACK_SYSTEM_ACTIVITY_SYSTEM_LOGS_LOADING, TRACK_SYSTEM_ACTIVITY_SYSTEMS_ACTIVITY, TRACK_SYSTEM_ACTIVITY_TITLE
+    TRACK_SYSTEM_ACTIVITY_NO_SYSTEM_LOGS_FOUND, TRACK_SYSTEM_ACTIVITY_SYSTEM_LOGS_LOADING, TRACK_SYSTEM_ACTIVITY_SYSTEMS_ACTIVITY, TRACK_SYSTEM_ACTIVITY_TITLE,
+    TRACK_SYSTEM_ACTIVITY_VIEW_LOGIN_AUDIT_DETAILS
 } from "../../lang-dump/lang";
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 import profileImg from '../../assets/img/profile-img.jpg';
@@ -38,6 +41,7 @@ const TrackSystemActivityView = () => {
     const [referrerUrl, setReferrerUrl] = useState("");
     const [loginTime, setLoginTime] = useState("");
     const [createdAt, setAuthUserCreatedAt] = useState("");
+    
     const dataTableRef = useRef(null);
     const hasFetched = useRef(false);
     const tableRef = useRef(null);
@@ -66,9 +70,14 @@ const TrackSystemActivityView = () => {
             dataTableRef.current = new DataTable("#demo-table", {
                 searchable: true,
                 sortable: true,
-                perPage: 10
-            });
 
+                perPage: 10,
+                perPageSelect: [5, 10, 25, 50, 100],
+
+                columns: [
+                    { select: 0, sort: "asc" }
+                ]
+            });
             document
                 .querySelector("#demo-table")
                 .addEventListener("click", (e) => {
@@ -87,7 +96,7 @@ const TrackSystemActivityView = () => {
             const res = await getLoginAuditDetailsApi(id);
             const authLoginAudit = res.data.content;
             if (authLoginAudit) {
-                setModalTitle("View Login Audit Details");
+                setModalTitle(TRACK_SYSTEM_ACTIVITY_VIEW_LOGIN_AUDIT_DETAILS);
                 setModalBtnText("Ok");
                 setAuthUserImage(authLoginAudit.authUserInfo?.authUserImage || null);
                 setActionBy(authLoginAudit.authUserInfo?.authUserName || "-");
@@ -110,11 +119,11 @@ const TrackSystemActivityView = () => {
                 const modal = new window.bootstrap.Modal(document.getElementById("viewModal"));
                 modal.show();
             } else {
-                toast.error("Login audit detail(s) not found.");
+                toast.error(TRACK_SYSTEM_ACTIVITY_AUDIT_DETAILS_NOT_FOUND);
             }
         } catch (error) {
             console.error(error);
-            toast.error("Failed to fetch login audit detail(s).");
+            toast.error(TRACK_SYSTEM_ACTIVITY_FAILED_TO_FETCH_LOGIN_AUDIT_DETAILS);
         } finally {
             setLoading(false);
         }
@@ -181,7 +190,9 @@ const TrackSystemActivityView = () => {
                                                     <td>{row.browser}</td>
                                                     <td>{row.operatingSystem}</td>
                                                     <td>{row.deviceType}</td>
-                                                    <td>{row.possibleIncognito ? <span className="badge bg-success rounded">Yes</span> : <span className="badge bg-danger rounded">No</span>}</td>
+                                                    <td>
+                                                        {row.possibleIncognito ? <span className="badge bg-success rounded">Yes</span> : <span className="badge bg-danger rounded">No</span>}
+                                                    </td>
                                                     <td>{formatDateTime(row.loginTime)}</td>
                                                     <td>{row.authUserInfo?.authUserName}</td>
                                                     <td>{formatDateTime(row.createdAt)}</td>

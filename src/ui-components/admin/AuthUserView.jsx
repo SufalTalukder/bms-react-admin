@@ -32,6 +32,7 @@ const AuthUserView = () => {
     const [authUserCreatedAt, setAuthUserCreatedAt] = useState("");
     const [authUsersList, setAuthUsersList] = useState([]);
     const [loading, setLoading] = useState(true);
+    
     const dataTableRef = useRef(null);
     const hasFetched = useRef(false);
     const tableRef = useRef(null);
@@ -62,7 +63,13 @@ const AuthUserView = () => {
             dataTableRef.current = new DataTable("#demo-table", {
                 searchable: true,
                 sortable: true,
-                perPage: 10
+
+                perPage: 10,
+                perPageSelect: [5, 10, 25, 50, 100],
+
+                columns: [
+                    { select: 0, sort: "asc" }
+                ]
             });
         }
     }, [authUsersList.length]);

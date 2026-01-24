@@ -21,6 +21,7 @@ const BannerView = () => {
     const [bannerActiveStatus, setBannerActiveStatus] = useState("YES");
     const [allBanners, setAllBanners] = useState([]);
     const [loading, setLoading] = useState(true);
+    
     const dataTableRef = useRef(null);
     const hasFetched = useRef(false);
     const tableRef = useRef(null);
@@ -51,7 +52,13 @@ const BannerView = () => {
             dataTableRef.current = new DataTable("#demo-table", {
                 searchable: true,
                 sortable: true,
-                perPage: 10
+
+                perPage: 10,
+                perPageSelect: [5, 10, 25, 50, 100],
+
+                columns: [
+                    { select: 0, sort: "asc" }
+                ]
             });
         }
     }, [allBanners.length]);

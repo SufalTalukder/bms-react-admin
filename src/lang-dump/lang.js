@@ -22,7 +22,7 @@ export const AUTH_LOGIN_PASSWORD = `Password`;
 export const AUTH_LOGIN_REMEMBER_ME = `Remember me`;
 export const AUTH_LOGIN_VALIDATION_EMAIL_AND_PASSWORD_REQUIRED = `Email & Password are required.`;
 export const AUTH_LOGIN_VALIDATION_ENTER_VALID_EMAIL = `Please enter a valid email address.`;
-export const AUTH_LOGIN_SUCCESS_MESSAGE = `Login successful`;
+export const AUTH_LOGIN_SUCCESS_MESSAGE = `Login successful!`;
 export const AUTH_LOGIN_FAILED_MESSAGE = `Login failed`;
 
 // TRACK SYSTEMS ACTIVITY PAGE
@@ -31,6 +31,9 @@ export const TRACK_SYSTEM_ACTIVITY_FAILED_TO_FETCH_LOGS = `Failed to fetch syste
 export const TRACK_SYSTEM_ACTIVITY_SYSTEMS_ACTIVITY = `Track Systems Activity`;
 export const TRACK_SYSTEM_ACTIVITY_SYSTEM_LOGS_LOADING = `System Log(s) Loading...`;
 export const TRACK_SYSTEM_ACTIVITY_NO_SYSTEM_LOGS_FOUND = ` No system log(s) found.`;
+export const TRACK_SYSTEM_ACTIVITY_VIEW_LOGIN_AUDIT_DETAILS = `View Login Audit Details`;
+export const TRACK_SYSTEM_ACTIVITY_AUDIT_DETAILS_NOT_FOUND = `Login audit detail(s) not found.`;
+export const TRACK_SYSTEM_ACTIVITY_FAILED_TO_FETCH_LOGIN_AUDIT_DETAILS = `Failed to fetch login audit detail(s).`;
 
 // AUTH USERS PAGE
 export const AUTH_USER_TITLE = `Manage Auth Users | ${SITE_TITLE}`;
