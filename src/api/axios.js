@@ -7,7 +7,8 @@ export const BASE_URLS = {
     AUTH: import.meta.env.VITE_8082_API_BASE,
     USER: import.meta.env.VITE_8081_API_BASE,
     BANNER: import.meta.env.VITE_8083_API_BASE,
-    LANGUAGE: import.meta.env.VITE_8088_API_BASE
+    LANGUAGE: import.meta.env.VITE_8088_API_BASE,
+    CATEGORY: import.meta.env.VITE_8084_API_BASE
 };
 
 /**

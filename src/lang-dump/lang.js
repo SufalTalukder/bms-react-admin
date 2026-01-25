@@ -22,7 +22,7 @@ export const AUTH_LOGIN_PASSWORD = `Password`;
 export const AUTH_LOGIN_REMEMBER_ME = `Remember me`;
 export const AUTH_LOGIN_VALIDATION_EMAIL_AND_PASSWORD_REQUIRED = `Email & Password are required.`;
 export const AUTH_LOGIN_VALIDATION_ENTER_VALID_EMAIL = `Please enter a valid email address.`;
-export const AUTH_LOGIN_SUCCESS_MESSAGE = `Login successful!`;
+export const AUTH_LOGIN_SUCCESS_MESSAGE = `Login successfully!`;
 export const AUTH_LOGIN_FAILED_MESSAGE = `Login failed`;
 
 // TRACK SYSTEMS ACTIVITY PAGE

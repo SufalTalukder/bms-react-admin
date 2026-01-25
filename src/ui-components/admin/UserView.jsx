@@ -303,7 +303,7 @@ const UserView = () => {
                                                     <td>
                                                         <span className="badge bg-primary rounded">{row.userReferralCode}</span>
                                                     </td>
-                                                    <td>{row.authUserInfo?.authUserName ?? '--'}</td>
+                                                    <td>{row.authUserInfo?.authUserName ?? '-'}</td>
                                                     <td>{formatDateTime(row.userCreatedAt)}</td>
                                                     <td>{getActiveStatus(row.userActive)}</td>
                                                     <td>

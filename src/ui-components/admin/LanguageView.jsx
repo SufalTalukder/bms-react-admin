@@ -66,16 +66,13 @@ const LanguageView = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
 
         if (!languageName) {
             toast.error("Language name is required.");
-            setLoading(false);
             return;
         }
         if (!languageActive) {
             toast.error("Please select active status.");
-            setLoading(false);
             return;
         }
 
@@ -85,10 +82,18 @@ const LanguageView = () => {
 
         try {
             if (isAddModal) {
-                await addLanguageApi(formData);
+                const addRes = await addLanguageApi(formData);
+                if (addRes.data.status === 'exist') {
+                    toast.warn("Language already exists!");
+                    return;
+                }
                 toast.success("Language added successfully!");
             } else {
-                await updateLanguageApi(languageId, formData);
+                const updateRes = await updateLanguageApi(languageId, formData);
+                if (updateRes.data.status === 'exist') {
+                    toast.warn("Language already exists!");
+                    return;
+                }
                 toast.success("Language updated successfully!");
             }
             resetForm();
@@ -97,8 +102,6 @@ const LanguageView = () => {
         } catch (error) {
             console.error(error);
             toast.error("Failed to save language.");
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -112,20 +115,23 @@ const LanguageView = () => {
     };
 
     // EDIT USER
-    const handleEdit = (language) => {
+    const handleEdit = (id) => {
+        const language = languagesList.find(l => l.languageId == id);
+        if (!language) return;
+
         setIsAddModal(false);
         setModalTitle("Update Language");
         setLanguageId(language.languageId);
         setLanguageName(language.languageName);
         setLanguageActive(language.languageActive);
-        const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
-        modal.show();
+
+        new window.bootstrap.Modal(
+            document.getElementById("addUpdateModal")
+        ).show();
     };
 
     // DELETE USER
     const handleDelete = async (id) => {
-        console.log(id);
-        
         try {
             await deleteLanguageApi(id);
             toast.success("Language deleted successfully!");
@@ -233,14 +239,19 @@ const LanguageView = () => {
                                                         <td>{formatDateTime(row.languageCreatedAt)}</td>
                                                         <td>{getActiveStatus(row.languageActive)}</td>
                                                         <td>
-                                                            <button className="btn btn-sm btn-info rounded-pill me-1"
-                                                                onClick={() => handleEdit(row)}>
+                                                            <button
+                                                                className="btn btn-sm btn-info rounded-pill me-1"
+                                                                data-id={row.languageId}
+                                                                onClick={(e) => handleEdit(e.currentTarget.dataset.id)}
+                                                            >
                                                                 ✏️
                                                             </button>
                                                             <button className="btn btn-sm btn-danger rounded-pill"
-                                                                onClick={() => {
-                                                                    setLanguageId(row.languageId);
-                                                                    setLanguageName(row.languageName);
+                                                                data-id={row.languageId}
+                                                                data-name={row.languageName}
+                                                                onClick={(e) => {
+                                                                    setLanguageId(e.currentTarget.dataset.id);
+                                                                    setLanguageName(e.currentTarget.dataset.name);
                                                                     const modal = new window.bootstrap.Modal(document.getElementById("deleteModal"));
                                                                     modal.show();
                                                                 }}>
