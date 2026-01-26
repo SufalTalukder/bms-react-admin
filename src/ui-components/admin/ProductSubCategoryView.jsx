@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DashboardLayout from "../../DashboardLayout";
 import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
 import { DataTable } from "simple-datatables";
@@ -345,7 +345,7 @@ export default function ProductSubCategoryView() {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <p>Are you sure you want to delete this "{subCategoryName}" SubCategory?</p>
+                            <p>Are you sure you want to delete this `{subCategoryName}` SubCategory?</p>
                         </div>
                         <ReusableModalButtons
                             loading={loading}
@@ -359,4 +359,4 @@ export default function ProductSubCategoryView() {
             </div>
         </DashboardLayout>
     );
-};
+}

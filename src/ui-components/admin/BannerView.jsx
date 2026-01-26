@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DashboardLayout from "../../DashboardLayout";
 import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
 import { deleteMultipleBannersApi, getBannersListApi, uploadMultipleBannersApi } from "../../api/banners-api";
@@ -278,7 +278,7 @@ export default function BannerView() {
                         </div>
                         <div className="modal-body">
                             <p>
-                                Are you sure you want to delete this "{appBannerName}" banner?
+                                Are you sure you want to delete this `{appBannerName}` Banner?
                             </p>
                         </div>
                         <ReusableModalButtons
@@ -293,4 +293,4 @@ export default function BannerView() {
             </div>
         </DashboardLayout>
     );
-};
+}

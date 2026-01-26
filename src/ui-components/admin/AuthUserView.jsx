@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import DashboardLayout from "../../DashboardLayout";
 import { DataTable } from "simple-datatables";
 import "simple-datatables/dist/style.css";
@@ -9,8 +9,7 @@ import profileImg from '../../assets/img/profile-img.jpg';
 import { formatDateTime, getActiveStatus, getAuthUserType } from "./FunctionHelper";
 import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
 import {
-    ADD_RECORD, AUTH_USER_ADD_AUTH_USER, AUTH_USER_ADDED_SUCCESSFULLY, AUTH_USER_AUTH_USERS_LOADING, AUTH_USER_DELETED_SUCCESSFULLY, AUTH_USER_EDIT_AUTH_USER, AUTH_USER_FAILED_TO_DELETE, AUTH_USER_FAILED_TO_FETCH_USERS, AUTH_USER_FAILED_TO_SAVE, AUTH_USER_FILL_ALL_REQUIRED_FIELDS, AUTH_USER_INVALID_EMAIL_ADDRESS, AUTH_USER_INVALID_PASSWORD, AUTH_USER_INVALID_PHONE_NUMBER, AUTH_USER_MANAGE_AUTH_USERS, AUTH_USER_NO_AUTH_USERS_FOUND, AUTH_USER_SAVING, AUTH_USER_TITLE, AUTH_USER_UPDATED_SUCCESSFULLY, AUTH_USER_UPDATING,
-    PROFILE_DETAILS
+    ADD_RECORD, AUTH_USER_ADD_AUTH_USER, AUTH_USER_ADDED_SUCCESSFULLY, AUTH_USER_AUTH_USERS_LOADING, AUTH_USER_DELETED_SUCCESSFULLY, AUTH_USER_EDIT_AUTH_USER, AUTH_USER_FAILED_TO_DELETE, AUTH_USER_FAILED_TO_FETCH_USERS, AUTH_USER_FAILED_TO_SAVE, AUTH_USER_FILL_ALL_REQUIRED_FIELDS, AUTH_USER_INVALID_EMAIL_ADDRESS, AUTH_USER_INVALID_PASSWORD, AUTH_USER_INVALID_PHONE_NUMBER, AUTH_USER_MANAGE_AUTH_USERS, AUTH_USER_NO_AUTH_USERS_FOUND, AUTH_USER_SAVING, AUTH_USER_TITLE, AUTH_USER_UPDATED_SUCCESSFULLY, AUTH_USER_UPDATING
 } from "../../lang-dump/lang";
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 
@@ -462,7 +461,7 @@ export default function AuthUserView() {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <p>Are you sure you want to delete this "{authUserName}" Auth?</p>
+                            <p>Are you sure you want to delete this `{authUserName}` Auth?</p>
                         </div>
                         <ReusableModalButtons
                             mode="delete"
@@ -475,4 +474,4 @@ export default function AuthUserView() {
             </div>
         </DashboardLayout>
     );
-};
+}
