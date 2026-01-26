@@ -3,7 +3,7 @@ import Navbar from "./ui-components/page-layout/Navbar";
 import Sidebar from "./ui-components/page-layout/Sidebar";
 import Footer from "./ui-components/page-layout/Footer";
 
-const DashboardLayout = ({ children }) => {
+export default function DashboardLayout({ children }) {
     return (
         <>
             <Navbar />
@@ -13,5 +13,3 @@ const DashboardLayout = ({ children }) => {
         </>
     );
 };
-
-export default DashboardLayout;

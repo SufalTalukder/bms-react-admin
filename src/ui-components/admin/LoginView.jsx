@@ -9,7 +9,7 @@ import {
     AUTH_LOGIN_EMAIL, AUTH_LOGIN_ENTER_EMAIL_AND_PASSWORD, AUTH_LOGIN_FAILED_MESSAGE, AUTH_LOGIN_PASSWORD, AUTH_LOGIN_REMEMBER_ME, AUTH_LOGIN_SUCCESS_MESSAGE, AUTH_LOGIN_TITLE, AUTH_LOGIN_TO_YOUR_ACCOUNT, AUTH_LOGIN_VALIDATION_EMAIL_AND_PASSWORD_REQUIRED, AUTH_LOGIN_VALIDATION_ENTER_VALID_EMAIL
 } from "../../lang-dump/lang";
 
-const LoginView = () => {
+export default function LoginView() {
 
     const { login } = useAuth();
     const navigate = useNavigate();
@@ -105,5 +105,3 @@ const LoginView = () => {
         </section>
     );
 };
-
-export default LoginView;

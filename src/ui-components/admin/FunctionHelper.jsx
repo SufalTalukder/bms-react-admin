@@ -1,4 +1,4 @@
-export const getActiveStatus = (isActive) => {
+export function getActiveStatus(isActive) {
     switch (isActive) {
         case "YES":
             return <span className="badge bg-success rounded">Yes</span>;
@@ -9,7 +9,7 @@ export const getActiveStatus = (isActive) => {
     }
 };
 
-export const getAuthUserType = ($userType) => {
+export function getAuthUserType($userType) {
     switch ($userType) {
         case "SUPER_ADMIN":
             return <span className="badge bg-primary rounded">Super Admin</span>;
@@ -21,7 +21,8 @@ export const getAuthUserType = ($userType) => {
 };
 
 // Format DOB as "Dec 25, 2023"
-export const formatDOB = (dateString) => {
+export function formatDOB(dateString) {
+
     if (dateString === null || dateString === undefined) {
         return "Invalid date";
     }
@@ -53,7 +54,8 @@ export const formatDOB = (dateString) => {
 }
 
 // Format as "Dec 25, 2023 • 03:30 PM"
-export const formatDateTime = (dateTimeString) => {
+export function formatDateTime(dateTimeString) {
+
     if (dateTimeString === null || dateTimeString === undefined) {
         return "Invalid date";
     }

@@ -7,7 +7,7 @@ import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 import { formatDateTime, getActiveStatus } from "./FunctionHelper";
 import { toast } from "react-toastify";
 
-const LanguageView = () => {
+export default function LanguageView() {
 
     // STATE VARIABLES
     const [isAddModal, setIsAddModal] = useState(true);
@@ -332,5 +332,3 @@ const LanguageView = () => {
         </DashboardLayout>
     );
 };
-
-export default LanguageView;

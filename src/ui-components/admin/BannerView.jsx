@@ -10,7 +10,7 @@ import {
     BANNER_DELETED_SUCCESSFULLY, BANNER_FAILED_TO_DELETE, BANNER_FAILED_TO_FETCH_BANNERS, BANNER_FAILED_TO_UPLOAD, BANNER_HEADING_MANAGE_BANNERS, BANNER_LOADING, BANNER_MODAL_SELECT_ACTIVE_STATUS, BANNER_MODAL_SELECT_BANNER_IMAGES, BANNER_NOT_FOUND, BANNER_TITLE, BANNER_UPLOAD, BANNER_UPLOADING_SUCCESSFULLY, CONFIRM_DELETION
 } from "../../lang-dump/lang";
 
-const BannerView = () => {
+export default function BannerView() {
 
     // STATE VARIABLES
     const [isAddModal, setIsAddModal] = useState(true);
@@ -21,7 +21,7 @@ const BannerView = () => {
     const [bannerActiveStatus, setBannerActiveStatus] = useState("YES");
     const [allBanners, setAllBanners] = useState([]);
     const [loading, setLoading] = useState(true);
-    
+
     const dataTableRef = useRef(null);
     const hasFetched = useRef(false);
     const tableRef = useRef(null);
@@ -294,5 +294,3 @@ const BannerView = () => {
         </DashboardLayout>
     );
 };
-
-export default BannerView;

@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import notFoundImg from "../../assets/img/not-found.svg";
 
-const Page404View = () => {
+export default function Page404View() {
 
-    React.useEffect(() => {
+    useEffect(() => {
         document.title = "404 Not Found | Admin Panel";
     }, []);
 
@@ -19,5 +19,3 @@ const Page404View = () => {
         </div>
     );
 };
-
-export default Page404View;

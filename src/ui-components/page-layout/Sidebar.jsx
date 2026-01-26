@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 
-const Sidebar = () => {
+export default function Sidebar() {
     const location = useLocation();
 
     const productRoutes = [
@@ -117,5 +117,3 @@ const Sidebar = () => {
         </aside>
     );
 };
-
-export default Sidebar;

@@ -1,6 +1,6 @@
 import React from "react";
 
-const ReusableModalButtons = ({ loading = false, mode = "add", onCancel, onSubmit, submitText }) => {
+export default function ReusableModalButtons({ loading = false, mode = "add", onCancel, onSubmit, submitText }) {
 
     const modalBtnText =
         submitText ?? (mode === "add" ? "Save" : mode === "edit" ? "Update" : mode === "delete" ? "Yes" : "OK");
@@ -40,5 +40,3 @@ const ReusableModalButtons = ({ loading = false, mode = "add", onCancel, onSubmi
         </div>
     );
 };
-
-export default ReusableModalButtons;

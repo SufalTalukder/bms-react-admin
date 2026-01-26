@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import reactLogo from "../../assets/react.svg";
 import "../../App.css";
 
-const Navbar = () => {
+export default function Navbar() {
 
     const navigate = useNavigate();
 
@@ -120,5 +120,3 @@ const Navbar = () => {
         </header>
     );
 };
-
-export default Navbar;

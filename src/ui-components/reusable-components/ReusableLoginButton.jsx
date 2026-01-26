@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ReusableLoginButton = ({ loading, buttonType, buttonText }) => {
+export default function ReusableLoginButton({ loading, buttonType, buttonText }) {
     return (
         <button
             className="btn btn-primary w-100"
@@ -21,5 +21,3 @@ const ReusableLoginButton = ({ loading, buttonType, buttonText }) => {
         </button>
     );
 };
-
-export default ReusableLoginButton;

@@ -4,7 +4,9 @@ const userApi = handleApi(BASE_URLS.USER);
 
 // ADD
 export const addUserApi = (data) =>
-    userApi.post("/create-user", data);
+    userApi.post("/create-user", data, {
+        headers: { "Content-Type": "multipart/form-data" }
+    });
 
 // GET ALL
 export const getUsersListApi = () =>
@@ -19,6 +21,7 @@ export const getUserDetailsApi = (userId) =>
 // UPDATE
 export const updateUserApi = (userId, data) =>
     userApi.patch("/update-user-details", data, {
+        headers: { "Content-Type": "multipart/form-data" },
         params: { userId },
     });
 

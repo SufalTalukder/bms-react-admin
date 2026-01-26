@@ -14,7 +14,7 @@ import {
 } from "../../lang-dump/lang";
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 
-const AuthUserView = () => {
+export default function AuthUserView() {
 
     // STATE VARIABLES
     const [isAddModal, setIsAddModal] = useState(true);
@@ -32,7 +32,7 @@ const AuthUserView = () => {
     const [authUserCreatedAt, setAuthUserCreatedAt] = useState("");
     const [authUsersList, setAuthUsersList] = useState([]);
     const [loading, setLoading] = useState(true);
-    
+
     const dataTableRef = useRef(null);
     const hasFetched = useRef(false);
     const tableRef = useRef(null);
@@ -476,6 +476,3 @@ const AuthUserView = () => {
         </DashboardLayout>
     );
 };
-
-export default AuthUserView;
-

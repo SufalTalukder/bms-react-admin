@@ -20,7 +20,7 @@ import NewsletterView from "./ui-components/admin/NewsletterView";
 import { AuthProvider } from "./context/AuthContext";
 import PublicRoute from "./PublicRoute";
 
-function App() {
+export default function App() {
 
   useEffect(() => {
     const canvas = document.createElement("canvas");
@@ -108,5 +108,3 @@ function App() {
     </BrowserRouter>
   );
 }
-
-export default App;

@@ -8,7 +8,7 @@ import { formatDateTime, getActiveStatus } from "./FunctionHelper";
 import { toast } from "react-toastify";
 import profileImg from '../../assets/img/profile-img.jpg';
 
-const ProductCategoryView = () => {
+export default function ProductCategoryView() {
 
     // STATE VARIABLES
     const [isAddModal, setIsAddModal] = useState(true);
@@ -157,6 +157,7 @@ const ProductCategoryView = () => {
             toast.error("Failed to delete category.");
         }
     };
+    
     return (
         <DashboardLayout>
             <div className="dashboard-layout">
@@ -359,5 +360,3 @@ const ProductCategoryView = () => {
         </DashboardLayout>
     );
 };
-
-export default ProductCategoryView;

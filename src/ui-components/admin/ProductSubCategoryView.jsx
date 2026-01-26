@@ -1,103 +1,336 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DashboardLayout from "../../DashboardLayout";
+import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
+import { DataTable } from "simple-datatables";
+import { addSubCategoryApi, deleteSubCategoryApi, getSubCategoriesListApi, updateSubCategoryApi } from "../../api/sub-categories-api";
+import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
+import { formatDateTime, getActiveStatus } from "./FunctionHelper";
+import { toast } from "react-toastify";
+import profileImg from '../../assets/img/profile-img.jpg';
 
-const ProductSubCategoryView = () => {
+export default function ProductSubCategoryView() {
+
+    // STATE VARIABLES
+    const [isAddModal, setIsAddModal] = useState(true);
+    const [modalTitle, setModalTitle] = useState("Add SubCategory");
+    const [subCategoryId, setSubCategoryId] = useState(null);
+    const [subCategoryName, setSubCategoryName] = useState("");
+    const [subCategoryActive, setSubCategoryActive] = useState("YES");
+    const [subCategoryImage, setSubCategoryImage] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [subCategoriesList, setSubCategoriesList] = useState([]);
+
+    const dataTableRef = useRef(null);
+    const hasFetched = useRef(false);
+    const tableRef = useRef(null);
 
     useEffect(() => {
-        document.title = "Manage Subcategories | Admin Panel";
+        document.title = "Manage SubCategories | Admin Panel";
+        if (hasFetched.current) return;
+        hasFetched.current = true;
+        fetchAllSubCategories();
     }, []);
+
+    // FETCH ALL SUB CATEGORIES
+    const fetchAllSubCategories = async () => {
+        try {
+            setLoading(true);
+            const res = await getSubCategoriesListApi();
+            setSubCategoriesList(res.data.content || []);
+        } catch (e) {
+            console.error(e);
+            toast.error("Failed to fetch subcategories.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (dataTableRef.current) {
+            dataTableRef.current.destroy();
+            dataTableRef.current = null;
+        }
+
+        if (!dataTableRef.current && subCategoriesList.length > 0) {
+            dataTableRef.current = new DataTable("#demo-table", {
+                searchable: true,
+                sortable: true,
+
+                perPage: 10,
+                perPageSelect: [5, 10, 25, 50, 100],
+
+                columns: [
+                    { select: 0, sort: "asc" }
+                ]
+            });
+        }
+    }, [subCategoriesList]);
+
+    // HANDLE SUBMIT FOR ADD/UPDATE
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        if (!subCategoryName.trim()) {
+            toast.error("SubCategory name is required.");
+            setLoading(false);
+            return;
+        }
+        if (!subCategoryActive.trim()) {
+            toast.error("Please select active status.");
+            setLoading(false);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("subCategoryName", subCategoryName);
+        formData.append("subCategoryActive", subCategoryActive);
+        if (subCategoryImage) formData.append("subCategoryImage", subCategoryImage);
+
+        try {
+            if (isAddModal) {
+                const addRes = await addSubCategoryApi(formData);
+                if (addRes.data.status === 'exist') {
+                    toast.warn("SubCategory already exists!");
+                    return;
+                }
+                toast.success("SubCategory added successfully!");
+            } else {
+                const updateRes = await updateSubCategoryApi(subCategoryId, formData);
+                if (updateRes.data.status === 'exist') {
+                    toast.warn("SubCategory already exists!");
+                    return;
+                }
+                toast.success("SubCategory updated successfully!");
+            }
+            setTimeout(() => {
+                resetForm();
+                fetchAllSubCategories();
+                window.bootstrap.Modal.getInstance(document.getElementById("addUpdateModal")).hide();
+            }, 1000);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to save subcategory.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // RESET FORM
+    const resetForm = () => {
+        setSubCategoryId(null);
+        setSubCategoryName("");
+        setSubCategoryActive("YES");
+        setSubCategoryImage(null);
+        setIsAddModal(true);
+        setModalTitle("Add SubCategory");
+    };
+
+    // EDIT SUB CATEGORY
+    const handleEdit = (id) => {
+        const category = subCategoriesList.find(l => l.subCategoryId == id);
+        if (!category) return;
+
+        setIsAddModal(false);
+        setModalTitle("Update SubCategory");
+        setSubCategoryId(category.subCategoryId);
+        setSubCategoryName(category.subCategoryName);
+        setSubCategoryActive(category.subCategoryActive);
+        setSubCategoryImage(category.subCategoryImage);
+        const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
+        modal.show();
+    };
+
+    // DELETE SUB CATEGORY
+    const handleDelete = async (id) => {
+        try {
+            await deleteSubCategoryApi(id);
+            toast.success("SubCategory deleted successfully!");
+
+            setTimeout(() => {
+                window.bootstrap.Modal
+                    .getInstance(document.getElementById("deleteModal"))
+                    ?.hide();
+                fetchAllSubCategories();
+            }, 1000);
+        } catch (error) {
+            toast.error("Failed to delete subcategory.");
+        }
+    };
 
     return (
         <DashboardLayout>
             <div className="dashboard-layout">
                 <main id="main" className="main">
                     <div className="pagetitle d-flex justify-content-between align-items-center">
-                        <h1 className="mb-0">Manage Subcategories</h1>
-                        <button type="button" className="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addUpdateModal">
+                        <h1 className="toggle-heading">Manage Categories</h1>
+                        <button
+                            className="btn btn-secondary"
+                            onClick={() => {
+                                resetForm();
+                                const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
+                                modal.show();
+                            }}>
                             + Add Record
                         </button>
                     </div>
-                    <section className="section">
-                        <div className="row">
-                            <div className="col-lg-12 px-0">
-                                <div className="card">
-                                    <div className="card-body">
-                                        <div className="datatable-top d-flex gap-2 pt-3">
-                                            <button className="btn btn-sm btn-outline-primary" id="export-csv">Export CSV</button>
-                                            <button className="btn btn-sm btn-outline-success" id="export-excel">ExportExcel</button>
-                                            <button className="btn btn-sm btn-outline-danger" id="export-pdf">Export PDF</button>
-                                            <button className="btn btn-sm btn-outline-info" id="export-doc">Export DOC</button>
-                                            <button className="btn btn-sm btn-outline-warning" id="export-txt">Export TXT</button>
-                                            <button className="btn btn-sm btn-outline-dark" id="export-sql">Export SQL</button>
-                                        </div>
-                                        <table className="table table-hover table-sm mt-2" id="demo-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Sr. No.</th>
-                                                    <th>Name</th>
-                                                    <th>Action By</th>
-                                                    <th>Created At</th>
-                                                    <th>Updated At</th>
-                                                    <th>Active</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="tcategory">
-                                                <tr id="loader-row">
-                                                    <td colSpan="7" className="text-center py-4">
-                                                        <div className="spinner-border spinner-border-sm"></div>
-                                                        <strong>&nbsp; Subcategorie(s) Loading...</strong>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+
+                    {loading && (
+                        <div className="card shadow-sm mt-3">
+                            <div className="card-body p-0">
+                                <ReusableExportTable
+                                    tableRef={tableRef}
+                                    dataTableRef={dataTableRef}
+                                />
+                                <div className="table-responsive system-log-table">
+                                    <table
+                                        ref={tableRef}
+                                        className="table table-hover table-sm mb-0"
+                                        id="demo-table"
+                                    >
+                                        <thead className="table-light">
+                                            <tr>
+                                                <th>Sr. No.</th>
+                                                <th>Image</th>
+                                                <th>SubCategory Name</th>
+                                                <th>Action By</th>
+                                                <th>Created At</th>
+                                                <th>Active</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr>
+                                                <td colSpan="7" className="text-center py-4">
+                                                    <div className="spinner-border spinner-border-sm"></div>
+                                                    <strong className="ms-2">Loading subcategorie(s)...</strong>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
-                    </section>
+                    )}
+
+                    {!loading && (
+                        <div className="card shadow-sm mt-3">
+                            <div className="card-body p-0">
+                                <ReusableExportTable
+                                    tableRef={tableRef}
+                                    dataTableRef={dataTableRef}
+                                />
+                                <div className="table-responsive system-log-table">
+                                    <table
+                                        ref={tableRef}
+                                        className="table table-hover table-sm mb-0"
+                                        id="demo-table"
+                                    >
+                                        <thead className="table-light">
+                                            <tr>
+                                                <th>Sr. No.</th>
+                                                <th>Image</th>
+                                                <th>SubCategory Name</th>
+                                                <th>Action By</th>
+                                                <th>Created At</th>
+                                                <th>Active</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            {subCategoriesList.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan="7" className="text-center py-4">
+                                                        No subcategorie(s) found.
+                                                    </td>
+                                                </tr>
+                                            ) : (
+                                                subCategoriesList.map((row, index) => (
+                                                    <tr key={`${row.subCategoryId}-${row.subCategoryCreatedAt}`}>
+                                                        <td>{index + 1}</td>
+                                                        <td>
+                                                            <img src={row.subCategoryImage ? `${import.meta.env.VITE_8085_API_BASE}/uploads/${row.subCategoryImage}` : profileImg} style={{ maxHeight: "70px", maxWidth: "80px" }} alt="subCategoryImage" />
+                                                        </td>
+                                                        <td>{row.subCategoryName}</td>
+                                                        <td>{row.authUserInfo?.authUserName ?? '-'}</td>
+                                                        <td>{formatDateTime(row.subCategoryCreatedAt)}</td>
+                                                        <td>{getActiveStatus(row.subCategoryActive)}</td>
+                                                        <td>
+                                                            <button className="btn btn-sm btn-info rounded-pill me-1"
+                                                                data-id={row.subCategoryId}
+                                                                onClick={(e) => handleEdit(e.currentTarget.dataset.id)}>
+                                                                ✏️
+                                                            </button>
+                                                            <button className="btn btn-sm btn-danger rounded-pill"
+                                                                data-id={row.subCategoryId}
+                                                                data-name={row.subCategoryName}
+                                                                data-image={row.subCategoryImage}
+                                                                onClick={(e) => {
+                                                                    setSubCategoryId(e.currentTarget.dataset.id);
+                                                                    setSubCategoryName(e.currentTarget.dataset.name);
+                                                                    setSubCategoryImage(e.currentTarget.dataset.image);
+                                                                    const modal = new window.bootstrap.Modal(document.getElementById("deleteModal"));
+                                                                    modal.show();
+                                                                }}>
+                                                                🗑
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </main>
             </div>
 
             {/* ADD MODAL */}
             {/* OR, UPDATE MODAL */}
             <div className="modal fade" id="addUpdateModal" tabIndex={-1} aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-                <div className="modal-dialog modal-dialog-scrollable" style={{ maxHeight: "65vh" }}>
+                <div className="modal-dialog modal-xl modal-dialog-scrollable" style={{ maxHeight: "65vh" }}>
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" id="addModalTitle">Add Subcategory</h5>
+                            <h5 className="modal-title">{modalTitle}</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" />
                         </div>
-                        <div className="modal-body">
-                            <div className="card">
-                                <div className="card-body">
-                                    <div className="row mb-3 pt-2">
-                                        <label className="col-sm-12 col-form-label">Name *</label>
-                                        <div className="col-sm-12">
-                                            <input type="text" className="form-control" name="addSubCategoryName" maxLength="100" autoComplete="new-name" required />
-                                        </div>
+                        <form className="row g-3 needs-validation" onSubmit={handleSubmit} noValidate>
+                            <div className="modal-body">
+                                <div className="row g-3 p-3">
+                                    <div className="col-md-4" style={{ textAlign: "left" }}>
+                                        <label className="form-label">Sub Category Name *</label>
+                                        <input type="text" className="form-control" maxLength="100" value={subCategoryName} onChange={(e) => setSubCategoryName(e.target.value)} autoComplete="new-name" required />
                                     </div>
-                                    <div className="row mb-3">
-                                        <label className="col-sm-12 col-form-label">Active *</label>
-                                        <div className="col-sm-12">
-                                            <select className="form-select" name="addSubCategoryActive" required>
-                                                <option value="">-- Select --</option>
-                                                <option value="YES">Yes</option>
-                                                <option value="NO">No</option>
-                                            </select>
-                                        </div>
+                                    <div className="col-md-4" style={{ textAlign: "left" }}>
+                                        <label className="form-label">Active *</label>
+                                        <select className="form-select" value={subCategoryActive} onChange={(e) => setSubCategoryActive(e.target.value)} required>
+                                            <option value="">-- Select --</option>
+                                            <option value="YES">Yes</option>
+                                            <option value="NO">No</option>
+                                        </select>
                                     </div>
-                                </div>
-                                <div className="modal-footer">
-                                    <button type="button" className="btn btn-primary" style={{ display: "none" }} >
-                                        <span className="spinner-border spinner-border-sm me-2"></span>
-                                    </button>
-                                    <button type="button" className="btn btn-primary">
-                                        Save
-                                    </button>
+                                    <div className="col-md-4" style={{ textAlign: "left" }}>
+                                        <label className="form-label">Upload Image</label>
+                                        <input
+                                            type="file"
+                                            className="form-control"
+                                            onChange={(e) => setSubCategoryImage(e.target.files[0])}
+                                            accept=".jpg,.jpeg,.png"
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                            <ReusableModalButtons
+                                loading={loading}
+                                mode={isAddModal ? "add" : "edit"}
+                                onCancel={resetForm}
+                                submitText={isAddModal ? "Save" : "Update"}
+                            />
+                        </form>
                     </div>
                 </div>
             </div>
@@ -112,18 +345,18 @@ const ProductSubCategoryView = () => {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <p>Are you sure you want to delete this Subcategory?</p>
-                            <input type="hidden" name="" value="" />
+                            <p>Are you sure you want to delete this "{subCategoryName}" SubCategory?</p>
                         </div>
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                            <button type="button" className="btn btn-danger" id="confirmDelete">Yes</button>
-                        </div>
+                        <ReusableModalButtons
+                            loading={loading}
+                            mode="delete"
+                            onCancel={() => { }}
+                            submitText="Yes"
+                            onSubmit={() => handleDelete(subCategoryId)}
+                        />
                     </div>
                 </div>
             </div>
         </DashboardLayout>
     );
 };
-
-export default ProductSubCategoryView;

@@ -4,7 +4,9 @@ const categoryApi = handleApi(BASE_URLS.CATEGORY);
 
 // ADD
 export const addCategoryApi = (data) =>
-    categoryApi.post("/create-category", data);
+    categoryApi.post("/create-category", data, {
+        headers: { "Content-Type": "multipart/form-data" }
+    });
 
 // GET ALL
 export const getCategoriesListApi = () =>
@@ -19,6 +21,7 @@ export const getCategoryDetailsApi = (categoryId) =>
 // UPDATE
 export const updateCategoryApi = (categoryId, data) =>
     categoryApi.put("/update-category-details", data, {
+        headers: { "Content-Type": "multipart/form-data" },
         params: { categoryId },
     });
 

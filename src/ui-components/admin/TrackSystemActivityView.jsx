@@ -17,7 +17,7 @@ import {
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 import profileImg from '../../assets/img/profile-img.jpg';
 
-const TrackSystemActivityView = () => {
+export default function TrackSystemActivityView() {
 
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -41,7 +41,7 @@ const TrackSystemActivityView = () => {
     const [referrerUrl, setReferrerUrl] = useState("");
     const [loginTime, setLoginTime] = useState("");
     const [createdAt, setAuthUserCreatedAt] = useState("");
-    
+
     const dataTableRef = useRef(null);
     const hasFetched = useRef(false);
     const tableRef = useRef(null);
@@ -316,5 +316,3 @@ const TrackSystemActivityView = () => {
         </DashboardLayout>
     );
 };
-
-export default TrackSystemActivityView;

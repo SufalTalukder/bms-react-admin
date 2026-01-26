@@ -10,7 +10,7 @@ import { formatDateTime, formatDOB, getActiveStatus } from "./FunctionHelper";
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
 
-const UserView = () => {
+export default function UserView() {
 
     // STATE VARIABLES
     const [isAddModal, setIsAddModal] = useState(true);
@@ -28,7 +28,7 @@ const UserView = () => {
     const [userCreatedAt, setUserCreatedAt] = useState("");
     const [usersList, setUsersList] = useState([]);
     const [loading, setLoading] = useState(true);
-    
+
     const dataTableRef = useRef(null);
     const hasFetched = useRef(false);
     const tableRef = useRef(null);
@@ -488,5 +488,3 @@ const UserView = () => {
         </DashboardLayout>
     );
 };
-
-export default UserView;

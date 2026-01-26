@@ -4,7 +4,7 @@ import {
     EXPORT_TABLE_EXPORT_CSV, EXPORT_TABLE_EXPORT_EXCEL, EXPORT_TABLE_EXPORT_PDF, EXPORT_TABLE_EXPORT_SQL, EXPORT_TABLE_EXPORT_TXT
 } from "../../lang-dump/lang";
 
-export const ReusableExportTable = ({ tableRef, dataTableRef }) => {
+export function ReusableExportTable({ tableRef, dataTableRef }) {
 
     return (
         <div className="datatable-top d-flex gap-2 pb-4">

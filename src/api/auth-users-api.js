@@ -4,7 +4,9 @@ const authApi = handleApi(BASE_URLS.AUTH);
 
 // ADD
 export const addAuthUserApi = (data) =>
-    authApi.post("/create", data);
+    authApi.post("/create", data, {
+        headers: { "Content-Type": "multipart/form-data" }
+    });
 
 // GET ALL
 export const getAuthUsersListApi = () =>
@@ -19,6 +21,7 @@ export const getAuthUserDetailsApi = (authUserId) =>
 // UPDATE
 export const updateAuthUserApi = (authUserId, data) =>
     authApi.put("/update-details", data, {
+        headers: { "Content-Type": "multipart/form-data" },
         params: { authUserId },
     });
 
