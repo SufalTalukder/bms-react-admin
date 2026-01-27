@@ -4,17 +4,17 @@ import { ReusableExportTable } from "../reusable-components/ResuableExportTable"
 import { deleteMultipleBannersApi, getBannersListApi, uploadMultipleBannersApi } from "../../api/banners-api";
 import { DataTable } from "simple-datatables";
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
-import { formatDateTime, getActiveStatus } from "./FunctionHelper";
+import toasterMsgDisplay, { formatDateTime, getActiveStatus } from "./FunctionHelper";
 import { toast } from "react-toastify";
 import {
-    BANNER_DELETED_SUCCESSFULLY, BANNER_FAILED_TO_DELETE, BANNER_FAILED_TO_FETCH_BANNERS, BANNER_FAILED_TO_UPLOAD, BANNER_HEADING_MANAGE_BANNERS, BANNER_LOADING, BANNER_MODAL_SELECT_ACTIVE_STATUS, BANNER_MODAL_SELECT_BANNER_IMAGES, BANNER_NOT_FOUND, BANNER_TITLE, BANNER_UPLOAD, BANNER_UPLOADING_SUCCESSFULLY, CONFIRM_DELETION
+    BANNER, BANNER_FAILED_TO_UPLOAD, BANNER_HEADING_MANAGE_BANNERS, BANNER_LOADING, BANNER_MODAL_SELECT_ACTIVE_STATUS, BANNER_MODAL_SELECT_BANNER_IMAGES, BANNER_NOT_FOUND, BANNER_TITLE, BANNER_UPLOAD, BANNER_UPLOADING_SUCCESSFULLY, CONFIRM_DELETION
 } from "../../lang-dump/lang";
 
 export default function BannerView() {
 
     // STATE VARIABLES
     const [isAddModal, setIsAddModal] = useState(true);
-    const [modalTitle, setModalTitle] = useState("Upload Banner");
+    const [modalTitle, setModalTitle] = useState(BANNER_UPLOAD);
     const [appBannerId, setAppBannerId] = useState(null);
     const [appBannerName, setAppBannerName] = useState("");
     const [appBannerImages, setAppBannerImages] = useState([]);
@@ -41,7 +41,7 @@ export default function BannerView() {
             setAllBanners(res.data.content || []);
         } catch (e) {
             console.error(e);
-            toast.error(BANNER_FAILED_TO_FETCH_BANNERS);
+            toast.error(toasterMsgDisplay('failed_r', BANNER));
         } finally {
             setLoading(false);
         }
@@ -109,6 +109,7 @@ export default function BannerView() {
 
     // RESET FORM
     const resetForm = () => {
+        setIsAddModal(true)
         setAppBannerId(null);
         setAppBannerImages([]);
         setBannerActiveStatus("YES");
@@ -119,7 +120,7 @@ export default function BannerView() {
     const handleDelete = async (id) => {
         try {
             await deleteMultipleBannersApi([id]);
-            toast.success(BANNER_DELETED_SUCCESSFULLY);
+            toast.success(toasterMsgDisplay('delete', BANNER));
 
             setTimeout(() => {
                 window.bootstrap.Modal
@@ -128,7 +129,7 @@ export default function BannerView() {
                 fetchAllBanners();
             }, 1000);
         } catch (error) {
-            toast.error(BANNER_FAILED_TO_DELETE);
+            toast.error(toasterMsgDisplay('failed_cud', 'delete', BANNER));
         }
     };
 

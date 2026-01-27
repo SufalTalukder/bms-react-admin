@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -6,8 +6,9 @@ import adminLogo from "../../assets/img/react.svg";
 import ReusableLoginButton from "../reusable-components/ReusableLoginButton";
 import "../../App.css";
 import {
-    AUTH_LOGIN_EMAIL, AUTH_LOGIN_ENTER_EMAIL_AND_PASSWORD, AUTH_LOGIN_FAILED_MESSAGE, AUTH_LOGIN_PASSWORD, AUTH_LOGIN_REMEMBER_ME, AUTH_LOGIN_SUCCESS_MESSAGE, AUTH_LOGIN_TITLE, AUTH_LOGIN_TO_YOUR_ACCOUNT, AUTH_LOGIN_VALIDATION_EMAIL_AND_PASSWORD_REQUIRED, AUTH_LOGIN_VALIDATION_ENTER_VALID_EMAIL
+    AUTH_LOGIN_EMAIL, AUTH_LOGIN_ENTER_EMAIL_AND_PASSWORD, AUTH_LOGIN_PAGE_TITLE, AUTH_LOGIN_PASSWORD, AUTH_LOGIN_REMEMBER_ME, AUTH_LOGIN_TITLE, AUTH_LOGIN_TO_YOUR_ACCOUNT, AUTH_LOGIN_VALIDATION_EMAIL_AND_PASSWORD_REQUIRED, AUTH_LOGIN_VALIDATION_ENTER_VALID_EMAIL
 } from "../../lang-dump/lang";
+import toasterMsgDisplay from "./FunctionHelper";
 
 export default function LoginView() {
 
@@ -15,7 +16,7 @@ export default function LoginView() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        document.title = AUTH_LOGIN_TITLE;
+        document.title = AUTH_LOGIN_PAGE_TITLE;
         const token = sessionStorage.getItem("authToken");
         if (token) {
             navigate("/admin/track-your-activity", { replace: true });
@@ -43,13 +44,13 @@ export default function LoginView() {
 
         try {
             await login(email, password);
-            toast.success(AUTH_LOGIN_SUCCESS_MESSAGE);
+            toast.success(toasterMsgDisplay('login_add', AUTH_LOGIN_TITLE));
             setTimeout(() => {
                 navigate("/admin/track-your-activity");
             }, 500);
         } catch (err) {
             console.error("Login error:", err);
-            toast.error(err.response?.data?.message || AUTH_LOGIN_FAILED_MESSAGE);
+            toast.error(err.response?.data?.message || toasterMsgDisplay('login_failed', AUTH_LOGIN_TITLE));
         } finally {
             setLoading(false);
         }
@@ -104,4 +105,4 @@ export default function LoginView() {
             </div>
         </section>
     );
-};
+}

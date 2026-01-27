@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import DashboardLayout from "../../DashboardLayout";
 import { getLoginAuditDetailsApi, getLoginAuditsApi } from "../../api/login-audit-api";
 import { DataTable } from "simple-datatables";
@@ -315,4 +315,4 @@ export default function TrackSystemActivityView() {
             </div>
         </DashboardLayout>
     );
-};
+}

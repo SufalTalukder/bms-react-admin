@@ -6,10 +6,10 @@ import { toast } from "react-toastify";
 import "../../App.css";
 import { addAuthUserApi, deleteAuthUserApi, getAuthUserDetailsApi, getAuthUsersListApi, updateAuthUserApi } from "../../api/auth-users-api";
 import profileImg from '../../assets/img/profile-img.jpg';
-import { formatDateTime, getActiveStatus, getAuthUserType } from "./FunctionHelper";
+import toasterMsgDisplay, { formatDateTime, getActiveStatus, getAuthUserType } from "./FunctionHelper";
 import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
 import {
-    ADD_RECORD, AUTH_USER_ADD_AUTH_USER, AUTH_USER_ADDED_SUCCESSFULLY, AUTH_USER_AUTH_USERS_LOADING, AUTH_USER_DELETED_SUCCESSFULLY, AUTH_USER_EDIT_AUTH_USER, AUTH_USER_FAILED_TO_DELETE, AUTH_USER_FAILED_TO_FETCH_USERS, AUTH_USER_FAILED_TO_SAVE, AUTH_USER_FILL_ALL_REQUIRED_FIELDS, AUTH_USER_INVALID_EMAIL_ADDRESS, AUTH_USER_INVALID_PASSWORD, AUTH_USER_INVALID_PHONE_NUMBER, AUTH_USER_MANAGE_AUTH_USERS, AUTH_USER_NO_AUTH_USERS_FOUND, AUTH_USER_SAVING, AUTH_USER_TITLE, AUTH_USER_UPDATED_SUCCESSFULLY, AUTH_USER_UPDATING
+    ADD_RECORD, ALL_FIELDS_ARE_REQUIRED, AUTH_USER, AUTH_USER_ADD_AUTH_USER, AUTH_USER_AUTH_USERS_LOADING, AUTH_USER_EDIT_AUTH_USER, AUTH_USER_INVALID_PASSWORD, AUTH_USER_MANAGE_AUTH_USERS, AUTH_USER_NO_AUTH_USERS_FOUND, AUTH_USER_SAVING, AUTH_USER_TITLE, AUTH_USER_UPDATING, INVALID_EMAIL_ADDRESS, INVALID_PHONE_NUMBER, OK_BUTTON
 } from "../../lang-dump/lang";
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 
@@ -51,7 +51,7 @@ export default function AuthUserView() {
             setAuthUsersList(res.data.content || []);
         } catch (e) {
             console.error(e);
-            toast.error(AUTH_USER_FAILED_TO_FETCH_USERS);
+            toast.error(toasterMsgDisplay('view_all', AUTH_USER));
         } finally {
             setLoading(false);
         }
@@ -80,8 +80,8 @@ export default function AuthUserView() {
             const authUser = res.data.content;
             if (authUser) {
                 setIsAddModal(false);
-                setModalTitle("View Auth Details");
-                setModalBtnText("Ok");
+                setModalTitle(toasterMsgDisplay('view', AUTH_USER));
+                setModalBtnText(OK_BUTTON);
                 setAuthUserId(authUser.authUserId);
                 setAuthUserName(authUser.authUserName);
                 setActionBy(authUser.actionByUserInfo?.authUserName);
@@ -93,11 +93,11 @@ export default function AuthUserView() {
                 const modal = new window.bootstrap.Modal(document.getElementById("viewModal"));
                 modal.show();
             } else {
-                toast.error("Auth user not found.");
+                toast.error(toasterMsgDisplay('not_found', AUTH_USER));
             }
         } catch (error) {
             console.error(error);
-            toast.error("Failed to fetch auth user details.");
+            toast.error(toasterMsgDisplay('failed_r', AUTH_USER));
         } finally {
             setLoading(false);
         }
@@ -109,17 +109,17 @@ export default function AuthUserView() {
         setLoading(true);
 
         if (!authUserName.trim() || !authUserEmail.trim() || !authUserPhone.trim() || !authUserType || !authUserActive) {
-            toast.error(AUTH_USER_FILL_ALL_REQUIRED_FIELDS);
+            toast.error(ALL_FIELDS_ARE_REQUIRED);
             setLoading(false);
             return;
         }
         if (!validateEmail(authUserEmail.trim())) {
-            toast.error(AUTH_USER_INVALID_EMAIL_ADDRESS);
+            toast.error(INVALID_EMAIL_ADDRESS);
             setLoading(false);
             return;
         }
         if (!validatePhoneNumber(authUserPhone.trim())) {
-            toast.error(AUTH_USER_INVALID_PHONE_NUMBER);
+            toast.error(INVALID_PHONE_NUMBER);
             setLoading(false);
             return;
         }
@@ -141,10 +141,10 @@ export default function AuthUserView() {
         try {
             if (isAddModal) {
                 await addAuthUserApi(formData);
-                toast.success(AUTH_USER_ADDED_SUCCESSFULLY);
+                toast.success(toasterMsgDisplay('add', AUTH_USER));
             } else {
                 await updateAuthUserApi(authUserId, formData);
-                toast.success(AUTH_USER_UPDATED_SUCCESSFULLY);
+                toast.success(toasterMsgDisplay('update', AUTH_USER));
             }
             setTimeout(() => {
                 resetForm();
@@ -154,7 +154,7 @@ export default function AuthUserView() {
             }, 1000);
         } catch (error) {
             console.error(error);
-            toast.error(AUTH_USER_FAILED_TO_SAVE);
+            toast.error(toasterMsgDisplay('failed_cud', 'save', AUTH_USER));
         } finally {
             setLoading(false);
         }
@@ -210,7 +210,7 @@ export default function AuthUserView() {
     const handleDelete = async (id) => {
         try {
             await deleteAuthUserApi(id);
-            toast.success(AUTH_USER_DELETED_SUCCESSFULLY);
+            toast.success(toasterMsgDisplay('delete', AUTH_USER));
 
             setTimeout(() => {
                 window.bootstrap.Modal
@@ -220,7 +220,7 @@ export default function AuthUserView() {
                 // location.reload();
             }, 1000);
         } catch (error) {
-            toast.error(AUTH_USER_FAILED_TO_DELETE);
+            toast.error(toasterMsgDisplay('failed_cud', 'delete', AUTH_USER));
         }
     };
 

@@ -7,7 +7,7 @@ export function getActiveStatus(isActive) {
         default:
             return <span className="badge bg-warning rounded">Unknown</span>;
     }
-};
+}
 
 export function getAuthUserType($userType) {
     switch ($userType) {
@@ -18,7 +18,7 @@ export function getAuthUserType($userType) {
         default:
             return <span className="badge bg-dark rounded">Unknown</span>;
     }
-};
+}
 
 // Format DOB as "Dec 25, 2023"
 export function formatDOB(dateString) {
@@ -87,4 +87,22 @@ export function formatDateTime(dateTimeString) {
         minute: "2-digit",
         hour12: true,
     }).replace(",", " •");
+}
+
+// GLOBAL TOASTER MESSAGES FUNCTION
+const messages = {
+    add: (t) => `${t} added successfully!`,
+    login_add: (t) => `${t} successfully!`,
+    login_failed: (t) => `${t} failed.`,
+    view: (t) => `Viewing ${t} details.`,
+    view_all: (t) => `Failed to fetch ${t}s.`,
+    update: (t) => `${t} updated successfully!`,
+    delete: (t) => `${t} deleted successfully!`,
+    failed_cud: (t, d) => `Failed to ${d || 'process'} ${t}.`,
+    failed_r: (t) => `Failed to fetch ${t} details.`,
+    not_found: (t) => `${t} not found.`,
 };
+
+export default function toasterMsgDisplay(mode, pageTitle, detailType = '') {
+    return messages[mode]?.(pageTitle, detailType) ?? 'UNKNOWN';
+}

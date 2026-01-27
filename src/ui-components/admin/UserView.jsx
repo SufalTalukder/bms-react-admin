@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import DashboardLayout from "../../DashboardLayout";
 import { DataTable } from "simple-datatables";
 import "simple-datatables/dist/style.css";
@@ -473,7 +473,7 @@ export default function UserView() {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <p>Are you sure you want to delete this "{fullName}" User?</p>
+                            <p>Are you sure you want to delete this `{fullName}` User?</p>
                         </div>
                         <ReusableModalButtons
                             loading={loading}
@@ -487,4 +487,4 @@ export default function UserView() {
             </div>
         </DashboardLayout>
     );
-};
+}
