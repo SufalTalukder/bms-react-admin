@@ -1,4 +1,4 @@
-import React from "react";
+import PropTypes from "prop-types";
 import { removeLoaderIfExists, exportSQL, exportHTML, exportPDF, exportCSV, exportTXT } from "../../utils/table-export";
 import {
     EXPORT_TABLE_EXPORT_CSV, EXPORT_TABLE_EXPORT_EXCEL, EXPORT_TABLE_EXPORT_PDF, EXPORT_TABLE_EXPORT_SQL, EXPORT_TABLE_EXPORT_TXT
@@ -16,4 +16,13 @@ export function ReusableExportTable({ tableRef, dataTableRef }) {
             <button className="btn btn-sm btn-outline-dark" onClick={() => exportSQL(tableRef)}>{EXPORT_TABLE_EXPORT_SQL}</button>
         </div>
     );
+}
+
+ReusableExportTable.propTypes = {
+    tableRef: PropTypes.shape({
+        current: PropTypes.any,
+    }),
+    dataTableRef: PropTypes.shape({
+        current: PropTypes.any,
+    }),
 };

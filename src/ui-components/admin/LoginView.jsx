@@ -4,11 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import adminLogo from "../../assets/img/react.svg";
 import ReusableLoginButton from "../reusable-components/ReusableLoginButton";
-import "../../App.css";
 import {
     AUTH_LOGIN_EMAIL, AUTH_LOGIN_ENTER_EMAIL_AND_PASSWORD, AUTH_LOGIN_PAGE_TITLE, AUTH_LOGIN_PASSWORD, AUTH_LOGIN_REMEMBER_ME, AUTH_LOGIN_TITLE, AUTH_LOGIN_TO_YOUR_ACCOUNT, AUTH_LOGIN_VALIDATION_EMAIL_AND_PASSWORD_REQUIRED, AUTH_LOGIN_VALIDATION_ENTER_VALID_EMAIL
 } from "../../lang-dump/lang";
 import toasterMsgDisplay from "./FunctionHelper";
+import validationChecker from "../../utils/validations-checker";
 
 export default function LoginView() {
 
@@ -21,7 +21,7 @@ export default function LoginView() {
         if (token) {
             navigate("/admin/track-your-activity", { replace: true });
         }
-    }, []);
+    }, [navigate]);
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -36,7 +36,7 @@ export default function LoginView() {
             setLoading(false);
             return;
         }
-        if (!validateEmail(email)) {
+        if (!validationChecker('email', email.trim())) {
             toast.error(AUTH_LOGIN_VALIDATION_ENTER_VALID_EMAIL);
             setLoading(false);
             return;
@@ -54,11 +54,6 @@ export default function LoginView() {
         } finally {
             setLoading(false);
         }
-    };
-
-    const validateEmail = (email) => {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(String(email).toLowerCase());
     };
 
     return (

@@ -19,6 +19,7 @@ import profileImg from '../../assets/img/profile-img.jpg';
 
 export default function TrackSystemActivityView() {
 
+    // STATE VARIBALES
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [modalTitle, setModalTitle] = useState("");
@@ -50,10 +51,10 @@ export default function TrackSystemActivityView() {
         document.title = TRACK_SYSTEM_ACTIVITY_TITLE;
         if (hasFetched.current) return;
         hasFetched.current = true;
-        fetchLogs();
+        loadSystemLogs();
     }, []);
 
-    const fetchLogs = async () => {
+    const loadSystemLogs = async () => {
         try {
             const res = await getLoginAuditsApi();
             setLogs(res.data.content || []);
@@ -88,7 +89,7 @@ export default function TrackSystemActivityView() {
                     }
                 });
         }
-    }, [logs.length]);
+    }, [logs]);
 
     // VIEW SYSTEM AUDIT DETAILS
     const handleView = async (id) => {
@@ -129,12 +130,25 @@ export default function TrackSystemActivityView() {
         }
     };
 
+    const refreshSystemLogs = () => {
+        if (dataTableRef.current) {
+            dataTableRef.current.destroy();
+            dataTableRef.current = null;
+        }
+        setLoading(true);
+        loadSystemLogs();
+    };
+
     return (
         <DashboardLayout>
             <div className="dashboard-layout">
                 <main id="main" className="main">
                     <div className="pagetitle d-flex justify-content-between align-items-center">
                         <h1 className="toggle-heading">{TRACK_SYSTEM_ACTIVITY_SYSTEMS_ACTIVITY}</h1>
+                        <button className="btn btn-secondary" onClick={() => refreshSystemLogs()} disabled={loading}>
+                            <i className={`${loading ? "spinner-border spinner-border-sm me-1" : "bi bi-arrow-clockwise me-1"}`} />
+                            Refresh
+                        </button>
                     </div>
 
                     <div className="card shadow-sm mt-3">
@@ -143,73 +157,104 @@ export default function TrackSystemActivityView() {
                                 tableRef={tableRef}
                                 dataTableRef={dataTableRef}
                             />
-                            <div className="table-responsive system-log-table">
-                                <table
-                                    ref={tableRef}
-                                    className="table table-hover table-sm mb-0"
-                                    id="demo-table"
-                                >
-                                    <thead className="table-light">
-                                        <tr>
-                                            <th>Sr. No.</th>
-                                            <th>IP Address</th>
-                                            <th>User Agent</th>
-                                            <th>Browser</th>
-                                            <th>OS</th>
-                                            <th>Device</th>
-                                            <th>Incognito</th>
-                                            <th>Login Time</th>
-                                            <th>Action By</th>
-                                            <th>Created At</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
 
-                                    <tbody>
-                                        {loading ? (
+                            {loading && (
+                                <div className="table-responsive system-log-table">
+                                    <table
+                                        ref={tableRef}
+                                        className="table table-hover table-sm mb-0"
+                                        id="demo-table"
+                                    >
+                                        <thead className="table-light">
+                                            <tr>
+                                                <th>Sr. No.</th>
+                                                <th>IP Address</th>
+                                                <th>User Agent</th>
+                                                <th>Browser</th>
+                                                <th>OS</th>
+                                                <th>Device</th>
+                                                <th>Incognito</th>
+                                                <th>Login Time</th>
+                                                <th>Action By</th>
+                                                <th>Created At</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
                                             <tr>
                                                 <td colSpan="11" className="text-center py-4">
                                                     <div className="spinner-border spinner-border-sm"></div>
                                                     <strong className="ms-2">{TRACK_SYSTEM_ACTIVITY_SYSTEM_LOGS_LOADING}</strong>
                                                 </td>
                                             </tr>
-                                        ) : logs.length === 0 ? (
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+
+                            {!loading && (
+                                <div className="table-responsive system-log-table">
+                                    <table
+                                        ref={tableRef}
+                                        className="table table-hover table-sm mb-0"
+                                        id="demo-table"
+                                    >
+                                        <thead className="table-light">
                                             <tr>
-                                                <td colSpan="11" className="text-center py-4">
-                                                    {TRACK_SYSTEM_ACTIVITY_NO_SYSTEM_LOGS_FOUND}
-                                                </td>
+                                                <th>Sr. No.</th>
+                                                <th>IP Address</th>
+                                                <th>User Agent</th>
+                                                <th>Browser</th>
+                                                <th>OS</th>
+                                                <th>Device</th>
+                                                <th>Incognito</th>
+                                                <th>Login Time</th>
+                                                <th>Action By</th>
+                                                <th>Created At</th>
+                                                <th>Action</th>
                                             </tr>
-                                        ) : (
-                                            logs.map((row, index) => (
-                                                <tr key={`${row.authLoginAuditId}-${row.createdAt}`}>
-                                                    <td>{index + 1}</td>
-                                                    <td>{row.ipAddress}</td>
-                                                    <td className="text-truncate" style={{ maxWidth: 250 }}>
-                                                        {row.userAgent}
-                                                    </td>
-                                                    <td>{row.browser}</td>
-                                                    <td>{row.operatingSystem}</td>
-                                                    <td>{row.deviceType}</td>
-                                                    <td>
-                                                        {row.possibleIncognito ? <span className="badge bg-success rounded">Yes</span> : <span className="badge bg-danger rounded">No</span>}
-                                                    </td>
-                                                    <td>{formatDateTime(row.loginTime)}</td>
-                                                    <td>{row.authUserInfo?.authUserName}</td>
-                                                    <td>{formatDateTime(row.createdAt)}</td>
-                                                    <td>
-                                                        <button
-                                                            className="btn btn-sm btn-success rounded-pill me-1 view-btn"
-                                                            data-id={row.authLoginAuditId}
-                                                        >
-                                                            👁️
-                                                        </button>
+                                        </thead>
+
+                                        <tbody>
+                                            {logs.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan="11" className="text-center py-4">
+                                                        {TRACK_SYSTEM_ACTIVITY_NO_SYSTEM_LOGS_FOUND}
                                                     </td>
                                                 </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                                            ) : (
+                                                logs.map((row, index) => (
+                                                    <tr key={`${row.authLoginAuditId}-${row.createdAt}`}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{row.ipAddress}</td>
+                                                        <td className="text-truncate" style={{ maxWidth: 250 }}>
+                                                            {row.userAgent}
+                                                        </td>
+                                                        <td>{row.browser}</td>
+                                                        <td>{row.operatingSystem}</td>
+                                                        <td>{row.deviceType}</td>
+                                                        <td>
+                                                            {row.possibleIncognito ? <span className="badge bg-success rounded">Yes</span> : <span className="badge bg-danger rounded">No</span>}
+                                                        </td>
+                                                        <td>{formatDateTime(row.loginTime)}</td>
+                                                        <td>{row.authUserInfo?.authUserName}</td>
+                                                        <td>{formatDateTime(row.createdAt)}</td>
+                                                        <td>
+                                                            <button
+                                                                className="btn btn-sm btn-success rounded-pill me-1 view-btn"
+                                                                data-id={row.authLoginAuditId}
+                                                            >
+                                                                👁️
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </main>

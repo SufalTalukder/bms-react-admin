@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoginView from "./ui-components/admin/LoginView";
@@ -38,7 +38,6 @@ export default function App() {
     img.onload = () => {
       const animate = () => {
         ctx.clearRect(0, 0, size, size);
-
         ctx.save();
         ctx.translate(size / 2, size / 2);
         ctx.rotate(angle);
@@ -51,13 +50,10 @@ export default function App() {
           link.rel = "icon";
           document.head.appendChild(link);
         }
-
         link.href = canvas.toDataURL("image/png");
-
         angle += 0.01; // speed control
         animationId = requestAnimationFrame(animate);
       };
-
       animate();
     };
 
@@ -82,6 +78,7 @@ export default function App() {
           {/* Public Routes */}
           <Route element={<PublicRoute />}>
             <Route path="/" element={<LoginView />} />
+            <Route path="/admin" element={<LoginView />} />
             <Route path="/admin/login" element={<LoginView />} />
           </Route>
 

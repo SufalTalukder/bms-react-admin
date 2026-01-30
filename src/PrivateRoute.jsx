@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
-const PrivateRoute = () => {
+export default function PrivateRoute() {
     const { user, loading } = useAuth();
     const token = sessionStorage.getItem("authToken");
 
@@ -9,6 +9,4 @@ const PrivateRoute = () => {
     if (!user || !token) return <Navigate to="/admin/login" replace />;
 
     return <Outlet />;
-};
-
-export default PrivateRoute;
+}

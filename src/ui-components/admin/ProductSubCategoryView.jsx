@@ -7,6 +7,8 @@ import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 import { formatDateTime, getActiveStatus } from "./FunctionHelper";
 import { toast } from "react-toastify";
 import profileImg from '../../assets/img/profile-img.jpg';
+import validationChecker from "../../utils/validations-checker";
+import { INVALID_NAMING_CONVENSION } from "../../lang-dump/lang";
 
 export default function ProductSubCategoryView() {
 
@@ -73,6 +75,11 @@ export default function ProductSubCategoryView() {
 
         if (!subCategoryName.trim()) {
             toast.error("SubCategory name is required.");
+            setLoading(false);
+            return;
+        }
+        if (!validationChecker('text', subCategoryName.trim())) {
+            toast.error(INVALID_NAMING_CONVENSION);
             setLoading(false);
             return;
         }

@@ -6,6 +6,8 @@ import { DataTable } from "simple-datatables";
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 import { formatDateTime, getActiveStatus } from "./FunctionHelper";
 import { toast } from "react-toastify";
+import validationChecker from "../../utils/validations-checker";
+import { INVALID_NAMING_CONVENSION } from "../../lang-dump/lang";
 
 export default function LanguageView() {
 
@@ -69,6 +71,10 @@ export default function LanguageView() {
 
         if (!languageName) {
             toast.error("Language name is required.");
+            return;
+        }
+        if (!validationChecker('text', languageName.trim())) {
+            toast.error(INVALID_NAMING_CONVENSION);
             return;
         }
         if (!languageActive) {

@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from "prop-types";
 
 export default function ReusableLoginButton({ loading, buttonType, buttonText }) {
     return (
@@ -20,4 +20,10 @@ export default function ReusableLoginButton({ loading, buttonType, buttonText })
             )}
         </button>
     );
+}
+
+ReusableLoginButton.propTypes = {
+    loading: PropTypes.bool,
+    buttonType: PropTypes.oneOf(["button", "submit", "reset"]),
+    buttonText: PropTypes.string,
 };

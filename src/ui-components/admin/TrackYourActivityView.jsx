@@ -1,59 +1,133 @@
-import React, { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import DashboardLayout from "../../DashboardLayout";
+import { toast } from "react-toastify";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import { Tooltip } from "bootstrap";
+import { fetchAuthActivities } from "../../api/activities-api";
+import { formatTime, getCalendarMethodDetails } from "./FunctionHelper";
 
-const TrackYourActivityView = () => {
+export default function TrackYourActivityView() {
+
+    // STATE VARIABLES
+    const [loading, setLoading] = useState(true);
+    const [events, setEvents] = useState([]);
+    const hasFetched = useRef(false);
 
     useEffect(() => {
         document.title = "Track Your Activity | Admin Panel";
+        if (hasFetched.current) return;
+        hasFetched.current = true;
+        loadActivities();
     }, []);
+
+    const loadActivities = async () => {
+        try {
+            const response = await fetchAuthActivities();
+
+            const calendarEvents = (response.data.content || []).map((activityLog) => ({
+                id: activityLog.actionLogId,
+                title: formatTime(activityLog.actionLogCreatedAt),
+                start: activityLog.actionLogCreatedAt,
+                allDay: false,
+                extendedProps: {
+                    method: activityLog.actionLogMethod,
+                    description: activityLog.actionLogMessage
+                }
+            }));
+
+            setEvents(calendarEvents);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to fetch activities");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const refreshCalendar = () => {
+        setLoading(true);
+        loadActivities();
+    };
 
     return (
         <DashboardLayout>
-            <div className="dashboard-layout">
-                <main id="main" className="main">
-                    <div className="pagetitle d-flex justify-content-between align-items-center">
-                        <h1 className="mb-0">Track Your Activity</h1>
+            <main id="main" className="main">
+                <div className="pagetitle d-flex justify-content-between align-items-center">
+                    <h1 className="toggle-heading">Track Your Activity</h1>
+                    <button className="btn btn-secondary" onClick={refreshCalendar} disabled={loading}>
+                        <i className={`${loading ? "spinner-border spinner-border-sm me-1" : "bi bi-arrow-clockwise me-1"}`} />
+                        Refresh
+                    </button>
+                </div>
+
+                <div className="card shadow-sm mt-3">
+                    <div className="card-body p-0">
+                        <FullCalendar
+                            plugins={[
+                                dayGridPlugin,
+                                timeGridPlugin,
+                                interactionPlugin
+                            ]}
+                            initialView="dayGridMonth"
+                            height={650}
+                            headerToolbar={{
+                                left: "prev,next today",
+                                center: "title",
+                                right:
+                                    "dayGridYear,dayGridMonth,timeGridWeek,timeGridDay"
+                            }}
+                            views={{
+                                dayGridYear: {
+                                    type: "dayGrid",
+                                    duration: { years: 1 },
+                                    buttonText: "Year"
+                                }
+                            }}
+                            events={events}
+                            eventContent={renderEventContent}
+                            eventTimeFormat={{
+                                hour: "numeric",
+                                minute: "2-digit",
+                                meridiem: "short"
+                            }}
+                            eventDidMount={(info) => {
+                                if (
+                                    info.event.extendedProps
+                                        .description
+                                ) {
+                                    new Tooltip(info.el, {
+                                        title:
+                                            info.event
+                                                .extendedProps
+                                                .description,
+                                        placement: "top",
+                                        trigger: "hover",
+                                        container: "body"
+                                    });
+                                }
+                            }}
+                        />
                     </div>
-                    <section className="section">
-                        <div className="row">
-                            <div className="col-lg-12 px-0">
-                                <div className="card">
-                                    <div className="card-body">
-                                        <div className="datatable-top d-flex gap-2 pt-3">
-                                            <button className="btn btn-sm btn-outline-primary" id="export-csv">Export CSV</button>
-                                            <button className="btn btn-sm btn-outline-success" id="export-excel">ExportExcel</button>
-                                            <button className="btn btn-sm btn-outline-danger" id="export-pdf">Export PDF</button>
-                                            <button className="btn btn-sm btn-outline-info" id="export-doc">Export DOC</button>
-                                            <button className="btn btn-sm btn-outline-warning" id="export-txt">Export TXT</button>
-                                            <button className="btn btn-sm btn-outline-dark" id="export-sql">Export SQL</button>
-                                        </div>
-                                        <table className="table table-hover table-sm mt-2" id="demo-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Sr. No.</th>
-                                                    <th>Method</th>
-                                                    <th>Message</th>
-                                                    <th>Created At</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="tcategory">
-                                                <tr id="loader-row">
-                                                    <td colSpan="5" className="text-center py-4">
-                                                        <div className="spinner-border spinner-border-sm"></div>
-                                                        <strong className="ms-2">Activity Log(s) Loading...</strong>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </main>
-            </div>
+                </div>
+            </main>
         </DashboardLayout>
     );
-};
+}
 
-export default TrackYourActivityView;
+function renderEventContent(eventInfo) {
+    const { method } = eventInfo.event.extendedProps;
+
+    return (
+        <div className="fc-event-custom">
+            <div className="d-flex align-items-center gap-1">
+                {getCalendarMethodDetails(method)}
+                <span className="fc-event-title text-truncate">
+                    {eventInfo.event.title}
+                </span>
+            </div>
+        </div>
+    );
+}

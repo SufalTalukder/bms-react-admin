@@ -16,6 +16,8 @@ export const OK_BUTTON = `Ok`;
 export const ALL_FIELDS_ARE_REQUIRED = `Please fill all required fields.`;
 export const INVALID_EMAIL_ADDRESS = `Invalid email address.`;
 export const INVALID_PHONE_NUMBER = `Invalid phone number. It should be 10 digits.`;
+export const INVALID_PASSWORD = `Invalid password format.`;
+export const INVALID_NAMING_CONVENSION = `Invalid naming convension.`;
 
 // 404 COMMON MESSAGES
 export const NOT_FOUND_404_TITLE = `404 Not Found | ${SITE_TITLE}`;

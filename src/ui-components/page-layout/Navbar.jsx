@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import reactLogo from "../../assets/react.svg";
 import "../../App.css";
@@ -114,9 +114,9 @@ export default function Navbar() {
             </nav>
             {isOffline && (
                 <div className="offline-banner">
-                    ⚠ You're offline. Check your connection.<span className="dots">{dots}</span>
+                    ⚠ You`re offline. Check your connection.<span className="dots">{dots}</span>
                 </div>
             )}
         </header>
     );
-};
+}

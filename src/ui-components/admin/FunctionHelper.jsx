@@ -9,14 +9,29 @@ export function getActiveStatus(isActive) {
     }
 }
 
-export function getAuthUserType($userType) {
-    switch ($userType) {
+export function getAuthUserType(userType) {
+    switch (userType) {
         case "SUPER_ADMIN":
             return <span className="badge bg-primary rounded">Super Admin</span>;
         case "ADMIN":
             return <span className="badge bg-secondary rounded">Admin</span>;
         default:
             return <span className="badge bg-dark rounded">Unknown</span>;
+    }
+}
+
+export function getCalendarMethodDetails(method) {
+    switch (method) {
+        case 'POST':
+            return <span className="badge bg-warning rounded">POST</span>;
+        case 'GET':
+            return <span className="badge bg-success rounded">GET</span>;
+        case 'DELETE':
+            return <span className="badge bg-danger rounded">DELETE</span>;
+        case 'PUT':
+            return <span className="badge bg-info rounded">PUT</span>;
+        default:
+            return <span className="badge bg-secondary rounded">PATCH</span>;
     }
 }
 
@@ -50,6 +65,18 @@ export function formatDOB(dateString) {
         month: "short",
         day: "numeric",
         year: "numeric",
+    });
+}
+
+// Format time "03:30 PM"
+export function formatTime(value) {
+    if (!value) return "";
+
+    return new Date(value).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: "Asia/Kolkata"
     });
 }
 
@@ -87,6 +114,26 @@ export function formatDateTime(dateTimeString) {
         minute: "2-digit",
         hour12: true,
     }).replace(",", " •");
+}
+
+// Format phone number as (XXX) XXX-XXXX
+export function formatPhoneNumber(phone) {
+    if (phone === null || phone === undefined) {
+        return "Invalid phone";
+    }
+
+    const digits = String(phone).replace(/\D/g, '');
+
+    // Expect exactly 10 digits
+    if (digits.length !== 10) {
+        return "Invalid phone";
+    }
+
+    const area = digits.slice(0, 3);
+    const middle = digits.slice(3, 6);
+    const last = digits.slice(6);
+
+    return `(${area}) ${middle}-${last}`;
 }
 
 // GLOBAL TOASTER MESSAGES FUNCTION

@@ -7,6 +7,8 @@ import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 import { formatDateTime, getActiveStatus } from "./FunctionHelper";
 import { toast } from "react-toastify";
 import profileImg from '../../assets/img/profile-img.jpg';
+import { INVALID_NAMING_CONVENSION } from "../../lang-dump/lang";
+import validationChecker from "../../utils/validations-checker";
 
 export default function ProductCategoryView() {
 
@@ -73,6 +75,11 @@ export default function ProductCategoryView() {
 
         if (!categoryName.trim()) {
             toast.error("Category name is required.");
+            setLoading(false);
+            return;
+        }
+        if (!validationChecker('text', categoryName.trim())) {
+            toast.error(INVALID_NAMING_CONVENSION);
             setLoading(false);
             return;
         }
@@ -175,7 +182,7 @@ export default function ProductCategoryView() {
                         </button>
                     </div>
 
-                    {loading && (
+                    {loading ? (
                         <div className="card shadow-sm mt-3">
                             <div className="card-body p-0">
                                 <ReusableExportTable
@@ -212,9 +219,7 @@ export default function ProductCategoryView() {
                                 </div>
                             </div>
                         </div>
-                    )}
-
-                    {!loading && (
+                    ) : (
                         <div className="card shadow-sm mt-3">
                             <div className="card-body p-0">
                                 <ReusableExportTable

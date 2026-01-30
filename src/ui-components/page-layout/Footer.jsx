@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function Footer() {
 
     const year = new Date().getFullYear();
@@ -9,4 +7,4 @@ export default function Footer() {
             <p>© {year} React Admin. All rights reserved.</p>
         </footer>
     );
-};
+}

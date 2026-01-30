@@ -1,4 +1,4 @@
-import React from "react";
+import PropTypes from "prop-types";
 
 export default function ReusableModalButtons({ loading = false, mode = "add", onCancel, onSubmit, submitText }) {
 
@@ -39,4 +39,12 @@ export default function ReusableModalButtons({ loading = false, mode = "add", on
             )}
         </div>
     );
+}
+
+ReusableModalButtons.propTypes = {
+    loading: PropTypes.bool,
+    mode: PropTypes.oneOf(["add", "edit", "delete", "view"]),
+    onCancel: PropTypes.func,
+    onSubmit: PropTypes.func,
+    submitText: PropTypes.string,
 };

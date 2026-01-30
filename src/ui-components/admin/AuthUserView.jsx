@@ -9,9 +9,10 @@ import profileImg from '../../assets/img/profile-img.jpg';
 import toasterMsgDisplay, { formatDateTime, getActiveStatus, getAuthUserType } from "./FunctionHelper";
 import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
 import {
-    ADD_RECORD, ALL_FIELDS_ARE_REQUIRED, AUTH_USER, AUTH_USER_ADD_AUTH_USER, AUTH_USER_AUTH_USERS_LOADING, AUTH_USER_EDIT_AUTH_USER, AUTH_USER_INVALID_PASSWORD, AUTH_USER_MANAGE_AUTH_USERS, AUTH_USER_NO_AUTH_USERS_FOUND, AUTH_USER_SAVING, AUTH_USER_TITLE, AUTH_USER_UPDATING, INVALID_EMAIL_ADDRESS, INVALID_PHONE_NUMBER, OK_BUTTON
+    ADD_RECORD, ALL_FIELDS_ARE_REQUIRED, AUTH_USER, AUTH_USER_ADD_AUTH_USER, AUTH_USER_AUTH_USERS_LOADING, AUTH_USER_EDIT_AUTH_USER, AUTH_USER_INVALID_PASSWORD, AUTH_USER_MANAGE_AUTH_USERS, AUTH_USER_NO_AUTH_USERS_FOUND, AUTH_USER_SAVING, AUTH_USER_TITLE, AUTH_USER_UPDATING, INVALID_EMAIL_ADDRESS, INVALID_NAMING_CONVENSION, INVALID_PHONE_NUMBER, OK_BUTTON
 } from "../../lang-dump/lang";
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
+import validationChecker from "../../utils/validations-checker";
 
 export default function AuthUserView() {
 
@@ -40,11 +41,15 @@ export default function AuthUserView() {
         document.title = AUTH_USER_TITLE;
         if (hasFetched.current) return;
         hasFetched.current = true;
-        fetchAuthUsers();
+        loadAuthUsers();
     }, []);
 
     // FETCH ALL AUTH USERS
-    const fetchAuthUsers = async () => {
+    const loadAuthUsers = async () => {
+        if (dataTableRef.current) {
+            dataTableRef.current.destroy();
+            dataTableRef.current = null;
+        }
         try {
             setLoading(true);
             const res = await getAuthUsersListApi();
@@ -71,7 +76,7 @@ export default function AuthUserView() {
                 ]
             });
         }
-    }, [authUsersList.length]);
+    }, [authUsersList]);
 
     // VIEW AUTH USER
     const handleView = async (id) => {
@@ -113,17 +118,22 @@ export default function AuthUserView() {
             setLoading(false);
             return;
         }
-        if (!validateEmail(authUserEmail.trim())) {
+        if (!validationChecker('text', authUserName.trim())) {
+            toast.error(INVALID_NAMING_CONVENSION);
+            setLoading(false);
+            return;
+        }
+        if (!validationChecker('email', authUserEmail.trim())) {
             toast.error(INVALID_EMAIL_ADDRESS);
             setLoading(false);
             return;
         }
-        if (!validatePhoneNumber(authUserPhone.trim())) {
+        if (!validationChecker('phone', authUserPhone.trim())) {
             toast.error(INVALID_PHONE_NUMBER);
             setLoading(false);
             return;
         }
-        if (isAddModal && !validatePassword(authUserPassword.trim())) {
+        if (isAddModal && !validationChecker('password', authUserPassword.trim())) {
             toast.error(AUTH_USER_INVALID_PASSWORD);
             setLoading(false);
             return;
@@ -148,7 +158,7 @@ export default function AuthUserView() {
             }
             setTimeout(() => {
                 resetForm();
-                fetchAuthUsers();
+                loadAuthUsers();
                 // location.reload();
                 window.bootstrap.Modal.getInstance(document.getElementById("addUpdateModal")).hide();
             }, 1000);
@@ -159,21 +169,6 @@ export default function AuthUserView() {
             setLoading(false);
         }
     };
-
-    const validateEmail = (email) => {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(String(email).toLowerCase());
-    };
-
-    const validatePhoneNumber = (phoneNumber) => {
-        const re = /^\d{10}$/;
-        return re.test(String(phoneNumber));
-    }
-
-    const validatePassword = (password) => {
-        const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        return re.test(String(password));
-    }
 
     // RESET FORM
     const resetForm = () => {
@@ -216,7 +211,7 @@ export default function AuthUserView() {
                 window.bootstrap.Modal
                     .getInstance(document.getElementById("deleteModal"))
                     ?.hide();
-                fetchAuthUsers();
+                loadAuthUsers();
                 // location.reload();
             }, 1000);
         } catch (error) {
@@ -224,21 +219,38 @@ export default function AuthUserView() {
         }
     };
 
+    const refreshAuthUsers = () => {
+        if (dataTableRef.current) {
+            dataTableRef.current.destroy();
+            dataTableRef.current = null;
+        }
+        setLoading(true);
+        loadAuthUsers();
+    };
+
     return (
         <DashboardLayout>
             <div className="dashboard-layout">
                 <main id="main" className="main">
                     <div className="pagetitle d-flex justify-content-between align-items-center">
-                        <h1 className="toggle-heading">{AUTH_USER_MANAGE_AUTH_USERS}</h1>
-                        <button
-                            className="btn btn-secondary"
-                            onClick={() => {
-                                resetForm();
-                                const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
-                                modal.show();
-                            }}>
-                            {ADD_RECORD}
-                        </button>
+                        <div className="text-left">
+                            <h1 className="toggle-heading">{AUTH_USER_MANAGE_AUTH_USERS}</h1>
+                        </div>
+                        <div className="text-right">
+                            <button className="btn btn-secondary" onClick={() => refreshAuthUsers()} disabled={loading} style={{ marginRight: '10px' }}>
+                                <i className={`${loading ? "spinner-border spinner-border-sm me-1" : "bi bi-arrow-clockwise me-1"}`} />
+                                Refresh
+                            </button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    resetForm();
+                                    const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
+                                    modal.show();
+                                }}>
+                                {ADD_RECORD}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="card shadow-sm mt-3">
@@ -247,82 +259,112 @@ export default function AuthUserView() {
                                 tableRef={tableRef}
                                 dataTableRef={dataTableRef}
                             />
-                            <div className="table-responsive system-log-table">
-                                <table
-                                    ref={tableRef}
-                                    className="table table-hover table-sm mb-0"
-                                    id="demo-table"
-                                >
-                                    <thead className="table-light">
-                                        <tr>
-                                            <th>Sr. No.</th>
-                                            <th>Image</th>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Ph. No.</th>
-                                            <th>Type</th>
-                                            <th>Action By</th>
-                                            <th>Created At</th>
-                                            <th>Active</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
 
-                                    <tbody key={authUsersList.length}>
-                                        {loading ? (
+                            {loading &&
+                                <div className="table-responsive system-log-table">
+                                    <table
+                                        ref={tableRef}
+                                        className="table table-hover table-sm mb-0"
+                                        id="demo-table"
+                                    >
+                                        <thead className="table-light">
+                                            <tr>
+                                                <th>Sr. No.</th>
+                                                <th>Image</th>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Ph. No.</th>
+                                                <th>Type</th>
+                                                <th>Action By</th>
+                                                <th>Created At</th>
+                                                <th>Active</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
                                             <tr>
                                                 <td colSpan="10" className="text-center py-4">
                                                     <div className="spinner-border spinner-border-sm"></div>
                                                     <strong className="ms-2">{AUTH_USER_AUTH_USERS_LOADING}</strong>
                                                 </td>
                                             </tr>
-                                        ) : authUsersList.length === 0 ? (
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+
+                            {!loading &&
+                                <div className="table-responsive system-log-table">
+                                    <table
+                                        ref={tableRef}
+                                        className="table table-hover table-sm mb-0"
+                                        id="demo-table"
+                                    >
+                                        <thead className="table-light">
                                             <tr>
-                                                <td colSpan="10" className="text-center py-4">
-                                                    {AUTH_USER_NO_AUTH_USERS_FOUND}
-                                                </td>
+                                                <th>Sr. No.</th>
+                                                <th>Image</th>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Ph. No.</th>
+                                                <th>Type</th>
+                                                <th>Action By</th>
+                                                <th>Created At</th>
+                                                <th>Active</th>
+                                                <th>Action</th>
                                             </tr>
-                                        ) : (
-                                            authUsersList.map((row, index) => (
-                                                <tr key={`${row.authUserId}-${row.authUserCreatedAt}`}>
-                                                    <td>{index + 1}</td>
-                                                    <td>
-                                                        <img src={row.authUserImage ? `${import.meta.env.VITE_8082_API_BASE}/uploads/${row.authUserImage}` : profileImg} style={{ maxHeight: "70px", maxWidth: "80px" }} alt="authImage" />
-                                                    </td>
-                                                    <td>{row.authUserName}</td>
-                                                    <td>{row.authUserEmailAddress}</td>
-                                                    <td>{row.authUserPhoneNumber}</td>
-                                                    <td>{getAuthUserType(row.authUserType)}</td>
-                                                    <td>{row.actionByUserInfo?.authUserName}</td>
-                                                    <td>{formatDateTime(row.authUserCreatedAt)}</td>
-                                                    <td>{getActiveStatus(row.authUserActive)}</td>
-                                                    <td>
-                                                        <button
-                                                            className="btn btn-sm btn-success rounded-pill me-1"
-                                                            onClick={() => handleView(row.authUserId)}
-                                                        >
-                                                            👁️
-                                                        </button>
-                                                        <button className="btn btn-sm btn-info rounded-pill me-1"
-                                                            onClick={() => handleEdit(row)}>
-                                                            ✏️
-                                                        </button>
-                                                        <button className="btn btn-sm btn-danger rounded-pill"
-                                                            onClick={() => {
-                                                                setAuthUserId(row.authUserId);
-                                                                setAuthUserName(row.authUserName);
-                                                                const modal = new window.bootstrap.Modal(document.getElementById("deleteModal"));
-                                                                modal.show();
-                                                            }}>
-                                                            🗑
-                                                        </button>
+                                        </thead>
+
+                                        <tbody key={authUsersList.length}>
+                                            {authUsersList.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan="10" className="text-center py-4">
+                                                        {AUTH_USER_NO_AUTH_USERS_FOUND}
                                                     </td>
                                                 </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                                            ) : (
+                                                authUsersList.map((row, index) => (
+                                                    <tr key={`${row.authUserId}-${row.authUserCreatedAt}`}>
+                                                        <td>{index + 1}</td>
+                                                        <td>
+                                                            <img src={row.authUserImage ? `${import.meta.env.VITE_8082_API_BASE}/uploads/${row.authUserImage}` : profileImg} style={{ maxHeight: "70px", maxWidth: "80px" }} alt="authImage" />
+                                                        </td>
+                                                        <td>{row.authUserName}</td>
+                                                        <td>{row.authUserEmailAddress}</td>
+                                                        <td>{row.authUserPhoneNumber}</td>
+                                                        <td>{getAuthUserType(row.authUserType)}</td>
+                                                        <td>{row.actionByUserInfo?.authUserName}</td>
+                                                        <td>{formatDateTime(row.authUserCreatedAt)}</td>
+                                                        <td>{getActiveStatus(row.authUserActive)}</td>
+                                                        <td>
+                                                            <button
+                                                                className="btn btn-sm btn-success rounded-pill me-1"
+                                                                onClick={() => handleView(row.authUserId)}
+                                                            >
+                                                                👁️
+                                                            </button>
+                                                            <button className="btn btn-sm btn-info rounded-pill me-1"
+                                                                onClick={() => handleEdit(row)}>
+                                                                ✏️
+                                                            </button>
+                                                            <button className="btn btn-sm btn-danger rounded-pill"
+                                                                onClick={() => {
+                                                                    setAuthUserId(row.authUserId);
+                                                                    setAuthUserName(row.authUserName);
+                                                                    const modal = new window.bootstrap.Modal(document.getElementById("deleteModal"));
+                                                                    modal.show();
+                                                                }}>
+                                                                🗑
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
                         </div>
                     </div>
                 </main>

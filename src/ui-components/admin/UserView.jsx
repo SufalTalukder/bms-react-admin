@@ -1,14 +1,14 @@
 import { useEffect, useState, useRef } from "react";
 import DashboardLayout from "../../DashboardLayout";
 import { DataTable } from "simple-datatables";
-import "simple-datatables/dist/style.css";
 import { toast } from "react-toastify";
-import "../../App.css";
 import { addUserApi, getUsersListApi, updateUserApi, deleteUserApi, getUserDetailsApi } from "../../api/users-api";
 import profileImg from '../../assets/img/profile-img.jpg';
 import { formatDateTime, formatDOB, getActiveStatus } from "./FunctionHelper";
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
+import validationChecker from "../../utils/validations-checker";
+import { INVALID_NAMING_CONVENSION } from "../../lang-dump/lang";
 
 export default function UserView() {
 
@@ -112,17 +112,22 @@ export default function UserView() {
             setLoading(false);
             return;
         }
-        if (!validateEmail(emailAddress.trim())) {
+        if (!validationChecker('text', fullName.trim())) {
+            toast.error(INVALID_NAMING_CONVENSION);
+            setLoading(false);
+            return;
+        }
+        if (!validationChecker('email', emailAddress.trim())) {
             toast.error("Invalid email address.");
             setLoading(false);
             return;
         }
-        if (!validatePhoneNumber(phoneNumber.trim())) {
+        if (!validationChecker('phone', phoneNumber.trim())) {
             toast.error("Invalid phone number. It should be 10 digits.");
             setLoading(false);
             return;
         }
-        if (!validateDOB(dob.trim())) {
+        if (!validationChecker('dob', dob.trim())) {
             toast.error("User must be at least 18 years old.");
             setLoading(false);
             return;
@@ -157,24 +162,6 @@ export default function UserView() {
         } finally {
             setLoading(false);
         }
-    };
-
-    const validateEmail = (email) => {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(String(email).toLowerCase());
-    };
-
-    const validatePhoneNumber = (phoneNumber) => {
-        const re = /^\d{10}$/;
-        return re.test(String(phoneNumber));
-    }
-
-    const validateDOB = (dob) => {
-        const date = new Date(dob);
-        const ageDiff = Date.now() - date.getTime();
-        const ageDate = new Date(ageDiff);
-        const age = Math.abs(ageDate.getUTCFullYear() - 1970);
-        return age >= 18;
     };
 
     // RESET FORM
