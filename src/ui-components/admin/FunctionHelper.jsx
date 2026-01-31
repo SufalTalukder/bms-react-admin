@@ -9,6 +9,17 @@ export function getActiveStatus(isActive) {
     }
 }
 
+export function getStockStatus(isStock) {
+    switch (isStock) {
+        case "IN_STOCK":
+            return <span className="badge bg-success rounded">In Stock</span>;
+        case "OUT_OF_STOCK":
+            return <span className="badge bg-danger rounded">Out of Stock</span>;
+        default:
+            return <span className="badge bg-warning rounded">Unknown</span>;
+    }
+}
+
 export function getAuthUserType(userType) {
     switch (userType) {
         case "SUPER_ADMIN":
