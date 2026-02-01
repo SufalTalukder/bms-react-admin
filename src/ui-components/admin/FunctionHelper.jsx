@@ -31,6 +31,19 @@ export function getAuthUserType(userType) {
     }
 }
 
+export function getSupportStatus(isSupport) {
+    switch (isSupport) {
+        case "PENDING":
+            return <span className="badge bg-warning rounded">Pending</span>;
+        case "ON_GOING":
+            return <span className="badge bg-info rounded">On Going</span>;
+        case "RESOLVED":
+            return <span className="badge bg-success rounded">Resolved</span>;
+        default:
+            return <span className="badge bg-dark rounded">Unknown</span>;
+    }
+}
+
 export function getCalendarMethodDetails(method) {
     switch (method) {
         case 'POST':
@@ -145,6 +158,13 @@ export function formatPhoneNumber(phone) {
     const last = digits.slice(6);
 
     return `(${area}) ${middle}-${last}`;
+}
+
+export function getTextPreview(html, limit = 120) {
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = html;
+    const text = tempDiv.textContent || tempDiv.innerText || "";
+    return text.length > limit ? text.substring(0, limit) + "..." : text;
 }
 
 // GLOBAL TOASTER MESSAGES FUNCTION

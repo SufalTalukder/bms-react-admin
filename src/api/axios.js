@@ -12,6 +12,7 @@ export const BASE_URLS = {
     CATEGORY: import.meta.env.VITE_8084_API_BASE,
     SUB_CATEGORY: import.meta.env.VITE_8085_API_BASE,
     PRODUCT: import.meta.env.VITE_8086_API_BASE,
+    SUPPORT: import.meta.env.VITE_8100_API_BASE,
 };
 
 /**

@@ -19,6 +19,7 @@ import CartView from "./ui-components/admin/CartView";
 import NewsletterView from "./ui-components/admin/NewsletterView";
 import { AuthProvider } from "./context/AuthContext";
 import PublicRoute from "./PublicRoute";
+import SupportView from "./ui-components/admin/SupportView";
 
 export default function App() {
 
@@ -96,6 +97,7 @@ export default function App() {
             <Route path="/admin/wishlist-service" element={<WishlistView />} />
             <Route path="/admin/cart-service" element={<CartView />} />
             <Route path="/admin/newsletter-service" element={<NewsletterView />} />
+            <Route path="/admin/support-service" element={<SupportView />} />
           </Route>
 
           {/* 404 Route */}

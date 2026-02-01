@@ -88,3 +88,29 @@ body.toggle-sidebar .toggle-heading {
     transform: rotate(360deg);
   }
 }
+
+/* 01-02-2026 */
+.ql-editor {
+  padding: 0;
+}
+
+.ql-editor p {
+  margin-bottom: 0.5rem;
+}
+
+.ql-editor ol,
+.ql-editor ul {
+  padding-left: 1.5rem;
+}
+
+.system-log-table td {
+  vertical-align: top;
+}
+
+.support-preview {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  /* show 3 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
