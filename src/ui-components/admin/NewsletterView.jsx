@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import DashboardLayout from "../../DashboardLayout";
+import { NEWSLETTER_PAGE_TITLE } from "../../lang-dump/lang";
 
-const NewsletterView = () => {
+export default function NewsletterView() {
 
     useEffect(() => {
-        document.title = "Manage Newsletters | Admin Panel";
+        document.title = NEWSLETTER_PAGE_TITLE;
     }, []);
 
     return (
@@ -33,7 +34,7 @@ const NewsletterView = () => {
                                         <table className="table table-hover table-sm mt-2" id="demo-table">
                                             <thead>
                                                 <tr>
-                                                    <th>Sr. No.</th>
+                                                    <th>#Sr. No.</th>
                                                     <th>User</th>
                                                     <th>Action By</th>
                                                     <th>Subscribed</th>
@@ -100,6 +101,4 @@ const NewsletterView = () => {
             </div>
         </DashboardLayout>
     );
-};
-
-export default NewsletterView;
+}

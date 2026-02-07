@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import notFoundImg from "../../assets/img/not-found.svg";
+import notFoundImg from "/assets/img/not-found.svg";
 import {
-    AUTH_LOGIN_PAGE_TITLE,
-    NOT_FOUND_404, NOT_FOUND_404_BACK_TO_HOME, NOT_FOUND_404_PAGE_DOESNT_EXIST
+    NOT_FOUND_404, NOT_FOUND_404_BACK_TO_HOME, NOT_FOUND_404_PAGE_DOESNT_EXIST,
+    NOT_FOUND_404_TITLE
 } from "../../lang-dump/lang";
 
 export default function Page404View() {
@@ -11,8 +11,18 @@ export default function Page404View() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        document.title = AUTH_LOGIN_PAGE_TITLE;
+        document.title = NOT_FOUND_404_TITLE;
     }, []);
+
+    useEffect(() => {
+        document.body.style.overflow = "hidden";
+        document.documentElement.style.overflow = "hidden";
+
+        return () => {
+            document.body.style.overflow = "";
+            document.documentElement.style.overflow = "";
+        };
+    });
 
     return (
         <div className="error-page">

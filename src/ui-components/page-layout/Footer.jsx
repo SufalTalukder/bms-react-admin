@@ -1,10 +1,13 @@
+import { SITE_TITLE } from "../../lang-dump/lang";
+
 export default function Footer() {
 
-    const year = new Date().getFullYear();
+    const currentYear = new Date().getFullYear();
+    const previousYear = currentYear - 1;
 
     return (
         <footer id="footer" className="footer text-center">
-            <p>© {year} React Admin. All rights reserved.</p>
+            <p>© {previousYear}-{currentYear} {SITE_TITLE}. All rights reserved.</p>
         </footer>
     );
 }

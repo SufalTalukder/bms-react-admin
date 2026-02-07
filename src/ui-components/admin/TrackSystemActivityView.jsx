@@ -3,7 +3,6 @@ import DashboardLayout from "../../DashboardLayout";
 import { getLoginAuditDetailsApi, getLoginAuditsApi } from "../../api/login-audit-api";
 import { DataTable } from "simple-datatables";
 import "simple-datatables/dist/style.css";
-import "../../App.css";
 import { formatDateTime } from "./FunctionHelper";
 import { toast } from "react-toastify";
 import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
@@ -15,7 +14,7 @@ import {
     TRACK_SYSTEM_ACTIVITY_VIEW_LOGIN_AUDIT_DETAILS
 } from "../../lang-dump/lang";
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
-import profileImg from '../../assets/img/profile-img.jpg';
+import profileImg from '/assets/img/profile-img.jpg';
 
 export default function TrackSystemActivityView() {
 
@@ -95,7 +94,7 @@ export default function TrackSystemActivityView() {
     const handleView = async (id) => {
         try {
             const res = await getLoginAuditDetailsApi(id);
-            const authLoginAudit = res.data.content;
+            const authLoginAudit = res.data?.content;
             if (authLoginAudit) {
                 setModalTitle(TRACK_SYSTEM_ACTIVITY_VIEW_LOGIN_AUDIT_DETAILS);
                 setModalBtnText("Ok");
@@ -167,7 +166,7 @@ export default function TrackSystemActivityView() {
                                     >
                                         <thead className="table-light">
                                             <tr>
-                                                <th>Sr. No.</th>
+                                                <th>#Sr. No.</th>
                                                 <th>IP Address</th>
                                                 <th>User Agent</th>
                                                 <th>Browser</th>
@@ -202,7 +201,7 @@ export default function TrackSystemActivityView() {
                                     >
                                         <thead className="table-light">
                                             <tr>
-                                                <th>Sr. No.</th>
+                                                <th>#Sr. No.</th>
                                                 <th>IP Address</th>
                                                 <th>User Agent</th>
                                                 <th>Browser</th>

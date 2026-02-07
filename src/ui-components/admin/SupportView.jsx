@@ -9,7 +9,8 @@ import { formatDateTime, getSupportStatus, getTextPreview } from "./FunctionHelp
 import { toast } from "react-toastify";
 import { addSupportApi, deleteSupportApi, getSupportDetailsApi, getSupportsListApi, updateSupportApi } from "../../api/supports-api";
 import { getUsersListApi } from "../../api/users-api";
-import profileImg from '../../assets/img/profile-img.jpg';
+import profileImg from '/assets/img/profile-img.jpg';
+import { SUPPORT_PAGE_TITLE } from "../../lang-dump/lang";
 
 export default function SupportView() {
 
@@ -35,7 +36,7 @@ export default function SupportView() {
     const tableRef = useRef(null);
 
     useEffect(() => {
-        document.title = "Manage Supports | Admin Panel";
+        document.title = SUPPORT_PAGE_TITLE;
         if (hasFetched.current) return;
         hasFetched.current = true;
         fetchUsers();
@@ -53,7 +54,7 @@ export default function SupportView() {
                 filterByStatus || null
             );
             setSupportsList(
-                res.data.status === "success" ? res.data.content : []
+                res.data?.status === "success" ? res.data?.content : []
             );
         } catch (e) {
             setSupportsList([]);
@@ -67,7 +68,7 @@ export default function SupportView() {
         try {
             setLoading(true);
             const res = await getUsersListApi();
-            setUsersList(res.data.content || []);
+            setUsersList(res.data?.content || []);
         } catch (e) {
             console.error(e);
             toast.error("Failed to fetch users.");
@@ -95,7 +96,6 @@ export default function SupportView() {
     // HANDLE SUBMIT FOR ADD/UPDATE
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
 
         if (!userId.trim() || !supportText.trim() || !supportStatus.trim()) {
             toast.error("All fields are required.");
@@ -108,6 +108,7 @@ export default function SupportView() {
         formData.append("supportStatus", supportStatus);
 
         try {
+            setLoading(true);
             if (isAddModal) {
                 await addSupportApi(userId, formData);
                 toast.success("Support added successfully!");
@@ -191,7 +192,7 @@ export default function SupportView() {
                 const modal = new window.bootstrap.Modal(document.getElementById("viewModal"));
                 modal.show();
             } else {
-                toast.error("Product not found.");
+                toast.error("Support info not found.");
             }
         } catch (error) {
             console.error(error);
@@ -246,7 +247,7 @@ export default function SupportView() {
                                 >
                                     <thead className="table-light">
                                         <tr>
-                                            <th>Sr. No.</th>
+                                            <th>#Sr. No.</th>
                                             <th>Support Details</th>
                                             <th>Raised By</th>
                                             <th>Action By</th>
@@ -391,7 +392,7 @@ export default function SupportView() {
                                 <div className="row g-3 p-3">
                                     <div className="col-md-6" style={{ textAlign: "left" }}>
                                         <label className="form-label">Select User *</label>
-                                        <select className="form-select" value={userId} onChange={(e) => setUserId(e.target.value)} required>
+                                        <select className="form-select form-control" value={userId} onChange={(e) => setUserId(e.target.value)} required>
                                             <option value="">-- Select --</option>
                                             {usersList.map((row) => (
                                                 <option key={`${row.userId}-${row.userCreatedAt}`} value={row.userId}>{row.fullName}</option>
@@ -400,7 +401,7 @@ export default function SupportView() {
                                     </div>
                                     <div className="col-md-6" style={{ textAlign: "left" }}>
                                         <label className="form-label">Active *</label>
-                                        <select className="form-select" value={supportStatus} onChange={(e) => setSupportStatus(e.target.value)} required>
+                                        <select className="form-select form-control" value={supportStatus} onChange={(e) => setSupportStatus(e.target.value)} required>
                                             <option value="">-- Select --</option>
                                             <option value="PENDING">Pending</option>
                                             <option value="ON_GOING">On Going</option>

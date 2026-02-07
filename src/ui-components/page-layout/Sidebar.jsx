@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 
 export default function Sidebar() {
+
     const location = useLocation();
 
     const productRoutes = [
@@ -35,7 +36,7 @@ export default function Sidebar() {
                 <li className="nav-item">
                     <NavLink to="/admin/auth-user-service" className="nav-link">
                         <i className="ri-shield-user-fill"></i>
-                        <span>Auth User Management</span>
+                        <span>Auth Management</span>
                     </NavLink>
                 </li>
                 <li className="nav-item">
@@ -86,7 +87,7 @@ export default function Sidebar() {
                 <li className="nav-item">
                     <NavLink to="/admin/wishlist-service" className="nav-link">
                         <i className="bx bx-bookmark-heart"></i>
-                        <span>Wishlist Management</span>
+                        <span>Favourite Management</span>
                     </NavLink>
                 </li>
                 <li className="nav-item">
@@ -110,7 +111,7 @@ export default function Sidebar() {
                 <li className="nav-item">
                     <NavLink to="/admin/support-service" className="nav-link">
                         <i className="bx bx-support"></i>
-                        <span>Support</span>
+                        <span>Manage Support</span>
                     </NavLink>
                 </li>
             </ul>

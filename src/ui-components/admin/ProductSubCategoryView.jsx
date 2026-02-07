@@ -6,9 +6,9 @@ import { addSubCategoryApi, deleteSubCategoryApi, getSubCategoriesListApi, updat
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 import { formatDateTime, getActiveStatus } from "./FunctionHelper";
 import { toast } from "react-toastify";
-import profileImg from '../../assets/img/profile-img.jpg';
+import profileImg from '/assets/img/profile-img.jpg';
 import validationChecker from "../../utils/validations-checker";
-import { INVALID_NAMING_CONVENSION } from "../../lang-dump/lang";
+import { INVALID_NAMING_CONVENSION, SUB_CATEGORY_PAGE_TITLE } from "../../lang-dump/lang";
 
 export default function ProductSubCategoryView() {
 
@@ -27,7 +27,7 @@ export default function ProductSubCategoryView() {
     const tableRef = useRef(null);
 
     useEffect(() => {
-        document.title = "Manage SubCategories | Admin Panel";
+        document.title = SUB_CATEGORY_PAGE_TITLE;
         if (hasFetched.current) return;
         hasFetched.current = true;
         fetchAllSubCategories();
@@ -38,7 +38,7 @@ export default function ProductSubCategoryView() {
         try {
             setLoading(true);
             const res = await getSubCategoriesListApi();
-            setSubCategoriesList(res.data.content || []);
+            setSubCategoriesList(res.data?.content || []);
         } catch (e) {
             console.error(e);
             toast.error("Failed to fetch subcategories.");
@@ -71,7 +71,6 @@ export default function ProductSubCategoryView() {
     // HANDLE SUBMIT FOR ADD/UPDATE
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
 
         if (!subCategoryName.trim()) {
             toast.error("SubCategory name is required.");
@@ -95,16 +94,17 @@ export default function ProductSubCategoryView() {
         if (subCategoryImage) formData.append("subCategoryImage", subCategoryImage);
 
         try {
+            setLoading(true);
             if (isAddModal) {
                 const addRes = await addSubCategoryApi(formData);
-                if (addRes.data.status === 'exist') {
+                if (addRes.data?.status === 'exist') {
                     toast.warn("SubCategory already exists!");
                     return;
                 }
                 toast.success("SubCategory added successfully!");
             } else {
                 const updateRes = await updateSubCategoryApi(subCategoryId, formData);
-                if (updateRes.data.status === 'exist') {
+                if (updateRes.data?.status === 'exist') {
                     toast.warn("SubCategory already exists!");
                     return;
                 }
@@ -172,7 +172,7 @@ export default function ProductSubCategoryView() {
                     <div className="pagetitle d-flex justify-content-between align-items-center">
                         <h1 className="toggle-heading">Manage Categories</h1>
                         <button
-                            className="btn btn-secondary"
+                            className="btn btn-primary"
                             onClick={() => {
                                 resetForm();
                                 const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
@@ -197,7 +197,7 @@ export default function ProductSubCategoryView() {
                                     >
                                         <thead className="table-light">
                                             <tr>
-                                                <th>Sr. No.</th>
+                                                <th>#Sr. No.</th>
                                                 <th>Image</th>
                                                 <th>SubCategory Name</th>
                                                 <th>Action By</th>
@@ -236,7 +236,7 @@ export default function ProductSubCategoryView() {
                                     >
                                         <thead className="table-light">
                                             <tr>
-                                                <th>Sr. No.</th>
+                                                <th>#Sr. No.</th>
                                                 <th>Image</th>
                                                 <th>SubCategory Name</th>
                                                 <th>Action By</th>
@@ -314,7 +314,7 @@ export default function ProductSubCategoryView() {
                                     </div>
                                     <div className="col-md-4" style={{ textAlign: "left" }}>
                                         <label className="form-label">Active *</label>
-                                        <select className="form-select" value={subCategoryActive} onChange={(e) => setSubCategoryActive(e.target.value)} required>
+                                        <select className="form-select form-control" value={subCategoryActive} onChange={(e) => setSubCategoryActive(e.target.value)} required>
                                             <option value="">-- Select --</option>
                                             <option value="YES">Yes</option>
                                             <option value="NO">No</option>
@@ -352,7 +352,9 @@ export default function ProductSubCategoryView() {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <p>Are you sure you want to delete this `{subCategoryName}` SubCategory?</p>
+                            <p>Are you sure you want to delete this
+                                <strong>`{subCategoryName}`</strong> SubCategory?
+                            </p>
                         </div>
                         <ReusableModalButtons
                             loading={loading}

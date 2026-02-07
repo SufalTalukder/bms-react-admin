@@ -2,8 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import DashboardLayout from "../../DashboardLayout";
 import { DataTable } from "simple-datatables";
 import { toast } from "react-toastify";
-import { } from "../../api/users-api";
-import profileImg from '../../assets/img/profile-img.jpg';
+import profileImg from '/assets/img/profile-img.jpg';
 import { formatDateTime, getActiveStatus, getStockStatus } from "./FunctionHelper";
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
@@ -11,6 +10,9 @@ import { addProductApi, deleteProductApi, getProductDetailsApi, getProductsListA
 import { getAllLanguagesApi } from "../../api/languages-api";
 import { getCategoriesListApi } from "../../api/categories-api";
 import { getSubCategoriesListApi } from "../../api/sub-categories-api";
+import ReactQuill from "react-quill";
+import 'react-quill/dist/quill.snow.css';
+import { PRODUCT_PAGE_TITLE } from "../../lang-dump/lang";
 
 export default function ProductView() {
 
@@ -48,7 +50,7 @@ export default function ProductView() {
     const tableRef = useRef(null);
 
     useEffect(() => {
-        document.title = "Manage Products | Admin Panel";
+        document.title = PRODUCT_PAGE_TITLE;
         if (hasFetched.current) return;
         hasFetched.current = true;
         fetchInitialData();
@@ -63,9 +65,9 @@ export default function ProductView() {
                 getAllLanguagesApi()
             ]);
 
-            setCategoriesList(cat.data.content || []);
-            setSubCategoriesList(subCat.data.content || []);
-            setLanguagesList(lang.data.content || []);
+            setCategoriesList(cat.data?.content || []);
+            setSubCategoriesList(subCat.data?.content || []);
+            setLanguagesList(lang.data?.content || []);
         } catch {
             toast.error("Failed to load filters.");
         }
@@ -86,7 +88,7 @@ export default function ProductView() {
             );
 
             setProductsList(
-                res.data.status === "success" ? res.data.content : []
+                res.data?.status === "success" ? res.data?.content : []
             );
         } catch (e) {
             setProductsList([]);
@@ -150,7 +152,6 @@ export default function ProductView() {
     // HANDLE SUBMIT FOR ADD/UPDATE
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
 
         if (
             !productName.trim()
@@ -179,6 +180,7 @@ export default function ProductView() {
         if (productImage) formData.append("productImage", productImage);
 
         try {
+            setLoading(true);
             if (isAddModal) {
                 await addProductApi(categoryId, subCategoryId, languageId, formData);
                 toast.success("Product added successfully!");
@@ -267,10 +269,10 @@ export default function ProductView() {
                         <h1 className="toggle-heading">Manage Products</h1>
                         <div className="d-flex justify-content-end gap-2">
                             <select
-                                className="form-select"
+                                className="btn btn-secondary"
                                 value={categoryId}
                                 onChange={(e) => setCategoryId(Number(e.target.value))}
-                                style={{ maxWidth: "150px" }}
+                                style={{ maxWidth: "170px" }}
                             >
                                 <option value="">-- Category --</option>
                                 {categoriesList.map((c) => (
@@ -278,10 +280,10 @@ export default function ProductView() {
                                 ))}
                             </select>
                             <select
-                                className="form-select"
+                                className="btn btn-secondary"
                                 value={subCategoryId}
                                 onChange={(e) => setSubCategoryId(Number(e.target.value))}
-                                style={{ maxWidth: "150px" }}
+                                style={{ maxWidth: "170px" }}
                             >
                                 <option value="">-- Subcategory --</option>
                                 {subCategoriesList.map((sc) => (
@@ -289,10 +291,10 @@ export default function ProductView() {
                                 ))}
                             </select>
                             <select
-                                className="form-select"
+                                className="btn btn-secondary"
                                 value={languageId}
                                 onChange={(e) => setLanguageId(Number(e.target.value))}
-                                style={{ maxWidth: "150px" }}
+                                style={{ maxWidth: "170px" }}
                             >
                                 <option value="">-- Language --</option>
                                 {languagesList.map((l) => (
@@ -300,7 +302,7 @@ export default function ProductView() {
                                 ))}
                             </select>
                             <button
-                                className="btn btn-secondary"
+                                className="btn btn-primary"
                                 onClick={() => {
                                     resetForm();
                                     const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
@@ -325,7 +327,7 @@ export default function ProductView() {
                                 >
                                     <thead className="table-light">
                                         <tr>
-                                            <th>Sr. No.</th>
+                                            <th>#Sr. No.</th>
                                             <th>Image</th>
                                             <th>Name</th>
                                             <th>Brand</th>
@@ -441,7 +443,11 @@ export default function ProductView() {
                                         </div>
                                         <div className="row mb-2">
                                             <div className="col-lg-3 col-md-4 fw-bold">Details</div>
-                                            <div className="col-lg-9 col-md-8" style={{ wordWrap: "break-word" }}>{productDetails}</div>
+                                            <div className="col-lg-9 col-md-8" style={{ wordWrap: "break-word" }}>
+                                                <div className="ql-editor"
+                                                    dangerouslySetInnerHTML={{ __html: productDetails }}
+                                                />
+                                            </div>
                                         </div>
                                         <div className="row mb-2">
                                             <div className="col-lg-3 col-md-4 fw-bold">Stock</div>
@@ -488,7 +494,7 @@ export default function ProductView() {
             {/* ADD MODAL */}
             {/* OR, UPDATE MODAL */}
             <div className="modal fade" id="addUpdateModal" tabIndex={-1} aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-                <div className="modal-dialog modal-xl modal-dialog-scrollable" style={{ maxHeight: "75vh" }}>
+                <div className="modal-dialog modal-xl" style={{ maxHeight: "75vh" }}>
                     <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title">{modalTitle}</h5>
@@ -503,7 +509,7 @@ export default function ProductView() {
                                     </div>
                                     <div className="col-md-4" style={{ textAlign: "left" }}>
                                         <label className="form-label">Select Category *</label>
-                                        <select className="form-select" value={categoryId} onChange={(e) => setCategoryId(e.target.value)} required>
+                                        <select className="form-select form-control" value={categoryId} onChange={(e) => setCategoryId(e.target.value)} required>
                                             <option value="">-- Select --</option>
                                             {categoriesList.map((row) => (
                                                 <option key={`${row.categoryId}-${row.categoryCreatedAt}`} value={row.categoryId}>{row.categoryName}</option>
@@ -512,7 +518,7 @@ export default function ProductView() {
                                     </div>
                                     <div className="col-md-4" style={{ textAlign: "left" }}>
                                         <label className="form-label">Select Subcategory *</label>
-                                        <select className="form-select" value={subCategoryId} onChange={(e) => setSubCategoryId(e.target.value)} required>
+                                        <select className="form-select form-control" value={subCategoryId} onChange={(e) => setSubCategoryId(e.target.value)} required>
                                             <option value="">-- Select --</option>
                                             {subCategoriesList.map((row) => (
                                                 <option key={`${row.subCategoryId}-${row.subCategoryCreatedAt}`} value={row.subCategoryId}>{row.subCategoryName}</option>
@@ -521,7 +527,7 @@ export default function ProductView() {
                                     </div>
                                     <div className="col-md-4" style={{ textAlign: "left" }}>
                                         <label className="form-label">Select Language *</label>
-                                        <select className="form-select" value={languageId} onChange={(e) => setLanguageId(e.target.value)} required>
+                                        <select className="form-select form-control" value={languageId} onChange={(e) => setLanguageId(e.target.value)} required>
                                             <option value="">-- Select --</option>
                                             {languagesList.map((row) => (
                                                 <option key={`${row.languageId}-${row.languageCreatedAt}`} value={row.languageId}>{row.languageName}</option>
@@ -545,12 +551,8 @@ export default function ProductView() {
                                         <input type="number" className="form-control" maxLength="50" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} autoComplete="new-address" required />
                                     </div>
                                     <div className="col-md-4" style={{ textAlign: "left" }}>
-                                        <label className="form-label">Details *</label>
-                                        <input type="text" className="form-control" value={productDetails} onChange={(e) => setProductDetails(e.target.value)} autoComplete="new-address" required />
-                                    </div>
-                                    <div className="col-md-4" style={{ textAlign: "left" }}>
                                         <label className="form-label">Stock *</label>
-                                        <select className="form-select" value={productStock} onChange={(e) => setProductStock(e.target.value)} required>
+                                        <select className="form-select form-control" value={productStock} onChange={(e) => setProductStock(e.target.value)} required>
                                             <option value="">-- Select --</option>
                                             <option value="IN_STOCK">In Stock</option>
                                             <option value="OUT_OF_STOCK">Out of Stock</option>
@@ -558,7 +560,7 @@ export default function ProductView() {
                                     </div>
                                     <div className="col-md-4" style={{ textAlign: "left" }}>
                                         <label className="form-label">Active *</label>
-                                        <select className="form-select" value={productActive} onChange={(e) => setProductActive(e.target.value)} required>
+                                        <select className="form-select form-control" value={productActive} onChange={(e) => setProductActive(e.target.value)} required>
                                             <option value="">-- Select --</option>
                                             <option value="YES">Yes</option>
                                             <option value="NO">No</option>
@@ -571,6 +573,14 @@ export default function ProductView() {
                                             className="form-control"
                                             onChange={(e) => setProductImage(e.target.files[0])}
                                             accept=".jpg,.jpeg,.png"
+                                        />
+                                    </div>
+                                    <div className="col-md-12" style={{ textAlign: "left" }}>
+                                        <label className="form-label">Details *</label>
+                                        <ReactQuill
+                                            value={productDetails}
+                                            onChange={setProductDetails}
+                                            theme="snow"
                                         />
                                     </div>
                                 </div>
@@ -596,7 +606,9 @@ export default function ProductView() {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <p>Are you sure you want to delete this `{productName}` Product?</p>
+                            <p>Are you sure you want to delete this
+                                <strong>`{productName}`</strong> Product?
+                            </p>
                         </div>
                         <ReusableModalButtons
                             loading={loading}

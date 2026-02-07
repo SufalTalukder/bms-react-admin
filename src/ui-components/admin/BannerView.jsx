@@ -38,7 +38,7 @@ export default function BannerView() {
         try {
             setLoading(true);
             const res = await getBannersListApi();
-            setAllBanners(res.data.content || []);
+            setAllBanners(res.data?.content || []);
         } catch (e) {
             console.error(e);
             toast.error(toasterMsgDisplay('failed_r', BANNER));
@@ -140,7 +140,7 @@ export default function BannerView() {
                     <div className="pagetitle d-flex justify-content-between align-items-center">
                         <h1 className="toggle-heading">{BANNER_HEADING_MANAGE_BANNERS}</h1>
                         <button
-                            className="btn btn-secondary"
+                            className="btn btn-primary"
                             onClick={() => {
                                 resetForm();
                                 const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
@@ -164,7 +164,7 @@ export default function BannerView() {
                                 >
                                     <thead className="table-light">
                                         <tr>
-                                            <th>Sr. No.</th>
+                                            <th>#Sr. No.</th>
                                             <th>Image</th>
                                             <th>Action By</th>
                                             <th>Created At</th>
@@ -249,7 +249,7 @@ export default function BannerView() {
                                     </div>
                                     <div className="col-md-6" style={{ textAlign: "left" }}>
                                         <label className="form-label">Active *</label>
-                                        <select className="form-select" value={bannerActiveStatus} onChange={(e) => setBannerActiveStatus(e.target.value)} required>
+                                        <select className="form-select form-control" value={bannerActiveStatus} onChange={(e) => setBannerActiveStatus(e.target.value)} required>
                                             <option value="">-- Select --</option>
                                             <option value="YES">Yes</option>
                                             <option value="NO">No</option>
@@ -279,7 +279,8 @@ export default function BannerView() {
                         </div>
                         <div className="modal-body">
                             <p>
-                                Are you sure you want to delete this `{appBannerName}` Banner?
+                                Are you sure you want to delete this
+                                <strong>`{appBannerName}`</strong> Banner?
                             </p>
                         </div>
                         <ReusableModalButtons

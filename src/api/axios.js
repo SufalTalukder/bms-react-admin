@@ -1,5 +1,8 @@
 import axios from "axios";
 
+let isRefreshing = false;
+let failedQueue = [];
+
 /**
  * Centralized service base URLs
  */
@@ -15,24 +18,85 @@ export const BASE_URLS = {
     SUPPORT: import.meta.env.VITE_8100_API_BASE,
 };
 
+const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+        error ? prom.reject(error) : prom.resolve(token);
+    });
+    failedQueue = [];
+};
+
 /**
  * Common interceptor logic
  */
-const applyInterceptors = (instance) => {
-    instance.interceptors.request.use(
-        (config) => {
-            const token = sessionStorage.getItem("authToken");
+export const applyInterceptors = (instance) => {
 
-            if (token) {
-                config.headers.authToken = token;
+    instance.interceptors.request.use(config => {
+        const token = sessionStorage.getItem("accessToken");
+        if (token) {
+            config.headers.authToken = token;
+        }
+
+        config.headers["x-api-key"] = import.meta.env.VITE_API_KEY;
+        config.headers["x-api-secret"] = import.meta.env.VITE_API_SECRET;
+
+        return config;
+    });
+
+    instance.interceptors.response.use(
+        response => response,
+        async error => {
+            const originalRequest = error.config;
+
+            if (error.response?.status === 401 && !originalRequest._retry) {
+                if (isRefreshing) {
+                    return new Promise((resolve, reject) => {
+                        failedQueue.push({ resolve, reject });
+                    }).then(token => {
+                        originalRequest.headers.authToken = token;
+                        return instance(originalRequest);
+                    });
+                }
+
+                originalRequest._retry = true;
+                isRefreshing = true;
+
+                try {
+                    const refreshToken =
+                        localStorage.getItem("refreshToken") ||
+                        sessionStorage.getItem("refreshToken");
+
+                    const res = await axios.post(
+                        `${import.meta.env.VITE_8082_API_BASE}/refresh-token`,
+                        { refreshToken },
+                        {
+                            headers: {
+                                "x-api-key": import.meta.env.VITE_API_KEY,
+                                "x-api-secret": import.meta.env.VITE_API_SECRET
+                            }
+                        }
+                    );
+
+                    const newAccessToken = res.data?.content?.accessToken;
+
+                    sessionStorage.setItem("accessToken", newAccessToken);
+                    processQueue(null, newAccessToken);
+
+                    originalRequest.headers.authToken = newAccessToken;
+
+                    return instance(originalRequest);
+                } catch (err) {
+                    processQueue(err, null);
+                    sessionStorage.clear();
+                    localStorage.removeItem("refreshToken");
+                    window.location.href = "/admin/login";
+                    return Promise.reject(err);
+                } finally {
+                    isRefreshing = false;
+                }
             }
 
-            config.headers["x-api-key"] = import.meta.env.VITE_API_KEY;
-            config.headers["x-api-secret"] = import.meta.env.VITE_API_SECRET;
-
-            return config;
-        },
-        (error) => Promise.reject(error)
+            return Promise.reject(error);
+        }
     );
 
     return instance;

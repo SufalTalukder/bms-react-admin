@@ -1,35 +1,45 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import adminLogo from "../../assets/img/react.svg";
+import adminLogo from "/assets/img/react.svg";
 import ReusableLoginButton from "../reusable-components/ReusableLoginButton";
 import {
-    AUTH_LOGIN_EMAIL, AUTH_LOGIN_ENTER_EMAIL_AND_PASSWORD, AUTH_LOGIN_PAGE_TITLE, AUTH_LOGIN_PASSWORD, AUTH_LOGIN_REMEMBER_ME, AUTH_LOGIN_TITLE, AUTH_LOGIN_TO_YOUR_ACCOUNT, AUTH_LOGIN_VALIDATION_EMAIL_AND_PASSWORD_REQUIRED, AUTH_LOGIN_VALIDATION_ENTER_VALID_EMAIL
+    AUTH_LOGIN_ENTER_EMAIL_AND_PASSWORD, AUTH_LOGIN_PAGE_TITLE, AUTH_LOGIN_PASSWORD, AUTH_LOGIN_REMEMBER_ME, AUTH_LOGIN_TITLE, AUTH_LOGIN_TO_YOUR_ACCOUNT, AUTH_LOGIN_USERNAME, AUTH_LOGIN_VALIDATION_EMAIL_AND_PASSWORD_REQUIRED, AUTH_LOGIN_VALIDATION_ENTER_VALID_EMAIL
 } from "../../lang-dump/lang";
 import toasterMsgDisplay from "./FunctionHelper";
 import validationChecker from "../../utils/validations-checker";
 
 export default function LoginView() {
 
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [rememberMe, setRememberMe] = useState(false);
+    const [loading, setLoading] = useState(false);
+
     const { login } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
         document.title = AUTH_LOGIN_PAGE_TITLE;
-        const token = sessionStorage.getItem("authToken");
+        const token = sessionStorage.getItem("accessToken");
         if (token) {
             navigate("/admin/track-your-activity", { replace: true });
         }
     }, [navigate]);
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
+    useEffect(() => {
+        document.body.style.overflow = "hidden";
+        document.documentElement.style.overflow = "hidden";
+
+        return () => {
+            document.body.style.overflow = "";
+            document.documentElement.style.overflow = "";
+        };
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
 
         if (!email.trim() || !password.trim()) {
             toast.error(AUTH_LOGIN_VALIDATION_EMAIL_AND_PASSWORD_REQUIRED);
@@ -42,12 +52,16 @@ export default function LoginView() {
             return;
         }
 
+        const data = {
+            authUserEmailAddress: email,
+            authUserPassword: password,
+        };
+
         try {
-            await login(email, password);
+            setLoading(true);
+            await login(data, rememberMe);
             toast.success(toasterMsgDisplay('login_add', AUTH_LOGIN_TITLE));
-            setTimeout(() => {
-                navigate("/admin/track-your-activity");
-            }, 500);
+            navigate("/admin/track-your-activity");
         } catch (err) {
             console.error("Login error:", err);
             toast.error(err.response?.data?.message || toasterMsgDisplay('login_failed', AUTH_LOGIN_TITLE));
@@ -61,39 +75,48 @@ export default function LoginView() {
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-lg-5 col-md-5 d-flex flex-column align-items-center justify-content-center">
-                        <div className="card mb-3" style={{ width: "85%" }}>
-                            <div className="card-body">
-                                <div className="pt-4 pb-2">
-                                    <img src={adminLogo} alt="logo" className="rotate-logo" style={{ maxWidth: "50px" }} />
-                                    <h5 className="card-title text-center pb-0 fs-4">
-                                        {AUTH_LOGIN_TO_YOUR_ACCOUNT}
-                                    </h5>
-                                    <p className="text-center small">
-                                        {AUTH_LOGIN_ENTER_EMAIL_AND_PASSWORD}
+                        <div className="card mb-5" style={{ width: "81%" }}>
+                            <div className="pt-2 pb-2">
+                                <img src={adminLogo} alt="logo" className="rotate-logo" style={{ maxWidth: "50px" }} />
+                                <h5 className="card-title text-center pb-0 fs-4">
+                                    {AUTH_LOGIN_TO_YOUR_ACCOUNT}
+                                </h5>
+                                <p className="text-center small">
+                                    {AUTH_LOGIN_ENTER_EMAIL_AND_PASSWORD}
+                                </p>
+                            </div>
+                            <form className="row g-3" onSubmit={handleSubmit} noValidate>
+                                <div className="col-lg-12 col-md-12" style={{ textAlign: "left" }}>
+                                    <div className="form-floating">
+                                        <input type="email" className="form-control" id="floatingEmail" placeholder="e.g; john.doe@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="off" required />
+                                        <label htmlFor="floatingEmail">{AUTH_LOGIN_USERNAME}</label>
+                                    </div>
+                                </div>
+                                <div className="col-lg-12 col-md-12" style={{ textAlign: "left" }}>
+                                    <div className="form-floating">
+                                        <input type="password" className="form-control" id="floatingPassword" placeholder="e.g; ••••••••" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" required />
+                                        <label htmlFor="floatingPassword" className="form-label">{AUTH_LOGIN_PASSWORD}</label>
+                                    </div>
+                                </div>
+                                <div className="col-lg-12 col-md-12" style={{ textAlign: "left" }}>
+                                    <div className="form-check">
+                                        <input type="checkbox" className="form-check-input" value={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
+                                        <label className="small mb-0">{AUTH_LOGIN_REMEMBER_ME}</label>
+                                    </div>
+                                </div>
+                                <ReusableLoginButton
+                                    loading={loading}
+                                    buttonType="submit"
+                                    buttonText="Login"
+                                />
+                                <div className="col-lg-12 col-md-12" style={{ textAlign: "left" }}>
+                                    <p className="small mb-0">Don`t have account?
+                                        <Link to="/admin/create-account">
+                                            &nbsp;Create an account
+                                        </Link>
                                     </p>
                                 </div>
-                                <form className="row g-3" onSubmit={handleSubmit} noValidate>
-                                    <div className="col-12" style={{ textAlign: "left" }}>
-                                        <label className="form-label">{AUTH_LOGIN_EMAIL}</label>
-                                        <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                                    </div>
-                                    <div className="col-12" style={{ textAlign: "left" }}>
-                                        <label className="form-label">{AUTH_LOGIN_PASSWORD}</label>
-                                        <input type="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                                    </div>
-                                    <div className="col-12" style={{ textAlign: "left" }}>
-                                        <div className="form-check">
-                                            <input type="checkbox" className="form-check-input" name="remember" value="true" />
-                                            <label className="form-check-label">{AUTH_LOGIN_REMEMBER_ME}</label>
-                                        </div>
-                                    </div>
-                                    <ReusableLoginButton
-                                        loading={loading}
-                                        buttonType="submit"
-                                        buttonText="Login"
-                                    />
-                                </form>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>

@@ -8,6 +8,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { Tooltip } from "bootstrap";
 import { fetchAuthActivities } from "../../api/activities-api";
 import { formatTime, getCalendarMethodDetails } from "./FunctionHelper";
+import { TRACK_YOUR_ACTIVITY_PAGE_TITLE } from "../../lang-dump/lang";
 
 export default function TrackYourActivityView() {
 
@@ -17,7 +18,7 @@ export default function TrackYourActivityView() {
     const hasFetched = useRef(false);
 
     useEffect(() => {
-        document.title = "Track Your Activity | Admin Panel";
+        document.title = TRACK_YOUR_ACTIVITY_PAGE_TITLE;
         if (hasFetched.current) return;
         hasFetched.current = true;
         loadActivities();

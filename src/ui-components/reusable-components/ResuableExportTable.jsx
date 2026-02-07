@@ -13,7 +13,7 @@ export function ReusableExportTable({ tableRef, dataTableRef }) {
             <button className="btn btn-sm btn-outline-danger" onClick={() => exportPDF(tableRef)}>{EXPORT_TABLE_EXPORT_PDF}</button>
             <button className="btn btn-sm btn-outline-info" onClick={() => exportHTML(tableRef, "doc", "application/msword")}>Export DOC</button>
             <button className="btn btn-sm btn-outline-warning" onClick={() => { removeLoaderIfExists(tableRef); exportTXT(dataTableRef); }}>{EXPORT_TABLE_EXPORT_TXT}</button>
-            <button className="btn btn-sm btn-outline-dark" onClick={() => exportSQL(tableRef)}>{EXPORT_TABLE_EXPORT_SQL}</button>
+            <button className="btn btn-sm btn-outline-secondary" onClick={() => exportSQL(tableRef)}>{EXPORT_TABLE_EXPORT_SQL}</button>
         </div>
     );
 }

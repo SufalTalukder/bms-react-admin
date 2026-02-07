@@ -160,6 +160,7 @@ export function formatPhoneNumber(phone) {
     return `(${area}) ${middle}-${last}`;
 }
 
+// Glance view of support details
 export function getTextPreview(html, limit = 120) {
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = html;

@@ -3,19 +3,18 @@ import DashboardLayout from "../../DashboardLayout";
 import { DataTable } from "simple-datatables";
 import { toast } from "react-toastify";
 import { addUserApi, getUsersListApi, updateUserApi, deleteUserApi, getUserDetailsApi } from "../../api/users-api";
-import profileImg from '../../assets/img/profile-img.jpg';
+import profileImg from '/assets/img/profile-img.jpg';
 import { formatDateTime, formatDOB, getActiveStatus } from "./FunctionHelper";
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
 import validationChecker from "../../utils/validations-checker";
-import { INVALID_NAMING_CONVENSION } from "../../lang-dump/lang";
+import { AUTH_USER_TITLE, INVALID_NAMING_CONVENSION } from "../../lang-dump/lang";
 
 export default function UserView() {
 
     // STATE VARIABLES
     const [isAddModal, setIsAddModal] = useState(true);
     const [modalTitle, setModalTitle] = useState("Add User");
-    const [modalBtnText, setModalBtnText] = useState("Saving...");
     const [userId, setUserId] = useState(null);
     const [fullName, setUserName] = useState("");
     const [emailAddress, setUserEmail] = useState("");
@@ -34,7 +33,7 @@ export default function UserView() {
     const tableRef = useRef(null);
 
     useEffect(() => {
-        document.title = "Manage Users | Admin Panel";
+        document.title = AUTH_USER_TITLE;
         if (hasFetched.current) return;
         hasFetched.current = true;
         fetchUsers();
@@ -45,7 +44,7 @@ export default function UserView() {
         try {
             setLoading(true);
             const res = await getUsersListApi();
-            setUsersList(res.data.content || []);
+            setUsersList(res.data?.content || []);
         } catch (e) {
             console.error(e);
             toast.error("Failed to fetch users.");
@@ -68,17 +67,16 @@ export default function UserView() {
                 ]
             });
         }
-    }, [usersList.length]);
+    }, [usersList]);
 
     // VIEW USER
     const handleView = async (id) => {
         try {
             const res = await getUserDetailsApi(id);
-            const user = res.data.content;
+            const user = res.data?.content;
             if (user) {
                 setIsAddModal(false);
                 setModalTitle("View User Details");
-                setModalBtnText("Ok");
                 setUserId(user.userId);
                 setUserName(user.fullName);
                 setUserEmail(user.emailAddress);
@@ -105,7 +103,6 @@ export default function UserView() {
     // HANDLE SUBMIT FOR ADD/UPDATE
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
 
         if (!fullName.trim() || !emailAddress.trim() || !phoneNumber.trim() || !userAddress.trim() || !dob.trim() || !userActive) {
             toast.error("Please fill all required fields.");
@@ -143,6 +140,7 @@ export default function UserView() {
         if (userImage) formData.append("userImage", userImage);
 
         try {
+            setLoading(true);
             if (isAddModal) {
                 await addUserApi(formData);
                 toast.success("User added successfully!");
@@ -182,7 +180,6 @@ export default function UserView() {
     const handleEdit = (user) => {
         setIsAddModal(false);
         setModalTitle("Update User");
-        setModalBtnText("Updating...");
         setUserId(user.userId);
         setUserName(user.fullName);
         setUserEmail(user.emailAddress);
@@ -220,7 +217,7 @@ export default function UserView() {
                     <div className="pagetitle d-flex justify-content-between align-items-center">
                         <h1 className="toggle-heading">Manage Users</h1>
                         <button
-                            className="btn btn-secondary"
+                            className="btn btn-primary"
                             onClick={() => {
                                 resetForm();
                                 const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
@@ -244,7 +241,7 @@ export default function UserView() {
                                 >
                                     <thead className="table-light">
                                         <tr>
-                                            <th>Sr. No.</th>
+                                            <th>#Sr. No.</th>
                                             <th>Image</th>
                                             <th>Name</th>
                                             <th>Ph. No.</th>
@@ -422,7 +419,7 @@ export default function UserView() {
                                     </div>
                                     <div className="col-md-4" style={{ textAlign: "left" }}>
                                         <label className="form-label">Active *</label>
-                                        <select className="form-select" value={userActive} onChange={(e) => setUserActive(e.target.value)} required>
+                                        <select className="form-select form-control" value={userActive} onChange={(e) => setUserActive(e.target.value)} required>
                                             <option value="">-- Select --</option>
                                             <option value="YES">Yes</option>
                                             <option value="NO">No</option>
@@ -460,7 +457,9 @@ export default function UserView() {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <p>Are you sure you want to delete this `{fullName}` User?</p>
+                            <p>Are you sure you want to delete this
+                                <strong>`{fullName}`</strong> User?
+                            </p>
                         </div>
                         <ReusableModalButtons
                             loading={loading}

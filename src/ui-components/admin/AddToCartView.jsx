@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import DashboardLayout from "../../DashboardLayout";
 
-const CartView = () => {
+export default function CartView() {
 
     useEffect(() => {
         document.title = "Manage Carts | Admin Panel";
@@ -144,6 +144,4 @@ const CartView = () => {
             </div>
         </DashboardLayout>
     );
-};
-
-export default CartView;
+}

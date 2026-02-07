@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import DashboardLayout from "../../DashboardLayout";
 
-const WishlistView = () => {
+export default function AddToFavouriteView() {
 
     useEffect(() => {
-        document.title = "Manage Wishlists | Admin Panel";
+        document.title = "Manage Favourites | Admin Panel";
     }, []);
 
     return (
@@ -33,7 +33,7 @@ const WishlistView = () => {
                                         <table className="table table-hover table-sm mt-2" id="demo-table">
                                             <thead>
                                                 <tr>
-                                                    <th>Sr. No.</th>
+                                                    <th>#Sr. No.</th>
                                                     <th>Product</th>
                                                     <th>User</th>
                                                     <th>Action By</th>
@@ -127,6 +127,4 @@ const WishlistView = () => {
             </div>
         </DashboardLayout>
     );
-};
-
-export default WishlistView;
+}

@@ -5,11 +5,11 @@ import "simple-datatables/dist/style.css";
 import { toast } from "react-toastify";
 import "../../App.css";
 import { addAuthUserApi, deleteAuthUserApi, getAuthUserDetailsApi, getAuthUsersListApi, updateAuthUserApi } from "../../api/auth-users-api";
-import profileImg from '../../assets/img/profile-img.jpg';
+import profileImg from '/assets/img/profile-img.jpg';
 import toasterMsgDisplay, { formatDateTime, getActiveStatus, getAuthUserType } from "./FunctionHelper";
 import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
 import {
-    ADD_RECORD, ALL_FIELDS_ARE_REQUIRED, AUTH_USER, AUTH_USER_ADD_AUTH_USER, AUTH_USER_AUTH_USERS_LOADING, AUTH_USER_EDIT_AUTH_USER, AUTH_USER_INVALID_PASSWORD, AUTH_USER_MANAGE_AUTH_USERS, AUTH_USER_NO_AUTH_USERS_FOUND, AUTH_USER_SAVING, AUTH_USER_TITLE, AUTH_USER_UPDATING, INVALID_EMAIL_ADDRESS, INVALID_NAMING_CONVENSION, INVALID_PHONE_NUMBER, OK_BUTTON
+    ADD_RECORD, ALL_FIELDS_ARE_REQUIRED, AUTH_USER, AUTH_USER_ADD_AUTH_USER, AUTH_USER_AUTH_USERS_LOADING, AUTH_USER_EDIT_AUTH_USER, AUTH_USER_INVALID_PASSWORD, AUTH_USER_MANAGE_AUTH_USERS, AUTH_USER_NO_AUTH_USERS_FOUND, AUTH_USER_TITLE, INVALID_EMAIL_ADDRESS, INVALID_NAMING_CONVENSION, INVALID_PHONE_NUMBER,
 } from "../../lang-dump/lang";
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 import validationChecker from "../../utils/validations-checker";
@@ -19,7 +19,6 @@ export default function AuthUserView() {
     // STATE VARIABLES
     const [isAddModal, setIsAddModal] = useState(true);
     const [modalTitle, setModalTitle] = useState(AUTH_USER_ADD_AUTH_USER);
-    const [modalBtnText, setModalBtnText] = useState(AUTH_USER_SAVING);
     const [authUserId, setAuthUserId] = useState(null);
     const [authUserName, setAuthUserName] = useState("");
     const [actionBy, setActionBy] = useState("");
@@ -53,7 +52,7 @@ export default function AuthUserView() {
         try {
             setLoading(true);
             const res = await getAuthUsersListApi();
-            setAuthUsersList(res.data.content || []);
+            setAuthUsersList(res.data?.content || []);
         } catch (e) {
             console.error(e);
             toast.error(toasterMsgDisplay('view_all', AUTH_USER));
@@ -82,11 +81,10 @@ export default function AuthUserView() {
     const handleView = async (id) => {
         try {
             const res = await getAuthUserDetailsApi(id);
-            const authUser = res.data.content;
+            const authUser = res.data?.content;
             if (authUser) {
                 setIsAddModal(false);
                 setModalTitle(toasterMsgDisplay('view', AUTH_USER));
-                setModalBtnText(OK_BUTTON);
                 setAuthUserId(authUser.authUserId);
                 setAuthUserName(authUser.authUserName);
                 setActionBy(authUser.actionByUserInfo?.authUserName);
@@ -111,7 +109,6 @@ export default function AuthUserView() {
     // HANDLE SUBMIT FOR ADD/UPDATE
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
 
         if (!authUserName.trim() || !authUserEmail.trim() || !authUserPhone.trim() || !authUserType || !authUserActive) {
             toast.error(ALL_FIELDS_ARE_REQUIRED);
@@ -149,6 +146,7 @@ export default function AuthUserView() {
         if (authUserImage) formData.append("authUserImage", authUserImage);
 
         try {
+            setLoading(true);
             if (isAddModal) {
                 await addAuthUserApi(formData);
                 toast.success(toasterMsgDisplay('add', AUTH_USER));
@@ -188,7 +186,6 @@ export default function AuthUserView() {
     const handleEdit = (authUser) => {
         setIsAddModal(false);
         setModalTitle(AUTH_USER_EDIT_AUTH_USER);
-        setModalBtnText(AUTH_USER_UPDATING);
         setAuthUserId(authUser.authUserId);
         setAuthUserName(authUser.authUserName);
         setAuthUserEmail(authUser.authUserEmailAddress);
@@ -269,7 +266,7 @@ export default function AuthUserView() {
                                     >
                                         <thead className="table-light">
                                             <tr>
-                                                <th>Sr. No.</th>
+                                                <th>#Sr. No.</th>
                                                 <th>Image</th>
                                                 <th>Name</th>
                                                 <th>Email</th>
@@ -303,7 +300,7 @@ export default function AuthUserView() {
                                     >
                                         <thead className="table-light">
                                             <tr>
-                                                <th>Sr. No.</th>
+                                                <th>#Sr. No.</th>
                                                 <th>Image</th>
                                                 <th>Name</th>
                                                 <th>Email</th>
@@ -440,39 +437,39 @@ export default function AuthUserView() {
                             <div className="modal-body">
                                 <div className="row g-3 p-3">
                                     <div className="col-md-4" style={{ textAlign: "left" }}>
-                                        <label htmlFor="authName" className="form-label">Name *</label>
+                                        <label className="form-label">Name *</label>
                                         <input type="text" className="form-control" maxLength="100" value={authUserName} onChange={(e) => setAuthUserName(e.target.value)} autoComplete="new-name" required />
                                     </div>
                                     <div className="col-md-4" style={{ textAlign: "left" }}>
-                                        <label htmlFor="authEmail" className="form-label">Email *</label>
+                                        <label className="form-label">Email *</label>
                                         <input type="email" className="form-control" maxLength="50" value={authUserEmail} onChange={(e) => setAuthUserEmail(e.target.value)} autoComplete="new-email" required />
                                     </div>
                                     <div className="col-md-4" style={{ textAlign: "left" }}>
-                                        <label htmlFor="authPhone" className="form-label">Phone Number *</label>
+                                        <label className="form-label">Phone Number *</label>
                                         <input type="text" className="form-control" minLength="10" maxLength="10" value={authUserPhone} onChange={(e) => setAuthUserPhone(e.target.value)} autoComplete="new-phone-number" required />
                                     </div>
                                     <div className="col-md-4" style={{ textAlign: "left" }}>
-                                        <label htmlFor="authPassword" className="form-label">Password {isAddModal ? "*" : "(Leave blank to keep unchanged)"}</label>
+                                        <label className="form-label">Password {isAddModal ? "*" : "(Leave blank to keep unchanged)"}</label>
                                         <input type="password" className="form-control" maxLength="50" value={authUserPassword} onChange={(e) => setAuthUserPassword(e.target.value)} autoComplete="new-password" required={isAddModal} />
                                     </div>
                                     <div className="col-md-4" style={{ textAlign: "left" }}>
-                                        <label htmlFor="authType" className="form-label">Type *</label>
-                                        <select className="form-select" value={authUserType} onChange={(e) => setAuthUserType(e.target.value)} required>
+                                        <label className="form-label">Type *</label>
+                                        <select className="form-select form-control" value={authUserType} onChange={(e) => setAuthUserType(e.target.value)} required>
                                             <option value="">-- Select --</option>
                                             <option value="SUPER_ADMIN">Super Admin</option>
                                             <option value="ADMIN">Admin</option>
                                         </select>
                                     </div>
                                     <div className="col-md-4" style={{ textAlign: "left" }}>
-                                        <label htmlFor="authActive" className="form-label">Active *</label>
-                                        <select className="form-select" value={authUserActive} onChange={(e) => setAuthUserActive(e.target.value)} required>
+                                        <label className="form-label">Active *</label>
+                                        <select className="form-select form-control" value={authUserActive} onChange={(e) => setAuthUserActive(e.target.value)} required>
                                             <option value="">-- Select --</option>
                                             <option value="YES">Yes</option>
                                             <option value="NO">No</option>
                                         </select>
                                     </div>
                                     <div className="col-md-4" style={{ textAlign: "left" }}>
-                                        <label htmlFor="authImage" className="form-label">Upload Image</label>
+                                        <label className="form-label">Upload Image</label>
                                         <input
                                             type="file"
                                             className="form-control"
@@ -503,7 +500,9 @@ export default function AuthUserView() {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <p>Are you sure you want to delete this `{authUserName}` Auth?</p>
+                            <p>Are you sure you want to delete this
+                                <strong>`{authUserName}`</strong> Auth?
+                            </p>
                         </div>
                         <ReusableModalButtons
                             mode="delete"

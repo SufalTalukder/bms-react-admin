@@ -7,7 +7,7 @@ import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 import { formatDateTime, getActiveStatus } from "./FunctionHelper";
 import { toast } from "react-toastify";
 import validationChecker from "../../utils/validations-checker";
-import { INVALID_NAMING_CONVENSION } from "../../lang-dump/lang";
+import { INVALID_NAMING_CONVENSION, LANGUAGE_PAGE_TITLE } from "../../lang-dump/lang";
 
 export default function LanguageView() {
 
@@ -25,7 +25,7 @@ export default function LanguageView() {
     const tableRef = useRef(null);
 
     useEffect(() => {
-        document.title = "Manage Languages | Admin Panel";
+        document.title = LANGUAGE_PAGE_TITLE;
         if (hasFetched.current) return;
         hasFetched.current = true;
         fetchAllLanguages();
@@ -36,7 +36,7 @@ export default function LanguageView() {
         try {
             setLoading(true);
             const res = await getAllLanguagesApi();
-            setLanguagesList(res.data.content || []);
+            setLanguagesList(res.data?.content || []);
         } catch (e) {
             console.error(e);
             toast.error("Failed to fetch languages.");
@@ -89,14 +89,14 @@ export default function LanguageView() {
         try {
             if (isAddModal) {
                 const addRes = await addLanguageApi(formData);
-                if (addRes.data.status === 'exist') {
+                if (addRes.data?.status === 'exist') {
                     toast.warn("Language already exists!");
                     return;
                 }
                 toast.success("Language added successfully!");
             } else {
                 const updateRes = await updateLanguageApi(languageId, formData);
-                if (updateRes.data.status === 'exist') {
+                if (updateRes.data?.status === 'exist') {
                     toast.warn("Language already exists!");
                     return;
                 }
@@ -157,7 +157,7 @@ export default function LanguageView() {
                     <div className="pagetitle d-flex justify-content-between align-items-center">
                         <h1 className="toggle-heading">Manage Languages</h1>
                         <button
-                            className="btn btn-secondary"
+                            className="btn btn-primary"
                             onClick={() => {
                                 resetForm();
                                 const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
@@ -182,7 +182,7 @@ export default function LanguageView() {
                                     >
                                         <thead className="table-light">
                                             <tr>
-                                                <th>Sr. No.</th>
+                                                <th>#Sr. No.</th>
                                                 <th>Language Name</th>
                                                 <th>Action By</th>
                                                 <th>Created At</th>
@@ -220,7 +220,7 @@ export default function LanguageView() {
                                     >
                                         <thead className="table-light">
                                             <tr>
-                                                <th>Sr. No.</th>
+                                                <th>#Sr. No.</th>
                                                 <th>Language Name</th>
                                                 <th>Action By</th>
                                                 <th>Created At</th>
@@ -294,7 +294,7 @@ export default function LanguageView() {
                                     </div>
                                     <div className="col-md-6" style={{ textAlign: "left" }}>
                                         <label className="form-label">Active *</label>
-                                        <select className="form-select" value={languageActive} onChange={(e) => setLanguageActive(e.target.value)} required>
+                                        <select className="form-select form-control" value={languageActive} onChange={(e) => setLanguageActive(e.target.value)} required>
                                             <option value="">-- Select --</option>
                                             <option value="YES">Yes</option>
                                             <option value="NO">No</option>
@@ -323,7 +323,9 @@ export default function LanguageView() {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <p>Are you sure you want to delete this `{languageName}` Language?</p>
+                            <p>Are you sure you want to delete this
+                                <strong>`{languageName}`</strong> Language?
+                            </p>
                         </div>
                         <ReusableModalButtons
                             loading={loading}

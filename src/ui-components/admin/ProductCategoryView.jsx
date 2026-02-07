@@ -6,8 +6,8 @@ import { addCategoryApi, deleteCategoryApi, getCategoriesListApi, updateCategory
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 import { formatDateTime, getActiveStatus } from "./FunctionHelper";
 import { toast } from "react-toastify";
-import profileImg from '../../assets/img/profile-img.jpg';
-import { INVALID_NAMING_CONVENSION } from "../../lang-dump/lang";
+import profileImg from '/assets/img/profile-img.jpg';
+import { CATEGORY_PAGE_TITLE, INVALID_NAMING_CONVENSION } from "../../lang-dump/lang";
 import validationChecker from "../../utils/validations-checker";
 
 export default function ProductCategoryView() {
@@ -27,7 +27,7 @@ export default function ProductCategoryView() {
     const tableRef = useRef(null);
 
     useEffect(() => {
-        document.title = "Manage Categories | Admin Panel";
+        document.title = CATEGORY_PAGE_TITLE;
         if (hasFetched.current) return;
         hasFetched.current = true;
         fetchAllCategories();
@@ -38,7 +38,7 @@ export default function ProductCategoryView() {
         try {
             setLoading(true);
             const res = await getCategoriesListApi();
-            setCategoriesList(res.data.content || []);
+            setCategoriesList(res.data?.content || []);
         } catch (e) {
             console.error(e);
             toast.error("Failed to fetch categories.");
@@ -71,7 +71,6 @@ export default function ProductCategoryView() {
     // HANDLE SUBMIT FOR ADD/UPDATE
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
 
         if (!categoryName.trim()) {
             toast.error("Category name is required.");
@@ -95,6 +94,7 @@ export default function ProductCategoryView() {
         if (categoryImage) formData.append("categoryImage", categoryImage);
 
         try {
+            setLoading(true);
             if (isAddModal) {
                 const addRes = await addCategoryApi(formData);
                 if (addRes.data.status === 'exist') {
@@ -104,7 +104,7 @@ export default function ProductCategoryView() {
                 toast.success("Category added successfully!");
             } else {
                 const updateRes = await updateCategoryApi(categoryId, formData);
-                if (updateRes.data.status === 'exist') {
+                if (updateRes.data?.status === 'exist') {
                     toast.warn("Category already exists!");
                     return;
                 }
@@ -172,7 +172,7 @@ export default function ProductCategoryView() {
                     <div className="pagetitle d-flex justify-content-between align-items-center">
                         <h1 className="toggle-heading">Manage Categories</h1>
                         <button
-                            className="btn btn-secondary"
+                            className="btn btn-primary"
                             onClick={() => {
                                 resetForm();
                                 const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
@@ -197,7 +197,7 @@ export default function ProductCategoryView() {
                                     >
                                         <thead className="table-light">
                                             <tr>
-                                                <th>Sr. No.</th>
+                                                <th>#Sr. No.</th>
                                                 <th>Image</th>
                                                 <th>Category Name</th>
                                                 <th>Action By</th>
@@ -234,7 +234,7 @@ export default function ProductCategoryView() {
                                     >
                                         <thead className="table-light">
                                             <tr>
-                                                <th>Sr. No.</th>
+                                                <th>#Sr. No.</th>
                                                 <th>Image</th>
                                                 <th>Category Name</th>
                                                 <th>Action By</th>
@@ -312,7 +312,7 @@ export default function ProductCategoryView() {
                                     </div>
                                     <div className="col-md-4" style={{ textAlign: "left" }}>
                                         <label className="form-label">Active *</label>
-                                        <select className="form-select" value={categoryActive} onChange={(e) => setCategoryActive(e.target.value)} required>
+                                        <select className="form-select form-control" value={categoryActive} onChange={(e) => setCategoryActive(e.target.value)} required>
                                             <option value="">-- Select --</option>
                                             <option value="YES">Yes</option>
                                             <option value="NO">No</option>
@@ -350,7 +350,9 @@ export default function ProductCategoryView() {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <p>Are you sure you want to delete this `{categoryName}` Category?</p>
+                            <p>Are you sure you want to delete this
+                                <strong>`{categoryName}`</strong> Category?
+                            </p>
                         </div>
                         <ReusableModalButtons
                             loading={loading}

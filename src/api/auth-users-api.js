@@ -8,6 +8,10 @@ export const addAuthUserApi = (data) =>
         headers: { "Content-Type": "multipart/form-data" }
     });
 
+// CREATE ACCOUNT
+export const createAuthAccountApi = (data) =>
+    authApi.post("/create-account", data);
+
 // GET ALL
 export const getAuthUsersListApi = () =>
     authApi.get("/get-all-auth-users");
