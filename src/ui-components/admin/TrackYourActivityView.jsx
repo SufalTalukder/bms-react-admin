@@ -80,6 +80,10 @@ export default function TrackYourActivityView() {
                                 right:
                                     "dayGridYear,dayGridMonth,timeGridWeek,timeGridDay"
                             }}
+                            buttonIcons={{
+                                prev: 'bi bi-chevron-left',
+                                next: 'bi bi-chevron-right'
+                            }}
                             views={{
                                 dayGridYear: {
                                     type: "dayGrid",

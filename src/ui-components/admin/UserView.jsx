@@ -210,21 +210,38 @@ export default function UserView() {
         }
     };
 
+    const refreshTable = () => {
+        if (dataTableRef.current) {
+            dataTableRef.current.destroy();
+            dataTableRef.current = null;
+        }
+        setLoading(true);
+        fetchUsers();
+    };
+
     return (
         <DashboardLayout>
             <div className="dashboard-layout">
                 <main id="main" className="main">
                     <div className="pagetitle d-flex justify-content-between align-items-center">
-                        <h1 className="toggle-heading">Manage Users</h1>
-                        <button
-                            className="btn btn-primary"
-                            onClick={() => {
-                                resetForm();
-                                const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
-                                modal.show();
-                            }}>
-                            + Add Record
-                        </button>
+                        <div className="text-left">
+                            <h1 className="toggle-heading">Manage Users</h1>
+                        </div>
+                        <div className="text-right">
+                            <button className="btn btn-secondary" onClick={refreshTable} disabled={loading} style={{ marginRight: '10px' }}>
+                                <i className={`${loading ? "spinner-border spinner-border-sm me-1" : "bi bi-arrow-clockwise me-1"}`} />
+                                Refresh
+                            </button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    resetForm();
+                                    const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
+                                    modal.show();
+                                }}>
+                                + Add Record
+                            </button>
+                        </div>
                     </div>
 
                     <div className="card shadow-sm mt-3">
@@ -233,90 +250,122 @@ export default function UserView() {
                                 tableRef={tableRef}
                                 dataTableRef={dataTableRef}
                             />
-                            <div className="table-responsive system-log-table">
-                                <table
-                                    ref={tableRef}
-                                    className="table table-hover table-sm mb-0"
-                                    id="demo-table"
-                                >
-                                    <thead className="table-light">
-                                        <tr>
-                                            <th>#Sr. No.</th>
-                                            <th>Image</th>
-                                            <th>Name</th>
-                                            <th>Ph. No.</th>
-                                            <th>Email</th>
-                                            <th>DOB</th>
-                                            <th>Address</th>
-                                            <th>Referral Code</th>
-                                            <th>Action By</th>
-                                            <th>Created At</th>
-                                            <th>Active</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
 
-                                    <tbody key={usersList.length}>
-                                        {loading ? (
+                            {loading &&
+                                <div className="table-responsive system-log-table">
+                                    <table
+                                        ref={tableRef}
+                                        className="table table-hover table-sm mb-0"
+                                        id="demo-table"
+                                    >
+                                        <thead className="table-light">
+                                            <tr>
+                                                <th>#Sr. No.</th>
+                                                <th>Image</th>
+                                                <th>Name</th>
+                                                <th>Ph. No.</th>
+                                                <th>Email</th>
+                                                <th>DOB</th>
+                                                <th>Address</th>
+                                                <th>Referral Code</th>
+                                                <th>Action By</th>
+                                                <th>Created At</th>
+                                                <th>Active</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
                                             <tr>
                                                 <td colSpan="12" className="text-center py-4">
                                                     <div className="spinner-border spinner-border-sm"></div>
                                                     <strong className="ms-2">User(s) Loading...</strong>
                                                 </td>
                                             </tr>
-                                        ) : usersList.length === 0 ? (
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+
+                            {!loading &&
+                                <div className="table-responsive system-log-table">
+                                    <table
+                                        ref={tableRef}
+                                        className="table table-hover table-sm mb-0"
+                                        id="demo-table"
+                                    >
+                                        <thead className="table-light">
                                             <tr>
-                                                <td colSpan="12" className="text-center py-4">
-                                                    No user(s) found.
-                                                </td>
+                                                <th>#Sr. No.</th>
+                                                <th>Image</th>
+                                                <th>Name</th>
+                                                <th>Ph. No.</th>
+                                                <th>Email</th>
+                                                <th>DOB</th>
+                                                <th>Address</th>
+                                                <th>Referral Code</th>
+                                                <th>Action By</th>
+                                                <th>Created At</th>
+                                                <th>Active</th>
+                                                <th>Action</th>
                                             </tr>
-                                        ) : (
-                                            usersList.map((row, index) => (
-                                                <tr key={`${row.userId}-${row.userCreatedAt}`}>
-                                                    <td>{index + 1}</td>
-                                                    <td>
-                                                        <img src={row.userImage ? `${import.meta.env.VITE_8081_API_BASE}/uploads/${row.userImage}` : profileImg} style={{ maxHeight: "70px", maxWidth: "80px" }} alt="userImage" />
-                                                    </td>
-                                                    <td>{row.fullName}</td>
-                                                    <td>{row.phoneNumber}</td>
-                                                    <td className="text-truncate" style={{ maxWidth: 250 }}>
-                                                        {row.emailAddress}
-                                                    </td>
-                                                    <td>{formatDOB(row.dob)}</td>
-                                                    <td>{row.userAddress}</td>
-                                                    <td>
-                                                        <span className="badge bg-primary rounded">{row.userReferralCode}</span>
-                                                    </td>
-                                                    <td>{row.authUserInfo?.authUserName ?? '-'}</td>
-                                                    <td>{formatDateTime(row.userCreatedAt)}</td>
-                                                    <td>{getActiveStatus(row.userActive)}</td>
-                                                    <td>
-                                                        <button
-                                                            className="btn btn-sm btn-success rounded-pill me-1"
-                                                            onClick={() => handleView(row.userId)}
-                                                        >
-                                                            👁️
-                                                        </button>
-                                                        <button className="btn btn-sm btn-info rounded-pill me-1"
-                                                            onClick={() => handleEdit(row)}>
-                                                            ✏️
-                                                        </button>
-                                                        <button className="btn btn-sm btn-danger rounded-pill"
-                                                            onClick={() => {
-                                                                setUserId(row.userId);
-                                                                setUserName(row.fullName);
-                                                                const modal = new window.bootstrap.Modal(document.getElementById("deleteModal"));
-                                                                modal.show();
-                                                            }}>
-                                                            🗑
-                                                        </button>
+                                        </thead>
+
+                                        <tbody key={usersList.length}>
+                                            {usersList.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan="12" className="text-center py-4">
+                                                        No user(s) found.
                                                     </td>
                                                 </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                                            ) : (
+                                                usersList.map((row, index) => (
+                                                    <tr key={`${row.userId}-${row.userCreatedAt}`}>
+                                                        <td>{index + 1}</td>
+                                                        <td>
+                                                            <img src={row.userImage ? `${import.meta.env.VITE_8081_API_BASE}/uploads/${row.userImage}` : profileImg} style={{ maxHeight: "70px", maxWidth: "80px" }} alt="userImage" />
+                                                        </td>
+                                                        <td>{row.fullName}</td>
+                                                        <td>{row.phoneNumber}</td>
+                                                        <td className="text-truncate" style={{ maxWidth: 250 }}>
+                                                            {row.emailAddress}
+                                                        </td>
+                                                        <td>{formatDOB(row.dob)}</td>
+                                                        <td>{row.userAddress}</td>
+                                                        <td>
+                                                            <span className="badge bg-primary rounded">{row.userReferralCode}</span>
+                                                        </td>
+                                                        <td>{row.authUserInfo?.authUserName ?? '-'}</td>
+                                                        <td>{formatDateTime(row.userCreatedAt)}</td>
+                                                        <td>{getActiveStatus(row.userActive)}</td>
+                                                        <td>
+                                                            <button
+                                                                className="btn btn-sm btn-success rounded-pill me-1"
+                                                                onClick={() => handleView(row.userId)}
+                                                            >
+                                                                👁️
+                                                            </button>
+                                                            <button className="btn btn-sm btn-info rounded-pill me-1"
+                                                                onClick={() => handleEdit(row)}>
+                                                                ✏️
+                                                            </button>
+                                                            <button className="btn btn-sm btn-danger rounded-pill"
+                                                                onClick={() => {
+                                                                    setUserId(row.userId);
+                                                                    setUserName(row.fullName);
+                                                                    const modal = new window.bootstrap.Modal(document.getElementById("deleteModal"));
+                                                                    modal.show();
+                                                                }}>
+                                                                🗑
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
                         </div>
                     </div>
                 </main>

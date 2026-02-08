@@ -216,7 +216,7 @@ export default function AuthUserView() {
         }
     };
 
-    const refreshAuthUsers = () => {
+    const refreshTable = () => {
         if (dataTableRef.current) {
             dataTableRef.current.destroy();
             dataTableRef.current = null;
@@ -234,7 +234,7 @@ export default function AuthUserView() {
                             <h1 className="toggle-heading">{AUTH_USER_MANAGE_AUTH_USERS}</h1>
                         </div>
                         <div className="text-right">
-                            <button className="btn btn-secondary" onClick={() => refreshAuthUsers()} disabled={loading} style={{ marginRight: '10px' }}>
+                            <button className="btn btn-secondary" onClick={() => refreshTable()} disabled={loading} style={{ marginRight: '10px' }}>
                                 <i className={`${loading ? "spinner-border spinner-border-sm me-1" : "bi bi-arrow-clockwise me-1"}`} />
                                 Refresh
                             </button>
