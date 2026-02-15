@@ -54,7 +54,6 @@ export default function AddToFavouriteView() {
     const [productCreatedAt, setProductCreatedAt] = useState("");
 
     const dataTableRef = useRef(null);
-    const hasFetched = useRef(false);
     const tableRef = useRef(null);
 
     useEffect(() => {
