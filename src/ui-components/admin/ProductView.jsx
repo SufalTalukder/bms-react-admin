@@ -56,7 +56,7 @@ export default function ProductView() {
         fetchInitialData();
     }, []);
 
-    // FETCH ALL PRODUCTS
+    // FETCH ALL FILTERS
     const fetchInitialData = async () => {
         try {
             const [cat, subCat, lang] = await Promise.all([
@@ -261,6 +261,15 @@ export default function ProductView() {
         }
     };
 
+    const refreshTable = () => {
+        if (dataTableRef.current) {
+            dataTableRef.current.destroy();
+            dataTableRef.current = null;
+        }
+        setLoading(true);
+        loadProducts();
+    };
+
     return (
         <DashboardLayout>
             <div className="dashboard-layout">
@@ -268,6 +277,15 @@ export default function ProductView() {
                     <div className="pagetitle d-flex justify-content-between align-items-center">
                         <h1 className="toggle-heading">Manage Products</h1>
                         <div className="d-flex justify-content-end gap-2">
+                            <button
+                                className="btn btn-secondary"
+                                onClick={() => refreshTable()}
+                                disabled={loading}
+                                style={{ maxWidth: "170px" }}
+                            >
+                                <i className={`${loading ? "spinner-border spinner-border-sm me-1" : "bi bi-arrow-clockwise me-1"}`} />
+                                Refresh
+                            </button>
                             <select
                                 className="btn btn-secondary"
                                 value={categoryId}
@@ -319,6 +337,7 @@ export default function ProductView() {
                                 tableRef={tableRef}
                                 dataTableRef={dataTableRef}
                             />
+                            
                             <div className="table-responsive system-log-table">
                                 <table
                                     ref={tableRef}

@@ -22,37 +22,37 @@ export default function Sidebar() {
         <aside id="sidebar" className="sidebar">
             <ul className="sidebar-nav">
                 <li className="nav-item">
-                    <NavLink to="/admin/track-your-activity" className="nav-link">
+                    <NavLink to="/bms-book-store/admin/track-your-activity" className="nav-link">
                         <i className="bi bi-file-person"></i>
                         <span>Track Your Activity</span>
                     </NavLink>
                 </li>
                 <li className="nav-item">
-                    <NavLink to="/admin/track-system-activity" className="nav-link">
+                    <NavLink to="/bms-book-store/admin/track-system-activity" className="nav-link">
                         <i className="ri-file-search-fill"></i>
                         <span>Track System Activity</span>
                     </NavLink>
                 </li>
                 <li className="nav-item">
-                    <NavLink to="/admin/auth-user-service" className="nav-link">
+                    <NavLink to="/bms-book-store/admin/auth-user-service" className="nav-link">
                         <i className="ri-shield-user-fill"></i>
                         <span>Auth Management</span>
                     </NavLink>
                 </li>
                 <li className="nav-item">
-                    <NavLink to="/admin/user-service" className="nav-link">
+                    <NavLink to="/bms-book-store/admin/user-service" className="nav-link">
                         <i className="ri-user-received-fill"></i>
                         <span>User Management</span>
                     </NavLink>
                 </li>
                 <li className="nav-item">
-                    <NavLink to="/admin/banner-service" className="nav-link">
+                    <NavLink to="/bms-book-store/admin/banner-service" className="nav-link">
                         <i className="bi bi-card-image"></i>
                         <span>Banner Management</span>
                     </NavLink>
                 </li>
                 <li className="nav-item">
-                    <NavLink to="/admin/language-service" className="nav-link">
+                    <NavLink to="/bms-book-store/admin/language-service" className="nav-link">
                         <i className="ri-english-input"></i>
                         <span>Language Management</span>
                     </NavLink>
@@ -65,19 +65,19 @@ export default function Sidebar() {
                     </button>
                     <ul className={`nav-content ${openProduct ? "" : "collapse"}`}>
                         <li>
-                            <NavLink to="/admin/category-service">
+                            <NavLink to="/bms-book-store/admin/category-service">
                                 <i className="bi bi-circle" />
                                 <span>Manage Category</span>
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/admin/sub-category-service">
+                            <NavLink to="/bms-book-store/admin/sub-category-service">
                                 <i className="bi bi-circle" />
                                 <span>Manage Subcategory</span>
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/admin/product-service">
+                            <NavLink to="/bms-book-store/admin/product-service">
                                 <i className="bi bi-circle" />
                                 <span>Manage Product</span>
                             </NavLink>
@@ -85,31 +85,31 @@ export default function Sidebar() {
                     </ul>
                 </li>
                 <li className="nav-item">
-                    <NavLink to="/admin/wishlist-service" className="nav-link">
+                    <NavLink to="/bms-book-store/admin/wishlist-service" className="nav-link">
                         <i className="bx bx-bookmark-heart"></i>
                         <span>Favourite Management</span>
                     </NavLink>
                 </li>
                 <li className="nav-item">
-                    <NavLink to="/admin/cart-service" className="nav-link">
+                    <NavLink to="/bms-book-store/admin/cart-service" className="nav-link">
                         <i className="bx bx-cart"></i>
                         <span>Cart Management</span>
                     </NavLink>
                 </li>
                 <li className="nav-item">
-                    <NavLink to="/admin/checkout-service" className="nav-link">
+                    <NavLink to="/bms-book-store/admin/checkout-service" className="nav-link">
                         <i className="ri-secure-payment-fill"></i>
                         <span>Checkout Management</span>
                     </NavLink>
                 </li>
                 <li className="nav-item">
-                    <NavLink to="/admin/newsletter-service" className="nav-link">
+                    <NavLink to="/bms-book-store/admin/newsletter-service" className="nav-link">
                         <i className="bx bx-news"></i>
                         <span>Newsletter Management</span>
                     </NavLink>
                 </li>
                 <li className="nav-item">
-                    <NavLink to="/admin/support-service" className="nav-link">
+                    <NavLink to="/bms-book-store/admin/support-service" className="nav-link">
                         <i className="bx bx-support"></i>
                         <span>Manage Support</span>
                     </NavLink>

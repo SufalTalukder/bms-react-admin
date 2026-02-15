@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
 
         setUser(null);
         setAccessToken(null);
-        navigate("/admin/login", { replace: true });
+        navigate("/bms-book-store/admin/login", { replace: true });
     };
 
     // INIT

@@ -251,7 +251,7 @@ export default function UserView() {
                                 dataTableRef={dataTableRef}
                             />
 
-                            {loading &&
+                            {loading && (
                                 <div className="table-responsive system-log-table">
                                     <table
                                         ref={tableRef}
@@ -285,9 +285,9 @@ export default function UserView() {
                                         </tbody>
                                     </table>
                                 </div>
-                            }
+                            )}
 
-                            {!loading &&
+                            {!loading && (
                                 <div className="table-responsive system-log-table">
                                     <table
                                         ref={tableRef}
@@ -365,7 +365,7 @@ export default function UserView() {
                                         </tbody>
                                     </table>
                                 </div>
-                            }
+                            )}
                         </div>
                     </div>
                 </main>

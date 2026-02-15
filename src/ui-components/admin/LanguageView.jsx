@@ -28,11 +28,11 @@ export default function LanguageView() {
         document.title = LANGUAGE_PAGE_TITLE;
         if (hasFetched.current) return;
         hasFetched.current = true;
-        fetchAllLanguages();
+        loadLanguages();
     }, []);
 
     // FETCH ALL LANGUAGES
-    const fetchAllLanguages = async () => {
+    const loadLanguages = async () => {
         try {
             setLoading(true);
             const res = await getAllLanguagesApi();
@@ -103,7 +103,7 @@ export default function LanguageView() {
                 toast.success("Language updated successfully!");
             }
             resetForm();
-            await fetchAllLanguages();
+            await loadLanguages();
             window.bootstrap.Modal.getInstance(document.getElementById("addUpdateModal")).hide();
         } catch (error) {
             console.error(error);
@@ -141,7 +141,7 @@ export default function LanguageView() {
         try {
             await deleteLanguageApi(id);
             toast.success("Language deleted successfully!");
-            await fetchAllLanguages();
+            await loadLanguages();
             window.bootstrap.Modal
                 .getInstance(document.getElementById("deleteModal"))
                 ?.hide();
@@ -150,30 +150,48 @@ export default function LanguageView() {
         }
     };
 
+    const refreshTable = () => {
+        if (dataTableRef.current) {
+            dataTableRef.current.destroy();
+            dataTableRef.current = null;
+        }
+        setLoading(true);
+        loadLanguages();
+    };
+
     return (
         <DashboardLayout>
             <div className="dashboard-layout">
                 <main id="main" className="main">
                     <div className="pagetitle d-flex justify-content-between align-items-center">
-                        <h1 className="toggle-heading">Manage Languages</h1>
-                        <button
-                            className="btn btn-primary"
-                            onClick={() => {
-                                resetForm();
-                                const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
-                                modal.show();
-                            }}>
-                            + Add Record
-                        </button>
+                        <div className="text-left">
+                            <h1 className="toggle-heading">Manage Languages</h1>
+                        </div>
+                        <div className="text-right">
+                            <button className="btn btn-secondary" onClick={() => refreshTable()} disabled={loading} style={{ marginRight: '10px' }}>
+                                <i className={`${loading ? "spinner-border spinner-border-sm me-1" : "bi bi-arrow-clockwise me-1"}`} />
+                                Refresh
+                            </button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    resetForm();
+                                    const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
+                                    modal.show();
+                                }}>
+                                + Add Record
+                            </button>
+                        </div>
                     </div>
 
-                    {loading && (
-                        <div className="card shadow-sm mt-3">
-                            <div className="card-body p-0">
-                                <ReusableExportTable
-                                    tableRef={tableRef}
-                                    dataTableRef={dataTableRef}
-                                />
+                    <div className="card shadow-sm mt-3">
+                        <div className="card-body p-0">
+                            <ReusableExportTable
+                                tableRef={tableRef}
+                                dataTableRef={dataTableRef}
+                            />
+
+                            {loading && (
                                 <div className="table-responsive system-log-table">
                                     <table
                                         ref={tableRef}
@@ -201,17 +219,9 @@ export default function LanguageView() {
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
-                        </div>
-                    )}
+                            )}
 
-                    {!loading && (
-                        <div className="card shadow-sm mt-3">
-                            <div className="card-body p-0">
-                                <ReusableExportTable
-                                    tableRef={tableRef}
-                                    dataTableRef={dataTableRef}
-                                />
+                            {!loading && (
                                 <div className="table-responsive system-log-table">
                                     <table
                                         ref={tableRef}
@@ -229,7 +239,7 @@ export default function LanguageView() {
                                             </tr>
                                         </thead>
 
-                                        <tbody>
+                                        <tbody key={languagesList.length}>
                                             {languagesList.length === 0 ? (
                                                 <tr>
                                                     <td colSpan="6" className="text-center py-4">
@@ -270,9 +280,9 @@ export default function LanguageView() {
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
+                            )}
                         </div>
-                    )}
+                    </div>
                 </main>
             </div>
 

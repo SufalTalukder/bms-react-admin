@@ -202,6 +202,15 @@ export default function SupportView() {
         }
     };
 
+    const refreshTable = () => {
+        if (dataTableRef.current) {
+            dataTableRef.current.destroy();
+            dataTableRef.current = null;
+        }
+        setLoading(true);
+        loadSupports();
+    };
+
     return (
         <DashboardLayout>
             <div className="dashboard-layout">
@@ -209,6 +218,15 @@ export default function SupportView() {
                     <div className="pagetitle d-flex justify-content-between align-items-center">
                         <h1 className="toggle-heading">Manage Supports</h1>
                         <div className="d-flex justify-content-end gap-2">
+                            <button
+                                className="btn btn-secondary"
+                                onClick={() => refreshTable()}
+                                disabled={loading}
+                                style={{ maxWidth: "170px" }}
+                            >
+                                <i className={`${loading ? "spinner-border spinner-border-sm me-1" : "bi bi-arrow-clockwise me-1"}`} />
+                                Refresh
+                            </button>
                             <select
                                 className="btn btn-secondary"
                                 value={filterByStatus}
@@ -239,6 +257,7 @@ export default function SupportView() {
                                 tableRef={tableRef}
                                 dataTableRef={dataTableRef}
                             />
+                            
                             <div className="table-responsive system-log-table">
                                 <table
                                     ref={tableRef}

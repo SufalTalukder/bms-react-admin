@@ -1,4 +1,4 @@
-export const SITE_TITLE = "BMS React Admin";
+export const SITE_TITLE = "BMS Book Store";
 export const PROJECT_ABOUT = "Gitapress E-commerce is a cutting-edge online platform dedicated to providing a seamless and enjoyable shopping experience for book enthusiasts. Our mission is to connect readers with a vast collection of books across various genres, authors, and formats, making it easy for them to discover, purchase, and enjoy their favorite reads from the comfort of their homes. With a user-friendly interface, secure payment options, and prompt delivery services, Gitapress E-commerce aims to be the go-to destination for book lovers worldwide.";
 
 // EXPORT TABLE COMPONENT
@@ -35,12 +35,12 @@ export const CREATE_ACCOUNT_TITLE = `Create Account - ${SITE_TITLE}`;
 // LOGIN PAGE
 export const AUTH_LOGIN_PAGE_TITLE = `Auth Login - ${SITE_TITLE}`;
 export const AUTH_LOGIN_TITLE = `Login`;
-export const AUTH_LOGIN_TO_YOUR_ACCOUNT = `Login to Your Account`;
-export const AUTH_LOGIN_ENTER_EMAIL_AND_PASSWORD = `Enter your email & password to login`;
+export const AUTH_LOGIN_TO_YOUR_ACCOUNT = `Sign in to your account`;
+export const AUTH_LOGIN_ENTER_EMAIL_AND_PASSWORD = `Enter your credentials to access your dashboard`;
 export const AUTH_LOGIN_EMAIL = `Email`;
 export const AUTH_LOGIN_USERNAME = `Username`;
 export const AUTH_LOGIN_PASSWORD = `Password`;
-export const AUTH_LOGIN_REMEMBER_ME = `Remember me`;
+export const AUTH_LOGIN_REMEMBER_ME = `Keep me signed in`;
 export const AUTH_LOGIN_VALIDATION_EMAIL_AND_PASSWORD_REQUIRED = `Email & Password are required.`;
 export const AUTH_LOGIN_VALIDATION_ENTER_VALID_EMAIL = `Please enter a valid email address.`;
 export const AUTH_LOGIN_SUCCESS_MESSAGE = `Login successfully!`;
@@ -110,6 +110,9 @@ export const SUB_CATEGORY_PAGE_TITLE = `Manage SubCategories - ${SITE_TITLE}`;
 
 // PRODUCTS PAGE
 export const PRODUCT_PAGE_TITLE = `Manage Products - ${SITE_TITLE}`;
+
+// PRODUCTS PAGE
+export const ADD_TO_FAVOURITES_PAGE_TITLE = `Manage Favourites - ${SITE_TITLE}`;
 
 // NEWSLETTER PAGE
 export const NEWSLETTER_PAGE_TITLE = `Manage Newsletters - ${SITE_TITLE}`;

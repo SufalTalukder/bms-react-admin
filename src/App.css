@@ -494,3 +494,16 @@ body.toggle-sidebar .toggle-heading {
 :root[data-theme="dark"] .profile .profile-card .social-links a {
   color: var(--social-link);
 }
+
+/* 10-02-26 */
+.toggle-icon {
+  transition: transform 0.3s ease;
+}
+
+[aria-expanded="true"] .toggle-icon {
+  transform: rotate(180deg);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}

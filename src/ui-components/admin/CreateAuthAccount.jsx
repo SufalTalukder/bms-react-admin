@@ -69,7 +69,7 @@ export default function CreateAuthAccountView() {
             setLoading(true);
             await createAuthAccountApi(formData);
             toast.error("Account created successfully!");
-            navigate("/admin/login");
+            navigate("/bms-book-store/admin/login");
             resetForm();
         } catch (error) {
             console.error("Error: ", error);
@@ -148,7 +148,7 @@ export default function CreateAuthAccountView() {
                                 </button>
                                 <div className="col-lg-12 col-md-12" style={{ textAlign: "left" }}>
                                     <p className="small mb-0">Already have an account?
-                                        <Link to="/admin/login">
+                                        <Link to="/bms-book-store/admin/login">
                                             &nbsp;Sign in
                                         </Link>
                                     </p>

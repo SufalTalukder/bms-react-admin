@@ -30,11 +30,11 @@ export default function BannerView() {
         document.title = BANNER_TITLE;
         if (hasFetched.current) return;
         hasFetched.current = true;
-        fetchAllBanners();
+        loadBanners();
     }, []);
 
     // FETCH ALL BANNERS
-    const fetchAllBanners = async () => {
+    const loadBanners = async () => {
         try {
             setLoading(true);
             const res = await getBannersListApi();
@@ -93,7 +93,7 @@ export default function BannerView() {
 
             setTimeout(() => {
                 resetForm();
-                fetchAllBanners();
+                loadBanners();
                 window.bootstrap.Modal
                     .getInstance(document.getElementById("addUpdateModal"))
                     ?.hide();
@@ -126,11 +126,20 @@ export default function BannerView() {
                 window.bootstrap.Modal
                     .getInstance(document.getElementById("deleteModal"))
                     ?.hide();
-                fetchAllBanners();
+                loadBanners();
             }, 1000);
         } catch (error) {
             toast.error(toasterMsgDisplay('failed_cud', 'delete', BANNER));
         }
+    };
+
+    const refreshTable = () => {
+        if (dataTableRef.current) {
+            dataTableRef.current.destroy();
+            dataTableRef.current = null;
+        }
+        setLoading(true);
+        loadBanners();
     };
 
     return (
@@ -138,16 +147,24 @@ export default function BannerView() {
             <div className="dashboard-layout">
                 <main id="main" className="main">
                     <div className="pagetitle d-flex justify-content-between align-items-center">
-                        <h1 className="toggle-heading">{BANNER_HEADING_MANAGE_BANNERS}</h1>
-                        <button
-                            className="btn btn-primary"
-                            onClick={() => {
-                                resetForm();
-                                const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
-                                modal.show();
-                            }}>
-                            + Add Record
-                        </button>
+                        <div className="text-left">
+                            <h1 className="toggle-heading">{BANNER_HEADING_MANAGE_BANNERS}</h1>
+                        </div>
+                        <div className="text-right">
+                            <button className="btn btn-secondary" onClick={() => refreshTable()} disabled={loading} style={{ marginRight: '10px' }}>
+                                <i className={`${loading ? "spinner-border spinner-border-sm me-1" : "bi bi-arrow-clockwise me-1"}`} />
+                                Refresh
+                            </button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    resetForm();
+                                    const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
+                                    modal.show();
+                                }}>
+                                + Add Record
+                            </button>
+                        </div>
                     </div>
 
                     <div className="card shadow-sm mt-3">
@@ -156,69 +173,95 @@ export default function BannerView() {
                                 tableRef={tableRef}
                                 dataTableRef={dataTableRef}
                             />
-                            <div className="table-responsive system-log-table">
-                                <table
-                                    ref={tableRef}
-                                    className="table table-hover table-sm mb-0"
-                                    id="demo-table"
-                                >
-                                    <thead className="table-light">
-                                        <tr>
-                                            <th>#Sr. No.</th>
-                                            <th>Image</th>
-                                            <th>Action By</th>
-                                            <th>Created At</th>
-                                            <th>Active</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
 
-                                    <tbody key={allBanners.length}>
-                                        {loading ? (
+                            {loading && (
+                                <div className="table-responsive system-log-table">
+                                    <table
+                                        ref={tableRef}
+                                        className="table table-hover table-sm mb-0"
+                                        id="demo-table"
+                                    >
+                                        <thead className="table-light">
+                                            <tr>
+                                                <th>#Sr. No.</th>
+                                                <th>Image</th>
+                                                <th>Action By</th>
+                                                <th>Created At</th>
+                                                <th>Active</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
                                             <tr>
                                                 <td colSpan="6" className="text-center py-4">
                                                     <div className="spinner-border spinner-border-sm"></div>
                                                     <strong className="ms-2">{BANNER_LOADING}</strong>
                                                 </td>
                                             </tr>
-                                        ) : allBanners.length === 0 ? (
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+
+                            {!loading && (
+                                <div className="table-responsive system-log-table">
+                                    <table
+                                        ref={tableRef}
+                                        className="table table-hover table-sm mb-0"
+                                        id="demo-table"
+                                    >
+                                        <thead className="table-light">
                                             <tr>
-                                                <td colSpan="6" className="text-center py-4">
-                                                    {BANNER_NOT_FOUND}
-                                                </td>
+                                                <th>#Sr. No.</th>
+                                                <th>Image</th>
+                                                <th>Action By</th>
+                                                <th>Created At</th>
+                                                <th>Active</th>
+                                                <th>Action</th>
                                             </tr>
-                                        ) : (
-                                            allBanners.map((row, index) => (
-                                                <tr key={`${row.appBannerId}-${row.appBannerCreatedAt}`}>
-                                                    <td>{index + 1}</td>
-                                                    <td>
-                                                        <img
-                                                            src={`${import.meta.env.VITE_8083_API_BASE}/uploads/${row.appBannerImage}`}
-                                                            style={{ maxHeight: "70px", maxWidth: "80px" }}
-                                                            alt="banner"
-                                                        />
-                                                    </td>
-                                                    <td>{row.authUserInfo?.authUserName}</td>
-                                                    <td>{formatDateTime(row.appBannerCreatedAt)}</td>
-                                                    <td>{getActiveStatus(row.bannerActive)}</td>
-                                                    <td>
-                                                        <button className="btn btn-sm btn-danger rounded-pill"
-                                                            onClick={() => {
-                                                                setAppBannerId(row.appBannerId);
-                                                                setAppBannerName(row.appBannerImage);
-                                                                new window.bootstrap.Modal(
-                                                                    document.getElementById("deleteModal")
-                                                                ).show();
-                                                            }}>
-                                                            🗑
-                                                        </button>
+                                        </thead>
+
+                                        <tbody key={allBanners.length}>
+                                            {allBanners.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan="6" className="text-center py-4">
+                                                        {BANNER_NOT_FOUND}
                                                     </td>
                                                 </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                                            ) : (
+                                                allBanners.map((row, index) => (
+                                                    <tr key={`${row.appBannerId}-${row.appBannerCreatedAt}`}>
+                                                        <td>{index + 1}</td>
+                                                        <td>
+                                                            <img
+                                                                src={`${import.meta.env.VITE_8083_API_BASE}/uploads/${row.appBannerImage}`}
+                                                                style={{ maxHeight: "70px", maxWidth: "80px" }}
+                                                                alt="banner"
+                                                            />
+                                                        </td>
+                                                        <td>{row.authUserInfo?.authUserName}</td>
+                                                        <td>{formatDateTime(row.appBannerCreatedAt)}</td>
+                                                        <td>{getActiveStatus(row.bannerActive)}</td>
+                                                        <td>
+                                                            <button className="btn btn-sm btn-danger rounded-pill"
+                                                                onClick={() => {
+                                                                    setAppBannerId(row.appBannerId);
+                                                                    setAppBannerName(row.appBannerImage);
+                                                                    new window.bootstrap.Modal(
+                                                                        document.getElementById("deleteModal")
+                                                                    ).show();
+                                                                }}>
+                                                                🗑
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </main>

@@ -84,28 +84,28 @@ export default function App() {
 
             {/* Public Routes */}
             <Route element={<PublicRoute />}>
-              <Route path="/" element={<LoginView />} />
-              <Route path="/admin" element={<LoginView />} />
-              <Route path="/admin/login" element={<LoginView />} />
-              <Route path="/admin/create-account" element={<CreateAuthAccountView />} />
+              <Route path="/bms-book-store" element={<LoginView />} />
+              <Route path="/bms-book-store/admin" element={<LoginView />} />
+              <Route path="/bms-book-store/admin/login" element={<LoginView />} />
+              <Route path="/bms-book-store/admin/create-account" element={<CreateAuthAccountView />} />
             </Route>
 
             {/* Protected Admin Routes */}
             <Route element={<PrivateRoute />}>
-              <Route path="/admin/my-profile" element={<AuthUserProfileView />} />
-              <Route path="/admin/track-your-activity" element={<TrackYourActivityView />} />
-              <Route path="/admin/track-system-activity" element={<TrackSystemActivityView />} />
-              <Route path="/admin/auth-user-service" element={<AuthUserView />} />
-              <Route path="/admin/user-service" element={<UserView />} />
-              <Route path="/admin/banner-service" element={<BannerView />} />
-              <Route path="/admin/language-service" element={<LanguageView />} />
-              <Route path="/admin/category-service" element={<ProductCategoryView />} />
-              <Route path="/admin/sub-category-service" element={<ProductSubCategoryView />} />
-              <Route path="/admin/product-service" element={<ProductView />} />
-              <Route path="/admin/wishlist-service" element={<WishlistView />} />
-              <Route path="/admin/cart-service" element={<CartView />} />
-              <Route path="/admin/newsletter-service" element={<NewsletterView />} />
-              <Route path="/admin/support-service" element={<SupportView />} />
+              <Route path="/bms-book-store/admin/my-profile" element={<AuthUserProfileView />} />
+              <Route path="/bms-book-store/admin/track-your-activity" element={<TrackYourActivityView />} />
+              <Route path="/bms-book-store/admin/track-system-activity" element={<TrackSystemActivityView />} />
+              <Route path="/bms-book-store/admin/auth-user-service" element={<AuthUserView />} />
+              <Route path="/bms-book-store/admin/user-service" element={<UserView />} />
+              <Route path="/bms-book-store/admin/banner-service" element={<BannerView />} />
+              <Route path="/bms-book-store/admin/language-service" element={<LanguageView />} />
+              <Route path="/bms-book-store/admin/category-service" element={<ProductCategoryView />} />
+              <Route path="/bms-book-store/admin/sub-category-service" element={<ProductSubCategoryView />} />
+              <Route path="/bms-book-store/admin/product-service" element={<ProductView />} />
+              <Route path="/bms-book-store/admin/wishlist-service" element={<WishlistView />} />
+              <Route path="/bms-book-store/admin/cart-service" element={<CartView />} />
+              <Route path="/bms-book-store/admin/newsletter-service" element={<NewsletterView />} />
+              <Route path="/bms-book-store/admin/support-service" element={<SupportView />} />
             </Route>
 
             {/* 404 Routes */}

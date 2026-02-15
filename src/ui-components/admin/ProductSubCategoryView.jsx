@@ -30,11 +30,11 @@ export default function ProductSubCategoryView() {
         document.title = SUB_CATEGORY_PAGE_TITLE;
         if (hasFetched.current) return;
         hasFetched.current = true;
-        fetchAllSubCategories();
+        loadSubCategories();
     }, []);
 
     // FETCH ALL SUB CATEGORIES
-    const fetchAllSubCategories = async () => {
+    const loadSubCategories = async () => {
         try {
             setLoading(true);
             const res = await getSubCategoriesListApi();
@@ -112,7 +112,7 @@ export default function ProductSubCategoryView() {
             }
             setTimeout(() => {
                 resetForm();
-                fetchAllSubCategories();
+                loadSubCategories();
                 window.bootstrap.Modal.getInstance(document.getElementById("addUpdateModal")).hide();
             }, 1000);
         } catch (error) {
@@ -158,11 +158,20 @@ export default function ProductSubCategoryView() {
                 window.bootstrap.Modal
                     .getInstance(document.getElementById("deleteModal"))
                     ?.hide();
-                fetchAllSubCategories();
+                loadSubCategories();
             }, 1000);
         } catch (error) {
             toast.error("Failed to delete subcategory.");
         }
+    };
+
+    const refreshTable = () => {
+        if (dataTableRef.current) {
+            dataTableRef.current.destroy();
+            dataTableRef.current = null;
+        }
+        setLoading(true);
+        loadSubCategories();
     };
 
     return (
@@ -170,25 +179,34 @@ export default function ProductSubCategoryView() {
             <div className="dashboard-layout">
                 <main id="main" className="main">
                     <div className="pagetitle d-flex justify-content-between align-items-center">
-                        <h1 className="toggle-heading">Manage Categories</h1>
-                        <button
-                            className="btn btn-primary"
-                            onClick={() => {
-                                resetForm();
-                                const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
-                                modal.show();
-                            }}>
-                            + Add Record
-                        </button>
+                        <div className="text-left">
+                            <h1 className="toggle-heading">Manage Categories</h1>
+                        </div>
+                        <div className="text-right">
+                            <button className="btn btn-secondary" onClick={() => refreshTable()} disabled={loading} style={{ marginRight: '10px' }}>
+                                <i className={`${loading ? "spinner-border spinner-border-sm me-1" : "bi bi-arrow-clockwise me-1"}`} />
+                                Refresh
+                            </button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    resetForm();
+                                    const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
+                                    modal.show();
+                                }}>
+                                + Add Record
+                            </button>
+                        </div>
                     </div>
 
-                    {loading && (
-                        <div className="card shadow-sm mt-3">
-                            <div className="card-body p-0">
-                                <ReusableExportTable
-                                    tableRef={tableRef}
-                                    dataTableRef={dataTableRef}
-                                />
+                    <div className="card shadow-sm mt-3">
+                        <div className="card-body p-0">
+                            <ReusableExportTable
+                                tableRef={tableRef}
+                                dataTableRef={dataTableRef}
+                            />
+
+                            {loading && (
                                 <div className="table-responsive system-log-table">
                                     <table
                                         ref={tableRef}
@@ -217,17 +235,9 @@ export default function ProductSubCategoryView() {
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
-                        </div>
-                    )}
+                            )}
 
-                    {!loading && (
-                        <div className="card shadow-sm mt-3">
-                            <div className="card-body p-0">
-                                <ReusableExportTable
-                                    tableRef={tableRef}
-                                    dataTableRef={dataTableRef}
-                                />
+                            {!loading && (
                                 <div className="table-responsive system-log-table">
                                     <table
                                         ref={tableRef}
@@ -246,7 +256,7 @@ export default function ProductSubCategoryView() {
                                             </tr>
                                         </thead>
 
-                                        <tbody>
+                                        <tbody key={subCategoriesList.length}>
                                             {subCategoriesList.length === 0 ? (
                                                 <tr>
                                                     <td colSpan="7" className="text-center py-4">
@@ -290,11 +300,11 @@ export default function ProductSubCategoryView() {
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
+                            )}
                         </div>
-                    )}
+                    </div>
                 </main>
-            </div>
+            </div >
 
             {/* ADD MODAL */}
             {/* OR, UPDATE MODAL */}
@@ -366,6 +376,6 @@ export default function ProductSubCategoryView() {
                     </div>
                 </div>
             </div>
-        </DashboardLayout>
+        </DashboardLayout >
     );
 }

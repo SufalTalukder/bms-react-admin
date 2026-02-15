@@ -24,7 +24,7 @@ export default function LoginView() {
         document.title = AUTH_LOGIN_PAGE_TITLE;
         const token = sessionStorage.getItem("accessToken");
         if (token) {
-            navigate("/admin/track-your-activity", { replace: true });
+            navigate("/bms-book-store/admin/track-your-activity", { replace: true });
         }
     }, [navigate]);
 
@@ -61,7 +61,7 @@ export default function LoginView() {
             setLoading(true);
             await login(data, rememberMe);
             toast.success(toasterMsgDisplay('login_add', AUTH_LOGIN_TITLE));
-            navigate("/admin/track-your-activity");
+            navigate("/bms-book-store/admin/track-your-activity");
         } catch (err) {
             console.error("Login error:", err);
             toast.error(err.response?.data?.message || toasterMsgDisplay('login_failed', AUTH_LOGIN_TITLE));
@@ -107,11 +107,11 @@ export default function LoginView() {
                                 <ReusableLoginButton
                                     loading={loading}
                                     buttonType="submit"
-                                    buttonText="Login"
+                                    buttonText="Sign in"
                                 />
                                 <div className="col-lg-12 col-md-12" style={{ textAlign: "left" }}>
                                     <p className="small mb-0">Don`t have account?
-                                        <Link to="/admin/create-account">
+                                        <Link to="/bms-book-store/admin/create-account">
                                             &nbsp;Create an account
                                         </Link>
                                     </p>

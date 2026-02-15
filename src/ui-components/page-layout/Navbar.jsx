@@ -46,7 +46,7 @@ export default function Navbar() {
         sessionStorage.clear();
         localStorage.removeItem("refreshToken");
         sessionStorage.removeItem("authUser");
-        navigate("/admin/login", { replace: true });
+        navigate("/bms-book-store/admin/login", { replace: true });
     };
 
     const toggleSidebar = () => {
@@ -165,7 +165,7 @@ export default function Navbar() {
                             </li>
                             <li><hr className="dropdown-divider" /></li>
                             <li>
-                                <Link to="/admin/my-profile" className="dropdown-item d-flex align-items-center">
+                                <Link to="/bms-book-store/admin/my-profile" className="dropdown-item d-flex align-items-center">
                                     <i className="bi bi-person"></i>
                                     <span>{MY_PROFILE}</span>
                                 </Link>
