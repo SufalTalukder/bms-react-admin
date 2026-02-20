@@ -2,21 +2,16 @@ import { useEffect, useState, useRef } from "react";
 import DashboardLayout from "../../DashboardLayout";
 import { getLoginAuditDetailsApi, getLoginAuditsApi } from "../../api/login-audit-api";
 import { DataTable } from "simple-datatables";
-import "simple-datatables/dist/style.css";
 import { formatDateTime } from "./FunctionHelper";
 import { toast } from "react-toastify";
 import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
-import {
-    TRACK_SYSTEM_ACTIVITY_AUDIT_DETAILS_NOT_FOUND,
-    TRACK_SYSTEM_ACTIVITY_FAILED_TO_FETCH_LOGIN_AUDIT_DETAILS,
-    TRACK_SYSTEM_ACTIVITY_FAILED_TO_FETCH_LOGS,
-    TRACK_SYSTEM_ACTIVITY_NO_SYSTEM_LOGS_FOUND, TRACK_SYSTEM_ACTIVITY_SYSTEM_LOGS_LOADING, TRACK_SYSTEM_ACTIVITY_SYSTEMS_ACTIVITY, TRACK_SYSTEM_ACTIVITY_TITLE,
-    TRACK_SYSTEM_ACTIVITY_VIEW_LOGIN_AUDIT_DETAILS
-} from "../../lang-dump/lang";
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 import profileImg from '/assets/img/profile-img.jpg';
+import { useTranslation } from "react-i18next";
 
 export default function TrackSystemActivityView() {
+
+    const { t } = useTranslation();
 
     // STATE VARIBALES
     const [logs, setLogs] = useState([]);
@@ -47,11 +42,11 @@ export default function TrackSystemActivityView() {
     const tableRef = useRef(null);
 
     useEffect(() => {
-        document.title = TRACK_SYSTEM_ACTIVITY_TITLE;
+        document.title = t('track_system_activites.page_title');
         if (hasFetched.current) return;
         hasFetched.current = true;
         loadSystemLogs();
-    }, []);
+    }, [t]);
 
     const loadSystemLogs = async () => {
         try {
@@ -59,7 +54,7 @@ export default function TrackSystemActivityView() {
             setLogs(res.data.content || []);
         } catch (e) {
             console.error(e);
-            toast.error(TRACK_SYSTEM_ACTIVITY_FAILED_TO_FETCH_LOGS);
+            toast.error(t('common.failed_to_fetch_records'));
         } finally {
             setLoading(false);
         }
@@ -96,8 +91,8 @@ export default function TrackSystemActivityView() {
             const res = await getLoginAuditDetailsApi(id);
             const authLoginAudit = res.data?.content;
             if (authLoginAudit) {
-                setModalTitle(TRACK_SYSTEM_ACTIVITY_VIEW_LOGIN_AUDIT_DETAILS);
-                setModalBtnText("Ok");
+                setModalTitle(t('common.view_details'));
+                setModalBtnText(t('common.ok_button'));
                 setAuthUserImage(authLoginAudit.authUserInfo?.authUserImage || null);
                 setActionBy(authLoginAudit.authUserInfo?.authUserName || "-");
                 setIpAddress(authLoginAudit.ipAddress || "-");
@@ -119,11 +114,11 @@ export default function TrackSystemActivityView() {
                 const modal = new window.bootstrap.Modal(document.getElementById("viewModal"));
                 modal.show();
             } else {
-                toast.error(TRACK_SYSTEM_ACTIVITY_AUDIT_DETAILS_NOT_FOUND);
+                toast.error(t('common.no_records_found'));
             }
         } catch (error) {
             console.error(error);
-            toast.error(TRACK_SYSTEM_ACTIVITY_FAILED_TO_FETCH_LOGIN_AUDIT_DETAILS);
+            toast.error(t('common.failed_to_fetch_detail'));
         } finally {
             setLoading(false);
         }
@@ -143,10 +138,10 @@ export default function TrackSystemActivityView() {
             <div className="dashboard-layout">
                 <main id="main" className="main">
                     <div className="pagetitle d-flex justify-content-between align-items-center">
-                        <h1 className="toggle-heading">{TRACK_SYSTEM_ACTIVITY_SYSTEMS_ACTIVITY}</h1>
+                        <h1 className="toggle-heading">{t('track_system_activites.header_title')}</h1>
                         <button className="btn btn-secondary" onClick={() => refreshSystemLogs()} disabled={loading}>
                             <i className={`${loading ? "spinner-border spinner-border-sm me-1" : "bi bi-arrow-clockwise me-1"}`} />
-                            Refresh
+                            {t('common.refresh')}
                         </button>
                     </div>
 
@@ -166,17 +161,17 @@ export default function TrackSystemActivityView() {
                                     >
                                         <thead className="table-light">
                                             <tr>
-                                                <th>#Sr. No.</th>
-                                                <th>IP Address</th>
-                                                <th>User Agent</th>
-                                                <th>Browser</th>
-                                                <th>OS</th>
-                                                <th>Device</th>
-                                                <th>Incognito</th>
-                                                <th>Login Time</th>
-                                                <th>Action By</th>
-                                                <th>Created At</th>
-                                                <th>Action</th>
+                                                <th>{t('common.sr_no')}</th>
+                                                <th>{t('track_your_activites.ip_address')}</th>
+                                                <th>{t('track_your_activites.user_agent')}</th>
+                                                <th>{t('track_your_activites.browser')}</th>
+                                                <th>{t('track_your_activites.os_type')}</th>
+                                                <th>{t('track_your_activites.device_type')}</th>
+                                                <th>{t('track_your_activites.incognito_mode')}</th>
+                                                <th>{t('track_your_activites.login_time')}</th>
+                                                <th>{t('common.action_by')}</th>
+                                                <th>{t('common.created_at')}</th>
+                                                <th>{t('common.action')}</th>
                                             </tr>
                                         </thead>
 
@@ -184,7 +179,7 @@ export default function TrackSystemActivityView() {
                                             <tr>
                                                 <td colSpan="11" className="text-center py-4">
                                                     <div className="spinner-border spinner-border-sm"></div>
-                                                    <strong className="ms-2">{TRACK_SYSTEM_ACTIVITY_SYSTEM_LOGS_LOADING}</strong>
+                                                    <strong className="ms-2">{t('common.loading')}</strong>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -201,17 +196,17 @@ export default function TrackSystemActivityView() {
                                     >
                                         <thead className="table-light">
                                             <tr>
-                                                <th>#Sr. No.</th>
-                                                <th>IP Address</th>
-                                                <th>User Agent</th>
-                                                <th>Browser</th>
-                                                <th>OS</th>
-                                                <th>Device</th>
-                                                <th>Incognito</th>
-                                                <th>Login Time</th>
-                                                <th>Action By</th>
-                                                <th>Created At</th>
-                                                <th>Action</th>
+                                                <th>{t('common.sr_no')}</th>
+                                                <th>{t('track_your_activites.ip_address')}</th>
+                                                <th>{t('track_your_activites.user_agent')}</th>
+                                                <th>{t('track_your_activites.browser')}</th>
+                                                <th>{t('track_your_activites.os_type')}</th>
+                                                <th>{t('track_your_activites.device_type')}</th>
+                                                <th>{t('track_your_activites.incognito_mode')}</th>
+                                                <th>{t('track_your_activites.login_time')}</th>
+                                                <th>{t('common.action_by')}</th>
+                                                <th>{t('common.created_at')}</th>
+                                                <th>{t('common.action')}</th>
                                             </tr>
                                         </thead>
 
@@ -219,7 +214,7 @@ export default function TrackSystemActivityView() {
                                             {logs.length === 0 ? (
                                                 <tr>
                                                     <td colSpan="11" className="text-center py-4">
-                                                        {TRACK_SYSTEM_ACTIVITY_NO_SYSTEM_LOGS_FOUND}
+                                                        {t('common.no_records_found')}
                                                     </td>
                                                 </tr>
                                             ) : (
@@ -275,73 +270,73 @@ export default function TrackSystemActivityView() {
                                             <img src={authUserImage ? `${import.meta.env.VITE_8081_API_BASE}/uploads/${authUserImage}` : profileImg} alt="Profile" className="rounded-circle border" style={{ width: "150px", height: "150px", objectFit: "cover" }} />
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">IP Address</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('track_your_activites.ip_address')}</div>
                                             <div className="col-lg-9 col-md-8">{ipAddress}</div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">User Agent</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('track_your_activites.user_agent')}</div>
                                             <div className="col-lg-9 col-md-8">{userAgent}</div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">Browser</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('track_your_activites.browser')}</div>
                                             <div className="col-lg-9 col-md-8">{browser}</div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">Browser Version</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('track_your_activites.browser_version')}</div>
                                             <div className="col-lg-9 col-md-8">{browserVersion}</div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">OS</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('track_your_activites.os_type')}</div>
                                             <div className="col-lg-9 col-md-8">{operatingSystem}</div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">OS Version</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('track_your_activites.os_version')}</div>
                                             <div className="col-lg-9 col-md-8">{osVersion}</div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">Device Type</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('track_your_activites.device_type')}</div>
                                             <div className="col-lg-9 col-md-8">{deviceType}</div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">Device Model</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('track_your_activites.device_model')}</div>
                                             <div className="col-lg-9 col-md-8">{deviceModel}</div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">Incongnito Mode</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('track_your_activites.incognito_mode')}</div>
                                             <div className="col-lg-9 col-md-8">
                                                 {possibleIncognito ? <span className="badge bg-success rounded">Yes</span> : <span className="badge bg-danger rounded">No</span>}
                                             </div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">Login Status</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('track_your_activites.login_status')}</div>
                                             <div className="col-lg-9 col-md-8">{loginStatus}</div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">Auth Method</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('track_your_activites.auth_method')}</div>
                                             <div className="col-lg-9 col-md-8">{authMethod}</div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">Failure Reason</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('track_your_activites.failure_reason')}</div>
                                             <div className="col-lg-9 col-md-8">{failureReason}</div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">Session ID</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('track_your_activites.session_id')}</div>
                                             <div className="col-lg-9 col-md-8">{sessionId}</div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">Referrer URL</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('track_your_activites.referrer_url')}</div>
                                             <div className="col-lg-9 col-md-8">{referrerUrl}</div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">Login Time</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('track_your_activites.login_time')}</div>
                                             <div className="col-lg-9 col-md-8">{formatDateTime(loginTime)}</div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">Action By</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('common.action_by')}</div>
                                             <div className="col-lg-9 col-md-8">{actionBy}</div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-lg-3 col-md-4 fw-bold">Created At</div>
+                                            <div className="col-lg-3 col-md-4 fw-bold">{t('common.created_at')}</div>
                                             <div className="col-lg-9 col-md-8">{formatDateTime(createdAt)}</div>
                                         </div>
                                     </div>

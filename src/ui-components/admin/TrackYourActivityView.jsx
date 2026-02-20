@@ -8,9 +8,11 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { Tooltip } from "bootstrap";
 import { fetchAuthActivities } from "../../api/activities-api";
 import { formatTime, getCalendarMethodDetails } from "./FunctionHelper";
-import { TRACK_YOUR_ACTIVITY_PAGE_TITLE } from "../../lang-dump/lang";
+import { useTranslation } from "react-i18next";
 
 export default function TrackYourActivityView() {
+
+    const { t } = useTranslation();
 
     // STATE VARIABLES
     const [loading, setLoading] = useState(true);
@@ -18,11 +20,11 @@ export default function TrackYourActivityView() {
     const hasFetched = useRef(false);
 
     useEffect(() => {
-        document.title = TRACK_YOUR_ACTIVITY_PAGE_TITLE;
+        document.title = t('track_your_activites.page_title');
         if (hasFetched.current) return;
         hasFetched.current = true;
         loadActivities();
-    }, []);
+    }, [t]);
 
     const loadActivities = async () => {
         try {
@@ -42,7 +44,7 @@ export default function TrackYourActivityView() {
             setEvents(calendarEvents);
         } catch (error) {
             console.error(error);
-            toast.error("Failed to fetch activities");
+            toast.error(t('common.failed_to_fetch_records'));
         } finally {
             setLoading(false);
         }
@@ -57,10 +59,10 @@ export default function TrackYourActivityView() {
         <DashboardLayout>
             <main id="main" className="main">
                 <div className="pagetitle d-flex justify-content-between align-items-center">
-                    <h1 className="toggle-heading">Track Your Activity</h1>
+                    <h1 className="toggle-heading">{t('track_your_activites.header_title')}</h1>
                     <button className="btn btn-secondary" onClick={refreshCalendar} disabled={loading}>
                         <i className={`${loading ? "spinner-border spinner-border-sm me-1" : "bi bi-arrow-clockwise me-1"}`} />
-                        Refresh
+                        {t('common.refresh')}
                     </button>
                 </div>
 
@@ -123,6 +125,7 @@ export default function TrackYourActivityView() {
 }
 
 function renderEventContent(eventInfo) {
+
     const { method } = eventInfo.event.extendedProps;
 
     return (

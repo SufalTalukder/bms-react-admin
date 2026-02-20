@@ -16,6 +16,7 @@ export const BASE_URLS = {
     SUB_CATEGORY: import.meta.env.VITE_8085_API_BASE,
     PRODUCT: import.meta.env.VITE_8086_API_BASE,
     FAVOURITE: import.meta.env.VITE_8091_API_BASE,
+    CART: import.meta.env.VITE_8092_API_BASE,
     SUPPORT: import.meta.env.VITE_8100_API_BASE,
 };
 

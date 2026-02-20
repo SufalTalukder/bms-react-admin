@@ -2,11 +2,12 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
 export default function PrivateRoute() {
+    
     const { user, loading } = useAuth();
     const token = sessionStorage.getItem("accessToken") || localStorage.getItem("accessToken");
 
     if (loading) return null; // show spinner if loading
-    if (!user || !token) return <Navigate to="/admin/login" replace />;
+    if (!user || !token) return <Navigate to="/bms-book-store/admin/login" replace />;
 
     return <Outlet />;
 }

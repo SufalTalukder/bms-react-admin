@@ -1,33 +1,33 @@
 import { handleApi, BASE_URLS } from "./axios";
 
-const addToFavouriteApi = handleApi(BASE_URLS.FAVOURITE);
+const addToCartApi = handleApi(BASE_URLS.CART);
 
 // ADD
-export const addFavouriteApi = (userId, productId) =>
-    addToFavouriteApi.post("/create-user-add-to-favourite", null, {
+export const addCartApi = (userId, productId) =>
+    addToCartApi.post("/create-user-add-to-cart", null, {
         params: { userId, productId }
     });
 
 // GET ALL
-export const getAllFavouritesApi = (userId, productId) =>
-    addToFavouriteApi.get("/get-all-user-favourites", {
+export const getAllCartsApi = (userId, productId) =>
+    addToCartApi.get("/get-all-user-carts", {
         params: { userId, productId }
     });
 
 // GET
-export const getFavouriteDetailsApi = (addToFavouriteId, userId) =>
-    addToFavouriteApi.get("/get-user-favourite", {
+export const getCartDetailsApi = (addToFavouriteId, userId) =>
+    addToCartApi.get("/get-user-cart", {
         params: { addToFavouriteId, userId },
     });
 
 // UPDATE
-export const updateFavouriteApi = (addToFavouriteId, userId, productId) =>
-    addToFavouriteApi.put("/update-user-favourite", null, {
+export const updateCartApi = (addToFavouriteId, userId, productId) =>
+    addToCartApi.put("/update-user-cart", null, {
         params: { addToFavouriteId, userId, productId },
     });
 
 // DELETE
-export const deleteFavouriteApi = (addToFavouriteId, userId) =>
-    addToFavouriteApi.delete("/remove-user-favourite", {
+export const deleteCartApi = (addToFavouriteId, userId) =>
+    addToCartApi.delete("/remove-user-cart", {
         params: { addToFavouriteId, userId },
     });

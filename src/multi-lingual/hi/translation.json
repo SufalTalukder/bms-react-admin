@@ -1,0 +1,151 @@
+{
+    "language": {
+        "english": "अंग्रेज़ी",
+        "hindi": "हिंदी",
+        "bengali": "बंगाली"
+    },
+    "common": {
+        "add_record": "+ रिकॉर्ड जोड़ें",
+        "profile_details": "प्रोफ़ाइल विवरण",
+        "confirm_deletion": "हटाने की पुष्टि करें",
+        "ok_button": "ठीक है",
+        "all_fields_are_required": "कृपया सभी आवश्यक फ़ील्ड भरें।",
+        "invalid_email_address": "अमान्य ईमेल पता।",
+        "invalid_phone_number": "अमान्य फोन नंबर। यह 10 अंक का होना चाहिए।",
+        "invalid_password_format": "अमान्य पासवर्ड प्रारूप।",
+        "invalid_naming_convension": "अमान्य नामकरण सम्मेलन।",
+        "my_profile": "मेरी प्रोफ़ाइल",
+        "error_while_creating_record": "रिकॉर्ड बनाते समय त्रुटि!",
+        "failed_to_fetch_records": "रिकॉर्ड लाने में विफल!",
+        "and": "और",
+        "logout": "लॉगआउट",
+        "refresh": "ताज़ा करें",
+        "loading": "लोड हो रहा है...",
+        "no_records_found": "कोई रिकॉर्ड नहीं मिला!",
+        "view": "देखें",
+        "view_details": "विवरण देखें",
+        "edit": "संपादित करें",
+        "delete": "हटाएं",
+        "close": "बंद करें",
+        "save": "सहेजें",
+        "update": "अपडेट करें",
+        "cancel": "रद्द करें",
+        "confirm": "पुष्टि करें",
+        "delete_confirmation_message": "क्या आप वाकई इस रिकॉर्ड को हटाना चाहते हैं?",
+        "yes": "हाँ",
+        "no": "नहीं",
+        "You_are_offline_check_your_connection": "आप ऑफ़लाइन हैं। अपना कनेक्शन जांचें।",
+        "site_title": "BMS Book Store",
+        "failed_to_fetch_detail": "विवरण लाने में विफल!",
+        "sr_no": "#क्रम संख्या",
+        "action_by": "कार्य द्वारा",
+        "created_at": "पर बनाया गया",
+        "action": "कार्य",
+        "all_rights_reserved": "सर्वाधिकार सुरक्षित"
+    },
+    "login": {
+        "page_title": "प्रमाणीकरण लॉगिन - BMS Book Store",
+        "header_title": "लॉगिन",
+        "login_to_account": "अपने खाते में साइन इन करें",
+        "email_and_password_required": "अपने डैशबोर्ड तक पहुंचने के लिए अपनी प्रमाण-पत्र दर्ज करें",
+        "login_email": "ईमेल",
+        "username": "उपयोगकर्ता नाम",
+        "password": "पासवर्ड",
+        "remember_me": "मुझे साइन इन रखें",
+        "email_and_password_required_error": "ईमेल और पासवर्ड आवश्यक हैं।",
+        "invalid_email_error": "कृपया एक मान्य ईमेल पता दर्ज करें।",
+        "success_message": "सफलतापूर्वक लॉगिन!",
+        "error_message": "लॉगिन विफल",
+        "sign_in": "साइन इन",
+        "dont_have_an_account": "खाता नहीं है?",
+        "create_an_account": "एक खाता बनाएं"
+    },
+    "create_account": {
+        "page_title": "खाता बनाएं - BMS Book Store",
+        "create_account": "खाता बनाएं",
+        "create_an_account": "एक खाता बनाएं",
+        "enter_your_details_to_create_an_account": "एक खाता बनाने के लिए अपनी जानकारी दर्ज करें",
+        "name": "आपका नाम",
+        "email": "आपका ईमेल",
+        "password": "पासवर्ड",
+        "agree_to": "मैं सहमत हूँ",
+        "terms_of_service": "सेवा की शर्तें",
+        "privacy_policy": "गोपनीयता नीति",
+        "already_have_an_account": "पहले से ही एक खाता है?"
+    },
+    "track_your_activites": {
+        "page_title": "अपनी गतिविधियों को ट्रैक करें - BMS Book Store",
+        "header_title": "अपनी गतिविधियों को ट्रैक करें",
+        "ip_address": "आईपी पता",
+        "user_agent": "उपयोगकर्ता एजेंट",
+        "browser": "ब्राउज़र",
+        "browser_version": "ब्राउज़र संस्करण",
+        "os_type": "ओएस प्रकार",
+        "os_version": "ओएस संस्करण",
+        "device_type": "डिवाइस प्रकार",
+        "device_model": "डिवाइस मॉडल",
+        "login_status": "लॉगिन स्थिति",
+        "auth_method": "प्रमाणीकरण विधि",
+        "failure_reason": "विफलता का कारण",
+        "session_id": "सत्र आईडी",
+        "referrer_url": "रेफरर URL",
+        "incognito_mode": "इनकॉग्निटो मोड",
+        "login_time": "लॉगिन समय"
+    },
+    "track_system_activites": {
+        "page_title": "सिस्टम गतिविधियों को ट्रैक करें - BMS Book Store",
+        "header_title": "सिस्टम गतिविधियों को ट्रैक करें"
+    },
+    "auth_management": {
+        "page_title": "प्रमाणीकरण प्रबंधन - BMS Book Store",
+        "header_title": "प्रमाणीकरण प्रबंधन"
+    },
+    "user_management": {
+        "page_title": "उपयोगकर्ता प्रबंधन - BMS Book Store",
+        "header_title": "उपयोगकर्ता प्रबंधन"
+    },
+    "banner_management": {
+        "page_title": "बैनर प्रबंधन - BMS Book Store",
+        "header_title": "बैनर प्रबंधन"
+    },
+    "language_management": {
+        "page_title": "भाषा प्रबंधन - BMS Book Store",
+        "header_title": "भाषा प्रबंधन"
+    },
+    "product_management": {
+        "page_title": "उत्पाद प्रबंधन - BMS Book Store",
+        "header_title": "उत्पाद प्रबंधन",
+        "manage_categories": {
+            "page_title": "श्रेणियाँ प्रबंधन - BMS Book Store",
+            "header_title": "श्रेणियाँ प्रबंधन"
+        },
+        "manage_products": {
+            "page_title": "उत्पाद प्रबंधन - BMS Book Store",
+            "header_title": "उत्पाद प्रबंधन"
+        },
+        "manage_sub_categories": {
+            "page_title": "उप-श्रेणियाँ प्रबंधन - BMS Book Store",
+            "header_title": "उप-श्रेणियाँ प्रबंधन"
+        }
+    },
+    "favourites_management": {
+        "page_title": "पसंदीदा प्रबंधन - BMS Book Store",
+        "header_title": "पसंदीदा प्रबंधन"
+    },
+    "carts_management": {
+        "page_title": "कार्ट प्रबंधन - BMS Book Store",
+        "header_title": "कार्ट प्रबंधन"
+    },
+    "checkout_management": {
+        "page_title": "चेकआउट प्रबंधन - BMS Book Store",
+        "header_title": "चेकआउट प्रबंधन"
+    },
+    "newsletters_management": {
+        "page_title": "न्यूज़लेटर प्रबंधन - BMS Book Store",
+        "header_title": "न्यूज़लेटर प्रबंधन"
+    },
+    "manage_support_tickets": {
+        "page_title": "सहायता टिकट प्रबंधन - BMS Book Store",
+        "header_title": "सहायता टिकट प्रबंधन"
+    }
+}

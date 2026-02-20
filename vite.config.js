@@ -21,6 +21,8 @@ const devConnectSrc = [
   "http://localhost:8085",
   "http://localhost:8086",
   "http://localhost:8088",
+  "http://localhost:8091",
+  "http://localhost:8092",
   "http://localhost:8095",
   "http://localhost:8100",
 ]
@@ -60,12 +62,13 @@ function csp(isLocal, isDev, isProd) {
 }
 
 export default defineConfig(({ mode }) => {
+
   const isLocal = mode === 'local'
   const isDev = mode === 'development'
   const isProd = mode === 'production'
 
   return {
-    base: '/bms-book-store/ ',
+    base: '/bms-book-store/',
     plugins: [react()],
     server: {
       headers: {

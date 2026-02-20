@@ -6,8 +6,8 @@ export default function ThemeToggleButton() {
     const { theme, toggleTheme } = useContext(ThemeContext);
 
     return (
-        <Link style={{ fontSize: "26px" }} onClick={toggleTheme}>
-            {theme === "light" ? <i className="ri-moon-fill"></i> : <i className="ri-sun-line"></i>}
+        <Link style={{ fontSize: "24px" }} onClick={toggleTheme}>
+            {theme === "light" ? <i className="bi bi-moon"></i> : <i className="ri-sun-line"></i>}
         </Link>
     );
 }

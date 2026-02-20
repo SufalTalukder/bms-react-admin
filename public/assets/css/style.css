@@ -630,12 +630,15 @@ h6 {
 }
 
 @media (min-width: 1200px) {
-
-  #main,
-  #footer {
+  #main {
     margin-left: 200px;
     margin-right: -100px;
+  }
+}
 
+@media (min-width: 1200px) {
+  #footer {
+    margin-right: -100px;
   }
 }
 
@@ -1216,7 +1219,7 @@ h6 {
 # Footer
 --------------------------------------------------------------*/
 .footer {
-  padding: 20px 0;
+  padding: 15px 0px 0px 10px;
   font-size: 14px;
   transition: all 0.3s;
   border-top: 1px solid #cddfff;

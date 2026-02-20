@@ -19,14 +19,22 @@ export default function ProductView() {
     // STATE VARIABLES
     const [isAddModal, setIsAddModal] = useState(true);
     const [modalTitle, setModalTitle] = useState("Add Product");
-    const [productId, setProductId] = useState(0);
+    const [productId, setProductId] = useState(null);
     const [authUserName, setAuthUserName] = useState("");
-    const [languageId, setLanguageId] = useState(0);
+
+    // FORM STATES
+    const [languageId, setLanguageId] = useState("");
     const [languageName, setLanguageName] = useState("");
-    const [categoryId, setCategoryId] = useState(0);
+    const [categoryId, setCategoryId] = useState("");
     const [categoryName, setCategoryName] = useState("");
-    const [subCategoryId, setSubCategoryId] = useState(0);
+    const [subCategoryId, setSubCategoryId] = useState("");
     const [subCategoryName, setSubCategoryName] = useState("");
+
+    // FILTER STATES
+    const [filterByLanguageId, setFilterByLanguageId] = useState("");
+    const [filterByCategoryId, setFilterByCategoryId] = useState("");
+    const [filterBySubCategoryId, setFilterBySubCategoryId] = useState("");
+
     const [productName, setProductName] = useState("");
     const [productBrand, setProductBrand] = useState("");
     const [productCode, setProductCode] = useState("");
@@ -56,6 +64,10 @@ export default function ProductView() {
         fetchInitialData();
     }, []);
 
+    useEffect(() => {
+        loadProducts();
+    }, [filterByLanguageId, filterByCategoryId, filterBySubCategoryId]);
+
     // FETCH ALL FILTERS
     const fetchInitialData = async () => {
         try {
@@ -72,10 +84,6 @@ export default function ProductView() {
             toast.error("Failed to load filters.");
         }
     };
-
-    useEffect(() => {
-        loadProducts();
-    }, [categoryId, subCategoryId, languageId]);
 
     const loadProducts = async () => {
         try {
@@ -155,6 +163,9 @@ export default function ProductView() {
 
         if (
             !productName.trim()
+            || !languageId
+            || !categoryId
+            || !subCategoryId
             || !productBrand.trim()
             || !productCode
             || !productAvailability
@@ -203,13 +214,13 @@ export default function ProductView() {
 
     // RESET FORM
     const resetForm = () => {
-        setProductId(0);
+        setProductId(null);
         setProductName("");
-        setCategoryId(0);
+        setCategoryId("");
         setCategoryName("");
-        setSubCategoryId(0);
+        setSubCategoryId("");
         setSubCategoryName("");
-        setLanguageId(0);
+        setLanguageId("");
         setLanguageName("");
         setProductBrand("");
         setProductCode("");
@@ -288,8 +299,19 @@ export default function ProductView() {
                             </button>
                             <select
                                 className="btn btn-secondary"
-                                value={categoryId}
-                                onChange={(e) => setCategoryId(Number(e.target.value))}
+                                value={filterByLanguageId}
+                                onChange={(e) => setFilterByLanguageId(Number(e.target.value))}
+                                style={{ maxWidth: "170px" }}
+                            >
+                                <option value="">-- Language --</option>
+                                {languagesList.map((l) => (
+                                    <option key={`${l.languageId}-${l.languageCreatedAt}`} value={l.languageId}>{l.languageName}</option>
+                                ))}
+                            </select>
+                            <select
+                                className="btn btn-secondary"
+                                value={filterByCategoryId}
+                                onChange={(e) => setFilterByCategoryId(Number(e.target.value))}
                                 style={{ maxWidth: "170px" }}
                             >
                                 <option value="">-- Category --</option>
@@ -299,24 +321,13 @@ export default function ProductView() {
                             </select>
                             <select
                                 className="btn btn-secondary"
-                                value={subCategoryId}
-                                onChange={(e) => setSubCategoryId(Number(e.target.value))}
+                                value={filterBySubCategoryId}
+                                onChange={(e) => setFilterBySubCategoryId(Number(e.target.value))}
                                 style={{ maxWidth: "170px" }}
                             >
                                 <option value="">-- Subcategory --</option>
                                 {subCategoriesList.map((sc) => (
                                     <option key={`${sc.subCategoryId}-${sc.subCategoryCreatedAt}`} value={sc.subCategoryId}>{sc.subCategoryName}</option>
-                                ))}
-                            </select>
-                            <select
-                                className="btn btn-secondary"
-                                value={languageId}
-                                onChange={(e) => setLanguageId(Number(e.target.value))}
-                                style={{ maxWidth: "170px" }}
-                            >
-                                <option value="">-- Language --</option>
-                                {languagesList.map((l) => (
-                                    <option key={`${l.languageId}-${l.languageCreatedAt}`} value={l.languageId}>{l.languageName}</option>
                                 ))}
                             </select>
                             <button
@@ -337,7 +348,7 @@ export default function ProductView() {
                                 tableRef={tableRef}
                                 dataTableRef={dataTableRef}
                             />
-                            
+
                             <div className="table-responsive system-log-table">
                                 <table
                                     ref={tableRef}

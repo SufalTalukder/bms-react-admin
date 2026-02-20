@@ -507,3 +507,12 @@ body.toggle-sidebar .toggle-heading {
 .cursor-pointer {
   cursor: pointer;
 }
+
+/* 20-02-2026 */
+.bi-moon {
+  color: #012970;
+}
+
+:root[data-theme="dark"] .bi-moon {
+  color: var(--text) !important;
+}

@@ -111,8 +111,11 @@ export const SUB_CATEGORY_PAGE_TITLE = `Manage SubCategories - ${SITE_TITLE}`;
 // PRODUCTS PAGE
 export const PRODUCT_PAGE_TITLE = `Manage Products - ${SITE_TITLE}`;
 
-// PRODUCTS PAGE
+// FAVOURITE PAGE
 export const ADD_TO_FAVOURITES_PAGE_TITLE = `Manage Favourites - ${SITE_TITLE}`;
+
+// CART PAGE
+export const ADD_TO_CARTS_PAGE_TITLE = `Manage Carts - ${SITE_TITLE}`;
 
 // NEWSLETTER PAGE
 export const NEWSLETTER_PAGE_TITLE = `Manage Newsletters - ${SITE_TITLE}`;

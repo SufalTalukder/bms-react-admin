@@ -6,8 +6,8 @@ import { getUsersListApi } from "../../api/users-api";
 import { getProductsListApi } from "../../api/products-api";
 import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
 import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
-import { formatDateTime, getActiveStatus, getStockStatus } from "../admin/FunctionHelper";
-import { addFavouriteApi, deleteFavouriteApi, getAllFavouritesApi, getFavouriteDetailsApi, updateFavouriteApi } from "../../api/add-to-cart-api";
+import { formatDateTime, formatDOB, formatPhoneNumber, getActiveStatus, getStockStatus } from "../admin/FunctionHelper";
+import { addFavouriteApi, deleteFavouriteApi, getAllFavouritesApi, getFavouriteDetailsApi, updateFavouriteApi } from "../../api/add-to-favourite-api";
 import { ADD_TO_FAVOURITES_PAGE_TITLE } from "../../lang-dump/lang";
 
 export default function AddToFavouriteView() {
@@ -18,12 +18,13 @@ export default function AddToFavouriteView() {
     const [loading, setLoading] = useState(false);
     const [addToFavouriteId, setAddToFavouriteId] = useState(null);
     const [userName, setUserName] = useState("");
+    const [openSection, setOpenSection] = useState(null);
 
-    // FILTER STATES (Top Dropdowns)
+    // FILTER STATES
     const [filterUserId, setFilterUserId] = useState("");
     const [filterProductId, setFilterProductId] = useState("");
 
-    // FORM STATES (Add/Update Modal)
+    // FORM STATES
     const [userId, setUserId] = useState("");
     const [productId, setProductId] = useState("");
     const [productName, setProductName] = useState("");
@@ -65,6 +66,11 @@ export default function AddToFavouriteView() {
         loadFavourites();
     }, [filterUserId, filterProductId]);
 
+    // TOGGLE COLLAPSE SECTIONS IN VIEW MODAL
+    const handleToggle = (section) => {
+        setOpenSection(openSection === section ? null : section);
+    };
+
     // FETCH ALL FILTERS LIST
     const fetchInitialData = async () => {
         try {
@@ -93,7 +99,7 @@ export default function AddToFavouriteView() {
             const res = await getAllFavouritesApi(
                 filterUserId || 0,
                 filterProductId || 0
-            );            
+            );
 
             const data =
                 res.data?.status === "success" ? res.data?.content : [];
@@ -413,22 +419,29 @@ export default function AddToFavouriteView() {
                                     <div className="col-lg-9 col-md-8">{userName}</div>
                                 </div>
                                 {/* USER DETAILS TOGGLE */}
-                                <div className="d-flex justify-content-between align-items-center fw-bold cursor-pointer" data-bs-toggle="collapse" data-bs-target="#userDetails" aria-expanded="false">
+                                <div
+                                    className="d-flex justify-content-between align-items-center fw-bold"
+                                    onClick={() => handleToggle("user")}
+                                    style={{ cursor: "pointer" }}
+                                >
                                     <span>User Details</span>
-                                    <i className="bi bi-chevron-down toggle-icon"></i>
+                                    <i
+                                        className={`bi ${openSection === "user" ? "bi-chevron-up" : "bi-chevron-down"
+                                            }`}
+                                    ></i>
                                 </div>
-                                <div className="collapse mt-3" id="userDetails">
+                                <div className={`collapse mt-3 ${openSection === "user" ? "show" : ""}`}>
                                     <div className="row mb-2">
                                         <div className="col-lg-4 fw-bold">Email</div>
                                         <div className="col-lg-8">{emailAddress}</div>
                                     </div>
                                     <div className="row mb-2">
                                         <div className="col-lg-4 fw-bold">Phone</div>
-                                        <div className="col-lg-8">{phoneNumber}</div>
+                                        <div className="col-lg-8">{formatPhoneNumber(phoneNumber)}</div>
                                     </div>
                                     <div className="row mb-2">
                                         <div className="col-lg-4 fw-bold">DOB</div>
-                                        <div className="col-lg-8">{dob}</div>
+                                        <div className="col-lg-8">{formatDOB(dob)}</div>
                                     </div>
                                     <div className="row mb-2">
                                         <div className="col-lg-4 fw-bold">Address</div>
@@ -449,11 +462,18 @@ export default function AddToFavouriteView() {
                                 </div>
                                 <hr />
                                 {/* PRODUCT DETAILS TOGGLE */}
-                                <div className="d-flex justify-content-between align-items-center fw-bold cursor-pointer" data-bs-toggle="collapse" data-bs-target="#productDetails" aria-expanded="false">
+                                <div
+                                    className="d-flex justify-content-between align-items-center fw-bold"
+                                    onClick={() => handleToggle("product")}
+                                    style={{ cursor: "pointer" }}
+                                >
                                     <span>Product Details</span>
-                                    <i className="bi bi-chevron-down toggle-icon"></i>
+                                    <i
+                                        className={`bi ${openSection === "product" ? "bi-chevron-up" : "bi-chevron-down"
+                                            }`}
+                                    ></i>
                                 </div>
-                                <div className="collapse mt-3" id="productDetails">
+                                <div className={`collapse mt-3 ${openSection === "product" ? "show" : ""}`}>
                                     <div className="row mb-2">
                                         <div className="col-lg-4 fw-bold">Product</div>
                                         <div className="col-lg-8">{productName}</div>

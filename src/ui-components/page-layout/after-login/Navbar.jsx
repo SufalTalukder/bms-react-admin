@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../../App.css";
-import { LOGOUT, MY_PROFILE, SITE_TITLE } from "../../lang-dump/lang";
 import reactLogo from "/assets/react.svg";
 import profileImg from '/assets/img/profile-img.jpg';
-import ThemeToggleButton from "../../ui-components/reusable-components/ThemeToggleButton";
-import { logoutApi } from "../../api/auth-api";
+import ThemeToggleButton from "../../reusable-components/ThemeToggleButton";
+import { logoutApi } from "../../../api/auth-api";
 import { toast } from "react-toastify";
+import LanguageToggleButton from "../../reusable-components/LanguageToggleButton";
+import { useTranslation } from "react-i18next";
 
 export default function Navbar() {
 
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [profileOpen, setProfileOpen] = useState(false);
     const profileRef = useRef(null);
@@ -31,7 +32,7 @@ export default function Navbar() {
             setAuthUserName(parsed.authUserName || "");
             setAuthUserPhoneNumber(parsed.authUserPhoneNumber);
         }
-    }, [storedAuthUser]);
+    }, [storedAuthUser, t]);
 
     const logout = async () => {
         try {
@@ -132,7 +133,7 @@ export default function Navbar() {
             <div className="d-flex align-items-center justify-content-between">
                 <Link to="#" className="logo d-flex align-items-center">
                     <img src={reactLogo} alt="Admin Logo" className="rotate-logo" loading="lazy" />
-                    <span className="d-none d-lg-block ms-2 site-title">{SITE_TITLE}</span>
+                    <span className="d-none d-lg-block ms-2 site-title">{t('common.site_title')}</span>
                 </Link>
                 <i className="bi bi-list toggle-sidebar-btn" role="button" aria-label="Toggle sidebar" onClick={toggleSidebar}></i>
             </div>
@@ -141,6 +142,7 @@ export default function Navbar() {
                     <li className="nav-item dropdown pe-3">
                         <ThemeToggleButton />
                     </li>
+                    <LanguageToggleButton />
                     <li className="nav-item dropdown pe-3" ref={profileRef}>
                         <Link className="nav-link nav-profile d-flex align-items-center pe-0 btn" data-bs-toggle="dropdown" onClick={toggleProfile}>
                             <img src={authUserImage ? `${import.meta.env.VITE_8082_API_BASE}/uploads/${authUserImage}` : profileImg} alt="Profile" className="rounded-circle" loading="lazy" />
@@ -167,14 +169,14 @@ export default function Navbar() {
                             <li>
                                 <Link to="/bms-book-store/admin/my-profile" className="dropdown-item d-flex align-items-center">
                                     <i className="bi bi-person"></i>
-                                    <span>{MY_PROFILE}</span>
+                                    <span>{t('common.my_profile')}</span>
                                 </Link>
                             </li>
                             <li><hr className="dropdown-divider" /></li>
                             <li>
                                 <button type="button" className="dropdown-item d-flex align-items-center" onClick={logout}>
                                     <i className="bi bi-box-arrow-right"></i>
-                                    <span>{LOGOUT}</span>
+                                    <span>{t('common.logout')}</span>
                                 </button>
                             </li>
                         </ul>
