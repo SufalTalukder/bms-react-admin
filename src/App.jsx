@@ -27,6 +27,7 @@ import NewsletterView from "./ui-components/admin/NewsletterView";
 import SupportView from "./ui-components/admin/SupportView";
 import './utils/language-switcher';
 import { LangProvider } from "./context/SwitchLangContext";
+import AuthUserPermissionView from "./ui-components/admin/AuthUserPermissionView";
 
 export default function App() {
 
@@ -100,6 +101,7 @@ export default function App() {
                 <Route path="/bms-book-store/admin/track-your-activity" element={<TrackYourActivityView />} />
                 <Route path="/bms-book-store/admin/track-system-activity" element={<TrackSystemActivityView />} />
                 <Route path="/bms-book-store/admin/auth-user-service" element={<AuthUserView />} />
+                <Route path="/bms-book-store/admin/auth-permission" element={<AuthUserPermissionView />} />
                 <Route path="/bms-book-store/admin/user-service" element={<UserView />} />
                 <Route path="/bms-book-store/admin/banner-service" element={<BannerView />} />
                 <Route path="/bms-book-store/admin/language-service" element={<LanguageView />} />

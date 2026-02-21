@@ -34,3 +34,11 @@ export const deleteAuthUserApi = (rqstAuthUserId) =>
     authApi.delete("/delete", {
         params: { rqstAuthUserId },
     });
+
+// GET PERMISSIONS
+export const getAuthPermissionListApi = () =>
+    authApi.get("/get-auths-all-permissions");
+
+// GRANT PERMISSION
+export const grantAuthPermissionApi = (data) =>
+    authApi.post("/grant-permission", data);

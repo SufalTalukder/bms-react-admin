@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import {
     AUTH_USER, AUTH_USER_INVALID_PASSWORD, INVALID_EMAIL_ADDRESS, INVALID_NAMING_CONVENSION, INVALID_PHONE_NUMBER, MANAGE_YOUR_PROFILE_PAGE_TITLE, PROJECT_ABOUT, SITE_TITLE
 } from "../../lang-dump/lang";
-import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 import validationChecker from "../../utils/validations-checker";
 import { toast } from "react-toastify";
 import toasterMsgDisplay, { getActiveStatus, getAuthUserType } from "./FunctionHelper";
@@ -12,9 +11,6 @@ import profileImg from '/assets/img/profile-img.jpg';
 import DashboardLayout from "../../DashboardLayout";
 
 export default function AuthUserProfileView() {
-
-    const [isAddModal, setIsAddModal] = useState(false);
-    const [loading, setLoading] = useState(false);
 
     const storedAuthUser = sessionStorage.getItem("authUser");
     const [authUserDetail, setAuthUserDetail] = useState(storedAuthUser ? JSON.parse(storedAuthUser) : null);
@@ -52,22 +48,18 @@ export default function AuthUserProfileView() {
 
         if (!validationChecker('text', authUserName.trim())) {
             toast.error(INVALID_NAMING_CONVENSION);
-            setLoading(false);
             return;
         }
         if (!validationChecker('email', authUserEmailAddress.trim())) {
             toast.error(INVALID_EMAIL_ADDRESS);
-            setLoading(false);
             return;
         }
         if (!validationChecker('phone', authUserPhoneNumber.trim())) {
             toast.error(INVALID_PHONE_NUMBER);
-            setLoading(false);
             return;
         }
         if (!validationChecker('password', authUserPassword.trim())) {
             toast.error(AUTH_USER_INVALID_PASSWORD);
-            setLoading(false);
             return;
         }
 
@@ -78,7 +70,6 @@ export default function AuthUserProfileView() {
         if (authUserPassword) formData.append("authUserPassword", authUserPassword);
 
         try {
-            setLoading(true);
             await updateAuthUserApi(authUserId, formData);
             toast.success(toasterMsgDisplay('update', AUTH_USER));
             setTimeout(() => {
@@ -87,8 +78,6 @@ export default function AuthUserProfileView() {
         } catch (error) {
             console.error(error);
             toast.error(toasterMsgDisplay('failed_cud', 'save', AUTH_USER));
-        } finally {
-            setLoading(false);
         }
     };
 
