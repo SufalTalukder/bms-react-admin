@@ -31,6 +31,12 @@ export default function Sidebar() {
         <aside id="sidebar" className="sidebar">
             <ul className="sidebar-nav">
                 <li className="nav-item">
+                    <NavLink to="/bms-book-store/admin/dashboard" className="nav-link">
+                        <i className="ri-dashboard-line"></i>
+                        <span>Dashboard</span>
+                    </NavLink>
+                </li>
+                <li className="nav-item">
                     <NavLink to="/bms-book-store/admin/track-your-activity" className="nav-link">
                         <i className="bi bi-file-person"></i>
                         <span>{t('track_your_activites.header_title')}</span>

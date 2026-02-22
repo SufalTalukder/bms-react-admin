@@ -132,6 +132,7 @@ export default function AuthUserPermissionView() {
                                             <th>View Permission</th>
                                             <th>Edit Permission</th>
                                             <th>Delete Permission</th>
+                                            <th>Action By</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -240,7 +241,7 @@ export default function AuthUserPermissionView() {
                                                             &nbsp;{row.deletePermission === "YES" ? "Yes" : "No"}
                                                         </label>
                                                     </td>
-
+                                                    <td>{row.actionByUserInfo?.authUserName}</td>
                                                     <td>
                                                         <button
                                                             className="btn btn-primary"
