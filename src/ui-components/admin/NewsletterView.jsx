@@ -10,8 +10,6 @@ import { addNewsletterApi, getNewslettersListApi, updateNewsletterApi } from "..
 
 export default function NewsletterView() {
 
-    const [modalTitle, setModalTitle] = useState("Add Newsletter");
-    const [newsletterId, setNewsletterId] = useState(null);
     const [userId, setUserId] = useState("");
     const [newsletterToggle, setNewsletterToggle] = useState("NO");
 
@@ -126,10 +124,8 @@ export default function NewsletterView() {
 
     // RESET FORM
     const resetForm = () => {
-        setNewsletterId(null);
         setUserId("");
         setNewsletterToggle("NO");
-        setModalTitle("Add Newsletter");
     };
 
     const refreshTable = () => {
