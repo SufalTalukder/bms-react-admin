@@ -151,6 +151,15 @@ export default function NewsletterView() {
                                 <i className={`${loading ? "spinner-border spinner-border-sm me-1" : "bi bi-arrow-clockwise me-1"}`} />
                                 Refresh
                             </button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    resetForm();
+                                    const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
+                                    modal.show();
+                                }}>
+                                + Add Record
+                            </button>
                         </div>
                     </div>
 

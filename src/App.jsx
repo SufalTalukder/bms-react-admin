@@ -28,6 +28,7 @@ import SupportView from "./ui-components/admin/SupportView";
 import './utils/language-switcher';
 import { LangProvider } from "./context/SwitchLangContext";
 import AuthUserPermissionView from "./ui-components/admin/AuthUserPermissionView";
+import CheckoutView from "./ui-components/admin/CheckoutView";
 
 export default function App() {
 
@@ -110,6 +111,7 @@ export default function App() {
                 <Route path="/bms-book-store/admin/product-service" element={<ProductView />} />
                 <Route path="/bms-book-store/admin/wishlist-service" element={<WishlistView />} />
                 <Route path="/bms-book-store/admin/cart-service" element={<CartView />} />
+                <Route path="/bms-book-store/admin/checkout-service" element={<CheckoutView />} />
                 <Route path="/bms-book-store/admin/newsletter-service" element={<NewsletterView />} />
                 <Route path="/bms-book-store/admin/support-service" element={<SupportView />} />
               </Route>

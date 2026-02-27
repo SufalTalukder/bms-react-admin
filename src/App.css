@@ -516,3 +516,8 @@ body.toggle-sidebar .toggle-heading {
 :root[data-theme="dark"] .bi-moon {
   color: var(--text) !important;
 }
+
+:root[data-theme="dark"] small,
+:root[data-theme="dark"] span {
+  color: var(--text) !important;
+}
