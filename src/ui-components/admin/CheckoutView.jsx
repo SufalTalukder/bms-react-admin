@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import DashboardLayout from "../../DashboardLayout";
 import { DataTable } from "simple-datatables";
-import { formatDateTime } from "./FunctionHelper";
+import { formatDateTime, formatPhoneNumber, getActiveStatus, getOrderStatus, getPaymentMethod, getPaymentStatus, getShippingMethod, getStockStatus } from "./FunctionHelper";
 import { toast } from "react-toastify";
-import { ReusableExportTable } from "../reusable-components/ResuableExportTable";;
+import { ReusableExportTable } from "../reusable-components/ResuableExportTable";
 import { useTranslation } from "react-i18next";
-import { getAllCheckoutHistoriesApi } from "../../api/checkout-api";
+import { getAllCheckoutHistoriesApi, getCheckoutDetailsApi } from "../../api/checkout-api";
+import ReusableModalButtons from "../reusable-components/ReusableModalButtons";
 
 export default function CheckoutView() {
 
@@ -16,11 +17,9 @@ export default function CheckoutView() {
     const [loading, setLoading] = useState(true);
     const [modalTitle, setModalTitle] = useState("");
     const [modalBtnText, setModalBtnText] = useState("");
-    const [authUserImage, setAuthUserImage] = useState(null);
     const [actionBy, setActionBy] = useState("");
-    const [userId, setUserId] = useState("");
-    const [cartDetails, setCartDetails] = useState([]);
-    const [productDetails, setProductDetails] = useState([]);
+
+    // FOR PAYMENT DETAILS
     const [paymentAddress, setPaymentAddress] = useState("");
     const [shippingAddress, setShippingAddress] = useState("");
     const [shippingMethod, setShippingMethod] = useState("");
@@ -30,8 +29,18 @@ export default function CheckoutView() {
     const [paymentStatus, setPaymentStatus] = useState("");
     const [orderStatus, setOrderStatus] = useState("");
     const [paymentDateTime, setPaymentDateTime] = useState("");
-    const [checkOutHistoryCreatedAt, setCheckOutHistoryCreatedAt] = useState("");
 
+    // FOR USER
+    const [userName, setUserName] = useState("");
+    const [emailAddress, setUserEmail] = useState("");
+    const [phoneNumber, setUserPhone] = useState("");
+    const [userActive, setUserActive] = useState("YES");
+    const [userCreatedAt, setUserCreatedAt] = useState("");
+
+    // FOR PRODUCT
+    const [productDetails, setProductDetails] = useState([]);
+
+    const [openSection, setOpenSection] = useState(null);
     const dataTableRef = useRef(null);
     const hasFetched = useRef(false);
     const tableRef = useRef(null);
@@ -56,14 +65,19 @@ export default function CheckoutView() {
         }
     };
 
+    // TOGGLE COLLAPSE SECTIONS IN VIEW MODAL
+    const handleToggle = (section) => {
+        setOpenSection(openSection === section ? null : section);
+    };
+
     useEffect(() => {
         if (loading) return;
-    
+
         if (dataTableRef.current) {
             dataTableRef.current.destroy();
             dataTableRef.current = null;
         }
-    
+
         if (checkoutLists.length > 0 && tableRef.current) {
             dataTableRef.current = new DataTable(tableRef.current, {
                 searchable: true,
@@ -76,7 +90,46 @@ export default function CheckoutView() {
     }, [checkoutLists, loading]);
 
     // VIEW CHECKOUT DETAILS
-    const handleView = () => { };
+    const handleView = async (id) => {
+        try {
+            const res = await getCheckoutDetailsApi(id);
+            const checkoutDetails = res.data?.content;
+            if (checkoutDetails) {
+                setModalTitle(t('common.view_details'));
+                setModalBtnText(t('common.ok_button'));
+
+                // USER INFO
+                setUserName(checkoutDetails.userInfo?.fullName);
+                setUserEmail(checkoutDetails.userInfo?.emailAddress);
+                setUserPhone(checkoutDetails.userInfo?.phoneNumber);
+                setUserActive(checkoutDetails.userInfo?.userActive);
+                setUserCreatedAt(checkoutDetails.userInfo?.userCreatedAt);
+
+                // PRODUCT INFO
+                setProductDetails(checkoutDetails?.products);
+
+                setActionBy(checkoutDetails.authUserInfo?.authUserName || "-");
+                setPaymentAddress(checkoutDetails.paymentAddress || "-");
+                setShippingAddress(checkoutDetails.browserVersion || "-");
+                setShippingMethod(checkoutDetails.shippingMethod || "-");
+                setPaymentMethod(checkoutDetails.paymentMethod || "-");
+                setPaymentAmount(checkoutDetails.paymentAmount || "-");
+                setDeliveryInDays(checkoutDetails.deliveryInDays || "-");
+                setPaymentStatus(checkoutDetails.paymentStatus || false);
+                setOrderStatus(checkoutDetails.orderStatus || "-");
+                setPaymentDateTime(checkoutDetails.paymentDateTime || "-");
+                const modal = new window.bootstrap.Modal(document.getElementById("viewModal"));
+                modal.show();
+            } else {
+                toast.error(t('common.no_records_found'));
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error(t('common.failed_to_fetch_detail'));
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const refreshSystemLogs = () => {
         if (dataTableRef.current) {
@@ -124,14 +177,13 @@ export default function CheckoutView() {
                                                 <th>Payment Status</th>
                                                 <th>Order Status</th>
                                                 <th>Payment Time</th>
-                                                <th>Created At</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
 
                                         <tbody>
                                             <tr>
-                                                <td colSpan="12" className="text-center py-4">
+                                                <td colSpan="11" className="text-center py-4">
                                                     <div className="spinner-border spinner-border-sm"></div>
                                                     <strong className="ms-2">{t('common.loading')}</strong>
                                                 </td>
@@ -159,7 +211,6 @@ export default function CheckoutView() {
                                                 <th>Payment Status</th>
                                                 <th>Order Status</th>
                                                 <th>Payment Time</th>
-                                                <th>Created At</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -167,7 +218,7 @@ export default function CheckoutView() {
                                         <tbody key={checkoutLists.length}>
                                             {checkoutLists.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan="12" className="text-center py-4">
+                                                    <td colSpan="11" className="text-center py-4">
                                                         No records found
                                                     </td>
                                                 </tr>
@@ -202,7 +253,7 @@ export default function CheckoutView() {
                                                         </td>
                                                         <td>
                                                             <div>
-                                                                <strong>{row.paymentMethod}</strong>
+                                                                <strong>{getPaymentMethod(row.paymentMethod)}</strong>
                                                                 <br />
                                                                 <small className="text-muted">
                                                                     {row.paymentAddress}
@@ -211,7 +262,7 @@ export default function CheckoutView() {
                                                         </td>
                                                         <td>
                                                             <div>
-                                                                <strong>{row.shippingMethod}</strong>
+                                                                <strong>{getShippingMethod(row.shippingMethod)}</strong>
                                                                 <br />
                                                                 <small className="text-muted">
                                                                     {row.shippingAddress}
@@ -226,27 +277,15 @@ export default function CheckoutView() {
                                                             </small>
                                                         </td>
                                                         <td>
-                                                            <span
-                                                                className={`badge ${row.paymentStatus === "PAID"
-                                                                    ? "bg-success"
-                                                                    : "bg-warning"
-                                                                    }`}
-                                                            >
-                                                                {row.paymentStatus}
-                                                            </span>
+                                                            {getPaymentStatus(row.paymentStatus)}
                                                         </td>
                                                         <td>
-                                                            <span className="badge bg-info">
-                                                                {row.orderStatus}
-                                                            </span>
+                                                            {getOrderStatus(row.orderStatus)}
                                                         </td>
                                                         <td>
                                                             {row.paymentDateTime
                                                                 ? formatDateTime(row.paymentDateTime)
                                                                 : "N/A"}
-                                                        </td>
-                                                        <td>
-                                                            {formatDateTime(row.checkOutHistoryCreatedAt)}
                                                         </td>
                                                         <td>
                                                             <button
@@ -269,6 +308,173 @@ export default function CheckoutView() {
             </div>
 
             {/* VIEW MODAL */}
+            <div className="modal fade" id="viewModal" tabIndex={-1} aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                <div className="modal-dialog modal-dialog-scrollable" style={{ maxHeight: "65vh" }}>
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">{modalTitle}</h5>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" />
+                        </div>
+                        <div className="modal-body">
+                            <div className="row g-3 p-3">
+                                {/* USER DETAILS TOGGLE */}
+                                <div
+                                    className="d-flex justify-content-between align-items-center fw-bold"
+                                    onClick={() => handleToggle("user")}
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    <span>User Details</span>
+                                    <i
+                                        className={`bi ${openSection === "user" ? "bi-chevron-up" : "bi-chevron-down"
+                                            }`}
+                                    ></i>
+                                </div>
+                                <div className={`collapse mt-3 ${openSection === "user" ? "show" : ""}`}>
+                                    <div className="row mb-2">
+                                        <div className="col-lg-4 fw-bold">Name</div>
+                                        <div className="col-lg-8">{userName}</div>
+                                    </div>
+                                    <div className="row mb-2">
+                                        <div className="col-lg-4 fw-bold">Email</div>
+                                        <div className="col-lg-8">{emailAddress}</div>
+                                    </div>
+                                    <div className="row mb-2">
+                                        <div className="col-lg-4 fw-bold">Phone</div>
+                                        <div className="col-lg-8">{formatPhoneNumber(phoneNumber)}</div>
+                                    </div>
+                                    <div className="row mb-2">
+                                        <div className="col-lg-4 fw-bold">Payment Address</div>
+                                        <div className="col-lg-8">{paymentAddress}</div>
+                                    </div>
+                                    <div className="row mb-2">
+                                        <div className="col-lg-4 fw-bold">Shipping Address</div>
+                                        <div className="col-lg-8">{shippingAddress}</div>
+                                    </div>
+                                    <div className="row mb-2">
+                                        <div className="col-lg-4 fw-bold">Active</div>
+                                        <div className="col-lg-8">{getActiveStatus(userActive)}</div>
+                                    </div>
+                                    <div className="row mb-2">
+                                        <div className="col-lg-4 fw-bold">Created At</div>
+                                        <div className="col-lg-8">{formatDateTime(userCreatedAt)}</div>
+                                    </div>
+                                </div>
+                                <hr />
+                                {/* PRODUCT DETAILS TOGGLE */}
+                                <div
+                                    className="d-flex justify-content-between align-items-center fw-bold"
+                                    onClick={() => handleToggle("product")}
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    <span>Products List</span>
+                                    <i
+                                        className={`bi ${openSection === "product" ? "bi-chevron-up" : "bi-chevron-down"
+                                            }`}
+                                    ></i>
+                                </div>
+                                {productDetails?.map((product, index) => (
+                                    <div key={product.productId} className={`collapse mt-3 ${openSection === "product" ? "show" : ""}`}>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-4 fw-bold">Product {index + 1}</div>
+                                            <div className="col-lg-8">{product.productName}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-4 fw-bold">Category</div>
+                                            <div className="col-lg-8">{product?.categoryInfo?.categoryName}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-4 fw-bold">Sub Category</div>
+                                            <div className="col-lg-8">{product?.subCategoryInfo?.subCategoryName}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-4 fw-bold">Language</div>
+                                            <div className="col-lg-8">{product?.languageInfo?.languageName}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-4 fw-bold">Brand</div>
+                                            <div className="col-lg-8">{product.productBrand}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-4 fw-bold">#Code</div>
+                                            <div className="col-lg-8">{product.productCode}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-4 fw-bold">Price</div>
+                                            <div className="col-lg-8">{product.productPrice}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-4 fw-bold">Stock</div>
+                                            <div className="col-lg-8">{getStockStatus(product.productStock)}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-4 fw-bold">Active</div>
+                                            <div className="col-lg-8">{getActiveStatus(product.productActive)}</div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-lg-4 fw-bold">Created At</div>
+                                            <div className="col-lg-8">{formatDateTime(product.productCreatedAt)}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                                <hr />
+                                {/* BASIC INFO */}
+                                <div className="row mb-2">
+                                    <div className="col-lg-3 col-md-4 fw-bold">Action By</div>
+                                    <div className="col-lg-9 col-md-8">{actionBy}</div>
+                                </div>
+                                <div className="row mb-2">
+                                    <div className="col-lg-3 col-md-4 fw-bold">Shipping Method</div>
+                                    <div className="col-lg-9 col-md-8">
+                                        {getShippingMethod(shippingMethod)}
+                                    </div>
+                                </div>
+                                <div className="row mb-2">
+                                    <div className="col-lg-3 col-md-4 fw-bold">Payment Method</div>
+                                    <div className="col-lg-9 col-md-8">
+                                        {getPaymentMethod(paymentMethod)}
+                                    </div>
+                                </div>
+                                <div className="row mb-2">
+                                    <div className="col-lg-3 col-md-4 fw-bold">Payment Amount</div>
+                                    <div className="col-lg-9 col-md-8">
+                                        {paymentAmount}
+                                    </div>
+                                </div>
+                                <div className="row mb-2">
+                                    <div className="col-lg-3 col-md-4 fw-bold">Delivery In Days</div>
+                                    <div className="col-lg-9 col-md-8">
+                                        {deliveryInDays}
+                                    </div>
+                                </div>
+                                <div className="row mb-2">
+                                    <div className="col-lg-3 col-md-4 fw-bold">Payment Status</div>
+                                    <div className="col-lg-9 col-md-8">
+                                        {getPaymentStatus(paymentStatus)}
+                                    </div>
+                                </div>
+                                <div className="row mb-2">
+                                    <div className="col-lg-3 col-md-4 fw-bold">Order Status</div>
+                                    <div className="col-lg-9 col-md-8">
+                                        {getOrderStatus(orderStatus)}
+                                    </div>
+                                </div>
+                                <div className="row mb-2">
+                                    <div className="col-lg-3 col-md-4 fw-bold">Payment Date-Time</div>
+                                    <div className="col-lg-9 col-md-8">
+                                        {formatDateTime(paymentDateTime)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <ReusableModalButtons
+                            loading={loading}
+                            mode="view"
+                            onCancel={() => { }}
+                            submitText="Close"
+                        />
+                    </div>
+                </div>
+            </div>
         </DashboardLayout>
     );
 }

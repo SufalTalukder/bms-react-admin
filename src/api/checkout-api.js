@@ -6,3 +6,9 @@ const checkoutApi = handleApi(BASE_URLS.CHECKOUT);
 export const getAllCheckoutHistoriesApi = () =>
     checkoutApi.get("/get-all-checkout-histories");
 
+// GET
+export const getCheckoutDetailsApi = (checkOutHistoryId) =>
+    checkoutApi.get("/get-checkout-details", {
+        params: { checkOutHistoryId }
+    });
+

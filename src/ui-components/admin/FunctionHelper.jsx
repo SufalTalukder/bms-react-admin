@@ -59,6 +59,50 @@ export function getCalendarMethodDetails(method) {
     }
 }
 
+export function getPaymentStatus(paymentStatus) {
+    switch (paymentStatus) {
+        case 'PAYMENT_PENDING':
+            return <span className="badge bg-warning rounded">Pending</span>;
+        case 'PAYMENT_SUCCESS':
+            return <span className="badge bg-success rounded">Successful</span>;
+        default:
+            return <span className="badge bg-secondary rounded">Pending</span>;
+    }
+}
+
+export function getOrderStatus(orderStatus) {
+    switch (orderStatus) {
+        case 'SUCCESSFUL':
+            return <span className="badge bg-success rounded">SUCCESSFUL</span>;
+        case 'CANCELLED':
+            return <span className="badge bg-info rounded">CANCELLED</span>;
+        default:
+            return <span className="badge bg-secondary rounded">Unknown</span>;
+    }
+}
+
+export function getShippingMethod(shippingMethod) {
+    switch (shippingMethod) {
+        case 'COURIER_INDIA_POST_SHIPPING':
+            return <span className="badge bg-primary rounded">COURIER INDIA</span>;
+        default:
+            return <span className="badge bg-secondary rounded">Unknown</span>;
+    }
+}
+
+export function getPaymentMethod(paymentMethod) {
+    switch (paymentMethod) {
+        case 'CCAVENUE':
+            return <span className="badge bg-secondary rounded">CCAVENUE</span>;
+        case 'BANK_RTGS_NEFT_TRANSFER':
+            return <span className="badge bg-warning rounded">NEFT Transfer</span>;
+        case 'COD':
+            return <span className="badge bg-info rounded">Cash On Delivery</span>;
+        default:
+            return <span className="badge bg-dark rounded">Unknown</span>;
+    }
+}
+
 // Format DOB as "Dec 25, 2023"
 export function formatDOB(dateString) {
 
