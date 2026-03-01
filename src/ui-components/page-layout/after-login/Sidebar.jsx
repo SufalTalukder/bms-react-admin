@@ -139,6 +139,12 @@ export default function Sidebar() {
                     </NavLink>
                 </li>
                 <li className="nav-item">
+                    <NavLink to="/bms-book-store/admin/notification-service" className="nav-link">
+                        <i className="bx bx-news"></i>
+                        <span>Manage Notifications</span>
+                    </NavLink>
+                </li>
+                <li className="nav-item">
                     <NavLink to="/bms-book-store/admin/support-service" className="nav-link">
                         <i className="bx bx-support"></i>
                         <span>{t('manage_support_tickets.header_title')}</span>

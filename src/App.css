@@ -517,7 +517,26 @@ body.toggle-sidebar .toggle-heading {
   color: var(--text) !important;
 }
 
-:root[data-theme="dark"] small,
-:root[data-theme="dark"] span {
+:root[data-theme="dark"] span,
+:root[data-theme="dark"] h5,
+:root[data-theme="dark"] p,
+:root[data-theme="dark"] .text-muted {
   color: var(--text) !important;
+}
+
+/* 01-03-2026 */
+:root[data-theme="dark"] .list-group-item {
+  background-color: var(--surface) !important;
+}
+
+:root[data-theme="dark"] .no-noti {
+  background-color: var(--surface) !important;
+}
+
+:root[data-theme="dark"] .noti-time {
+  color: var(--sidebar-text);
+}
+
+:root[data-theme="dark"] .bg-light {
+  background-color: var(--badge-bg-admin) !important;
 }

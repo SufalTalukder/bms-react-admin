@@ -19,6 +19,7 @@ export const BASE_URLS = {
     NEWSLETTER: import.meta.env.VITE_8089_API_BASE,
     FAVOURITE: import.meta.env.VITE_8091_API_BASE,
     CART: import.meta.env.VITE_8092_API_BASE,
+    NOTIFICATION: import.meta.env.VITE_8093_API_BASE,
     SUPPORT: import.meta.env.VITE_8100_API_BASE,
 };
 
