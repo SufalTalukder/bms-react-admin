@@ -13,8 +13,12 @@ import { getSubCategoriesListApi } from "../../api/sub-categories-api";
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
 import { PRODUCT_PAGE_TITLE } from "../../lang-dump/lang";
+import { useNotifications } from "../../context/NotificationContext";
 
 export default function ProductView() {
+
+    // GLOBALLY NOTIFICATION FETCHED
+    const { fetchNotifications } = useNotifications();
 
     // STATE VARIABLES
     const [isAddModal, setIsAddModal] = useState(true);
@@ -45,6 +49,7 @@ export default function ProductView() {
     const [productActive, setProductActive] = useState("YES");
     const [productCreatedAt, setProductCreatedAt] = useState("");
     const [productImage, setProductImage] = useState("");
+    const [existingImage, setExistingImage] = useState("");
 
     const [productsList, setProductsList] = useState([]);
     const [languagesList, setLanguagesList] = useState([]);
@@ -90,9 +95,9 @@ export default function ProductView() {
             setLoading(true);
 
             const res = await getProductsListApi(
-                categoryId || 0,
-                subCategoryId || 0,
-                languageId || 0
+                filterByCategoryId || 0,
+                filterBySubCategoryId || 0,
+                filterByLanguageId || 0
             );
 
             setProductsList(
@@ -106,8 +111,8 @@ export default function ProductView() {
     };
 
     useEffect(() => {
-        if (!dataTableRef.current && productsList.length > 0) {
-            dataTableRef.current = new DataTable("#demo-table", {
+        if (productsList.length > 0) {
+            dataTableRef.current = new DataTable(tableRef.current, {
                 searchable: true,
                 sortable: true,
 
@@ -188,21 +193,30 @@ export default function ProductView() {
         formData.append("productDetails", productDetails);
         formData.append("productStock", productStock);
         formData.append("productActive", productActive);
-        if (productImage) formData.append("productImage", productImage);
+        if (productImage instanceof File) {
+            formData.append("productImage", productImage);
+        }
 
         try {
             setLoading(true);
             if (isAddModal) {
                 await addProductApi(categoryId, subCategoryId, languageId, formData);
+                await fetchNotifications();
                 toast.success("Product added successfully!");
             } else {
                 await updateProductApi(productId, categoryId, subCategoryId, languageId, formData);
+                await fetchNotifications();
                 toast.success("Product updated successfully!");
             }
             setTimeout(() => {
                 resetForm();
                 loadProducts();
-                window.bootstrap.Modal.getInstance(document.getElementById("addUpdateModal")).hide();
+                const modalEl = document.getElementById("addUpdateModal");
+                const modalInstance = window.bootstrap.Modal.getInstance(modalEl);
+
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
             }, 1000);
         } catch (error) {
             console.error(error);
@@ -250,7 +264,8 @@ export default function ProductView() {
         setProductDetails(product.productDetails);
         setProductStock(product.productStock);
         setProductActive(product.productActive);
-        setProductImage(product.productImage);
+        setProductImage(null); // don't preload image file
+        setExistingImage(product.productImage); // create new state
         const modal = new window.bootstrap.Modal(document.getElementById("addUpdateModal"));
         modal.show();
     };
@@ -277,7 +292,6 @@ export default function ProductView() {
             dataTableRef.current.destroy();
             dataTableRef.current = null;
         }
-        setLoading(true);
         loadProducts();
     };
 
@@ -300,7 +314,7 @@ export default function ProductView() {
                             <select
                                 className="btn btn-secondary"
                                 value={filterByLanguageId}
-                                onChange={(e) => setFilterByLanguageId(Number(e.target.value))}
+                                onChange={(e) => setFilterByLanguageId(e.target.value ? Number(e.target.value) : "")}
                                 style={{ maxWidth: "170px" }}
                             >
                                 <option value="">-- Language --</option>
@@ -311,7 +325,7 @@ export default function ProductView() {
                             <select
                                 className="btn btn-secondary"
                                 value={filterByCategoryId}
-                                onChange={(e) => setFilterByCategoryId(Number(e.target.value))}
+                                onChange={(e) => setFilterByCategoryId(e.target.value ? Number(e.target.value) : "")}
                                 style={{ maxWidth: "170px" }}
                             >
                                 <option value="">-- Category --</option>
@@ -322,7 +336,7 @@ export default function ProductView() {
                             <select
                                 className="btn btn-secondary"
                                 value={filterBySubCategoryId}
-                                onChange={(e) => setFilterBySubCategoryId(Number(e.target.value))}
+                                onChange={(e) => setFilterBySubCategoryId(e.target.value ? Number(e.target.value) : "")}
                                 style={{ maxWidth: "170px" }}
                             >
                                 <option value="">-- Subcategory --</option>
@@ -349,88 +363,120 @@ export default function ProductView() {
                                 dataTableRef={dataTableRef}
                             />
 
-                            <div className="table-responsive system-log-table">
-                                <table
-                                    ref={tableRef}
-                                    className="table table-hover table-sm mb-0"
-                                    id="demo-table"
-                                >
-                                    <thead className="table-light">
-                                        <tr>
-                                            <th>#Sr. No.</th>
-                                            <th>Image</th>
-                                            <th>Name</th>
-                                            <th>Brand</th>
-                                            <th>Availability</th>
-                                            <th>Price</th>
-                                            <th>Stock</th>
-                                            <th>Action By</th>
-                                            <th>Created At</th>
-                                            <th>Active</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
+                            {loading &&
+                                <div className="table-responsive system-log-table">
+                                    <table
+                                        ref={tableRef}
+                                        className="table table-hover table-sm mb-0"
+                                        id="demo-table"
+                                    >
+                                        <thead className="table-light">
+                                            <tr>
+                                                <th>#Sr. No.</th>
+                                                <th>Image</th>
+                                                <th>Name</th>
+                                                <th>Brand</th>
+                                                <th>Availability</th>
+                                                <th>Price</th>
+                                                <th>Stock</th>
+                                                <th>Action By</th>
+                                                <th>Created At</th>
+                                                <th>Active</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
 
-                                    <tbody key={productsList.length}>
-                                        {loading && (
+                                        <tbody>
                                             <tr>
                                                 <td colSpan="11" className="text-center py-4">
                                                     <div className="spinner-border spinner-border-sm"></div>
                                                     <strong className="ms-2">Product(s) Loading...</strong>
                                                 </td>
                                             </tr>
-                                        )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
 
-                                        {!loading && productsList.length === 0 && (
+                            {!loading &&
+                                <div className="table-responsive system-log-table">
+                                    <table
+                                        ref={tableRef}
+                                        className="table table-hover table-sm mb-0"
+                                        id="demo-table"
+                                    >
+                                        <thead className="table-light">
                                             <tr>
-                                                <td colSpan="11" className="text-center py-4">
-                                                    No product(s) found.
-                                                </td>
+                                                <th>#Sr. No.</th>
+                                                <th>Image</th>
+                                                <th>Name</th>
+                                                <th>Brand</th>
+                                                <th>Availability</th>
+                                                <th>Price</th>
+                                                <th>Stock</th>
+                                                <th>Action By</th>
+                                                <th>Created At</th>
+                                                <th>Active</th>
+                                                <th>Action</th>
                                             </tr>
-                                        )}
+                                        </thead>
 
-                                        {!loading && productsList.map((row, index) => (
-                                            <tr key={`${row.productId}-${row.productCreatedAt}`}>
-                                                <td>{index + 1}</td>
-                                                <td>
-                                                    <img src={row.productImage ? `${import.meta.env.VITE_8086_API_BASE}/uploads/${row.productImage}` : profileImg} style={{ maxHeight: "70px", maxWidth: "80px" }} alt="productImage" />
-                                                </td>
-                                                <td>{row.productName}</td>
-                                                <td>{row.productBrand}</td>
-                                                <td className="text-truncate" style={{ maxWidth: 250 }}>
-                                                    {row.productAvailability}
-                                                </td>
-                                                <td>{row.productPrice}</td>
-                                                <td>{getStockStatus(row.productStock)}</td>
-                                                <td>{row.authUserInfo?.authUserName ?? '-'}</td>
-                                                <td>{formatDateTime(row.productCreatedAt)}</td>
-                                                <td>{getActiveStatus(row.productActive)}</td>
-                                                <td>
-                                                    <button
-                                                        className="btn btn-sm btn-success rounded-pill me-1"
-                                                        onClick={() => handleView(row.productId)}
-                                                    >
-                                                        👁️
-                                                    </button>
-                                                    <button className="btn btn-sm btn-info rounded-pill me-1"
-                                                        onClick={() => handleEdit(row)}>
-                                                        ✏️
-                                                    </button>
-                                                    <button className="btn btn-sm btn-danger rounded-pill"
-                                                        onClick={() => {
-                                                            setProductId(row.productId);
-                                                            setProductName(row.productName);
-                                                            const modal = new window.bootstrap.Modal(document.getElementById("deleteModal"));
-                                                            modal.show();
-                                                        }}>
-                                                        🗑
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        <tbody>
+                                            {productsList.length === 0 && (
+                                                <tr>
+                                                    <td colSpan="11" className="text-center py-4">
+                                                        No product(s) found.
+                                                    </td>
+                                                </tr>
+                                            )}
+
+                                            {productsList.map((row, index) => (
+                                                <tr key={`${row.productId}-${row.productCreatedAt}`}>
+                                                    <td>{index + 1}</td>
+                                                    <td>
+                                                        <img src={productImage
+                                                            ? URL.createObjectURL(productImage)
+                                                            : existingImage
+                                                                ? `${import.meta.env.VITE_8086_API_BASE}/uploads/${existingImage}`
+                                                                : profileImg} style={{ maxHeight: "70px", maxWidth: "80px" }} alt="productImage" />
+                                                    </td>
+                                                    <td>{row.productName}</td>
+                                                    <td>{row.productBrand}</td>
+                                                    <td className="text-truncate" style={{ maxWidth: 250 }}>
+                                                        {row.productAvailability}
+                                                    </td>
+                                                    <td>{row.productPrice}</td>
+                                                    <td>{getStockStatus(row.productStock)}</td>
+                                                    <td>{row.authUserInfo?.authUserName ?? '-'}</td>
+                                                    <td>{formatDateTime(row.productCreatedAt)}</td>
+                                                    <td>{getActiveStatus(row.productActive)}</td>
+                                                    <td>
+                                                        <button
+                                                            className="btn btn-sm btn-success rounded-pill me-1"
+                                                            onClick={() => handleView(row.productId)}
+                                                        >
+                                                            👁️
+                                                        </button>
+                                                        <button className="btn btn-sm btn-info rounded-pill me-1"
+                                                            onClick={() => handleEdit(row)}>
+                                                            ✏️
+                                                        </button>
+                                                        <button className="btn btn-sm btn-danger rounded-pill"
+                                                            onClick={() => {
+                                                                setProductId(row.productId);
+                                                                setProductName(row.productName);
+                                                                const modal = new window.bootstrap.Modal(document.getElementById("deleteModal"));
+                                                                modal.show();
+                                                            }}>
+                                                            🗑
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
                         </div>
                     </div>
                 </main>
@@ -628,7 +674,7 @@ export default function ProductView() {
 
             {/* DELETE MODAL */}
             <div className="modal fade" id="deleteModal" tabIndex={-1} aria-labelledby="deleteModalLabel" aria-hidden="true"
-                data-bs-backdrop="static" data-keyboard="false">
+                data-bs-backdrop="static" data-bs-keyboard="false">
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">

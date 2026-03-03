@@ -12,7 +12,7 @@ export const getAllNotificationsApi = () =>
 
 // UPDATE
 export const updateNotificationApi = (notificationId) =>
-    notificationApi.patch("/update-mgmt-notification", {
+    notificationApi.put("/update-mgmt-notification", null, {
         params: { notificationId },
     });
 

@@ -7,13 +7,18 @@ import { logoutApi } from "../../../api/auth-api";
 import { toast } from "react-toastify";
 import LanguageToggleButton from "../../reusable-components/LanguageToggleButton";
 import { useTranslation } from "react-i18next";
+import { useNotifications } from "../../../context/NotificationContext";
 
 export default function Navbar() {
 
     const { t } = useTranslation();
+    const { unreadCount } = useNotifications();
+
     const navigate = useNavigate();
     const [profileOpen, setProfileOpen] = useState(false);
     const profileRef = useRef(null);
+    const [notificationOpen, setNotificationOpen] = useState(false);
+    const notificationRef = useRef(null);
 
     const storedAuthUser = sessionStorage.getItem("authUser");
     const [authUserDetail, setAuthUserDetail] = useState(storedAuthUser ? JSON.parse(storedAuthUser) : null);
@@ -64,10 +69,17 @@ export default function Navbar() {
         setProfileOpen(prev => !prev);
     };
 
+    const toggleNotification = () => {
+        setNotificationOpen(prev => !prev);
+    };
+
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (profileRef.current && !profileRef.current.contains(e.target)) {
                 setProfileOpen(false);
+            }
+            if (notificationRef.current && !notificationRef.current.contains(e.target)) {
+                setNotificationOpen(false);
             }
         };
 
@@ -139,10 +151,54 @@ export default function Navbar() {
             </div>
             <nav className="header-nav ms-auto">
                 <ul className="d-flex align-items-center">
+
+                    {/* Theme mode start */}
                     <li className="nav-item dropdown pe-3">
                         <ThemeToggleButton />
                     </li>
+
+                    {/* Notification start */}
+                    <li className="nav-item dropdown" ref={notificationRef}>
+                        <Link className="nav-link nav-icon" href="#" data-bs-toggle="dropdown" onClick={toggleNotification}>
+                            <i className="bi bi-bell"></i>
+                            {unreadCount > 9 && (
+                                <span className="badge bg-primary badge-number">
+                                    {unreadCount}+
+                                </span>
+                            )}
+                            {unreadCount > 0 ? (
+                                <span className="badge bg-primary badge-number">
+                                    {unreadCount}
+                                </span>
+                            ) : (
+                                <span className="badge bg-primary badge-number">
+                                </span>
+                            )}
+                        </Link>
+                        <ul className={`dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications ${notificationOpen ? 'show' : ''}`} style={
+                            notificationOpen
+                                ? {
+                                    position: "absolute",
+                                    inset: "0px 0px auto auto",
+                                    margin: "0px",
+                                    transform: "translate(-25px, 35px)",
+                                }
+                                : {}
+                        }
+                        >
+                            {unreadCount > 0 &&
+                                <li className="dropdown-header noti">
+                                    You have {unreadCount > 9 ? unreadCount + '+' : unreadCount} unread notification{unreadCount > 1 ? 's.' : '.'}
+                                    <Link to="/bms-book-store/admin/notification-service"><span className="badge rounded-pill bg-primary p-2 ms-2">View all</span></Link>
+                                </li>
+                            }
+                        </ul>
+                    </li>
+
+                    {/* Language toggle start */}
                     <LanguageToggleButton />
+
+                    {/* My profile start */}
                     <li className="nav-item dropdown pe-3" ref={profileRef}>
                         <Link className="nav-link nav-profile d-flex align-items-center pe-0 btn" data-bs-toggle="dropdown" onClick={toggleProfile}>
                             <img src={authUserImage ? `${import.meta.env.VITE_8082_API_BASE}/uploads/${authUserImage}` : profileImg} alt="Profile" className="rounded-circle" loading="lazy" />

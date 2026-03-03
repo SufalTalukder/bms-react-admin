@@ -30,6 +30,7 @@ import { LangProvider } from "./context/SwitchLangContext";
 import AuthUserPermissionView from "./ui-components/admin/AuthUserPermissionView";
 import CheckoutView from "./ui-components/admin/CheckoutView";
 import NotificationView from "./ui-components/admin/NotificationView";
+import { NotificationProvider } from "./context/NotificationContext";
 
 export default function App() {
 
@@ -78,50 +79,52 @@ export default function App() {
       <AuthProvider>
         <LangProvider>
           <ThemeProvider>
-            <ToastContainer
-              position="top-right"
-              autoClose={1000}
-              hideProgressBar={false}
-              newestOnTop
-              closeOnClick
-              pauseOnHover
-              theme="colored"
-            />
-            <Routes>
+            <NotificationProvider>
+              <ToastContainer
+                position="top-right"
+                autoClose={1000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                pauseOnHover
+                theme="colored"
+              />
+              <Routes>
 
-              {/* Public Routes */}
-              <Route element={<PublicRoute />}>
-                <Route path="/bms-book-store" element={<LoginView />} />
-                <Route path="/bms-book-store/admin" element={<LoginView />} />
-                <Route path="/bms-book-store/admin/login" element={<LoginView />} />
-                <Route path="/bms-book-store/admin/create-account" element={<CreateAuthAccountView />} />
-              </Route>
+                {/* Public Routes */}
+                <Route element={<PublicRoute />}>
+                  <Route path="/bms-book-store" element={<LoginView />} />
+                  <Route path="/bms-book-store/admin" element={<LoginView />} />
+                  <Route path="/bms-book-store/admin/login" element={<LoginView />} />
+                  <Route path="/bms-book-store/admin/create-account" element={<CreateAuthAccountView />} />
+                </Route>
 
-              {/* Protected Admin Routes */}
-              <Route element={<PrivateRoute />}>
-                <Route path="/bms-book-store/admin/my-profile" element={<AuthUserProfileView />} />
-                <Route path="/bms-book-store/admin/track-your-activity" element={<TrackYourActivityView />} />
-                <Route path="/bms-book-store/admin/track-system-activity" element={<TrackSystemActivityView />} />
-                <Route path="/bms-book-store/admin/auth-user-service" element={<AuthUserView />} />
-                <Route path="/bms-book-store/admin/auth-permission" element={<AuthUserPermissionView />} />
-                <Route path="/bms-book-store/admin/user-service" element={<UserView />} />
-                <Route path="/bms-book-store/admin/banner-service" element={<BannerView />} />
-                <Route path="/bms-book-store/admin/language-service" element={<LanguageView />} />
-                <Route path="/bms-book-store/admin/category-service" element={<ProductCategoryView />} />
-                <Route path="/bms-book-store/admin/sub-category-service" element={<ProductSubCategoryView />} />
-                <Route path="/bms-book-store/admin/product-service" element={<ProductView />} />
-                <Route path="/bms-book-store/admin/wishlist-service" element={<WishlistView />} />
-                <Route path="/bms-book-store/admin/cart-service" element={<CartView />} />
-                <Route path="/bms-book-store/admin/checkout-service" element={<CheckoutView />} />
-                <Route path="/bms-book-store/admin/newsletter-service" element={<NewsletterView />} />
-                <Route path="/bms-book-store/admin/notification-service" element={<NotificationView />} />
-                <Route path="/bms-book-store/admin/support-service" element={<SupportView />} />
-              </Route>
+                {/* Protected Admin Routes */}
+                <Route element={<PrivateRoute />}>
+                  <Route path="/bms-book-store/admin/my-profile" element={<AuthUserProfileView />} />
+                  <Route path="/bms-book-store/admin/track-your-activity" element={<TrackYourActivityView />} />
+                  <Route path="/bms-book-store/admin/track-system-activity" element={<TrackSystemActivityView />} />
+                  <Route path="/bms-book-store/admin/auth-user-service" element={<AuthUserView />} />
+                  <Route path="/bms-book-store/admin/auth-permission" element={<AuthUserPermissionView />} />
+                  <Route path="/bms-book-store/admin/user-service" element={<UserView />} />
+                  <Route path="/bms-book-store/admin/banner-service" element={<BannerView />} />
+                  <Route path="/bms-book-store/admin/language-service" element={<LanguageView />} />
+                  <Route path="/bms-book-store/admin/category-service" element={<ProductCategoryView />} />
+                  <Route path="/bms-book-store/admin/sub-category-service" element={<ProductSubCategoryView />} />
+                  <Route path="/bms-book-store/admin/product-service" element={<ProductView />} />
+                  <Route path="/bms-book-store/admin/wishlist-service" element={<WishlistView />} />
+                  <Route path="/bms-book-store/admin/cart-service" element={<CartView />} />
+                  <Route path="/bms-book-store/admin/checkout-service" element={<CheckoutView />} />
+                  <Route path="/bms-book-store/admin/newsletter-service" element={<NewsletterView />} />
+                  <Route path="/bms-book-store/admin/notification-service" element={<NotificationView />} />
+                  <Route path="/bms-book-store/admin/support-service" element={<SupportView />} />
+                </Route>
 
-              {/* 404 Routes */}
-              <Route path="*" element={<Page404View />} />
+                {/* 404 Routes */}
+                <Route path="*" element={<Page404View />} />
 
-            </Routes>
+              </Routes>
+            </NotificationProvider>
           </ThemeProvider>
         </LangProvider>
       </AuthProvider>

@@ -24,6 +24,7 @@ const devConnectSrc = [
   "http://localhost:8088",
   "http://localhost:8091",
   "http://localhost:8092",
+  "http://localhost:8093",
   "http://localhost:8095",
   "http://localhost:8100",
 ]

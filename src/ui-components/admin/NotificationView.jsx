@@ -1,11 +1,14 @@
 import DashboardLayout from "../../DashboardLayout";
 import { useEffect, useState, useRef, useCallback } from "react";
-import { getAllNotificationsApi, removeNotificationApi, updateNotificationApi } from "../../api/notification-api";
+import { removeNotificationApi, updateNotificationApi } from "../../api/notification-api";
+import { toast } from "react-toastify";
+import { useNotifications } from "../../context/NotificationContext";
 
 export default function NotificationView() {
 
+    const { notifications, setNotifications } = useNotifications();
+
     const [allNotifications, setAllNotifications] = useState([]);
-    const [notifications, setNotifications] = useState([]);
     const [page, setPage] = useState(1);
     const [limit] = useState(10);
     const [hasMore, setHasMore] = useState(true);
@@ -15,34 +18,13 @@ export default function NotificationView() {
 
     useEffect(() => {
         document.title = "Manage Notifications - BMS Book Store";
-        fetchAllNotifications();
     }, []);
 
     useEffect(() => {
         loadMoreNotifications();
     }, [page, allNotifications]);
 
-    const fetchAllNotifications = async () => {
-        try {
-            setLoading(true);
-            const res = await getAllNotificationsApi();
-            const data = res.data?.content || [];
-
-            const sorted = [...data].reverse();
-
-            setAllNotifications(sorted);
-            setNotifications([]);
-            setPage(1);
-            setHasMore(true);
-
-        } catch (error) {
-            console.error("Error fetching notifications:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // INFINITE SCOLL LOADER
+    // INFINITE SCROLL LOADER
     const loadMoreNotifications = () => {
         if (loading) return;
 
@@ -75,7 +57,6 @@ export default function NotificationView() {
     const markAsRead = async (id) => {
         try {
             await updateNotificationApi(id);
-
             setNotifications(prev =>
                 prev.map(item =>
                     item.notificationId === id
@@ -84,6 +65,7 @@ export default function NotificationView() {
                 )
             );
         } catch (error) {
+            toast.error("Error while updating: ", error);
             console.error("Error updating notification:", error);
         }
     };
@@ -92,11 +74,11 @@ export default function NotificationView() {
     const deleteNotification = async (id) => {
         try {
             await removeNotificationApi(id);
-
             setNotifications(prev =>
                 prev.filter(item => item.notificationId !== id)
             );
         } catch (error) {
+            toast.error("Error while deleting: ", error);
             console.error("Error deleting notification:", error);
         }
     };
@@ -127,7 +109,7 @@ export default function NotificationView() {
 
                                         return (
                                             <div
-                                                key={notification.notificationId}
+                                                key={`${notification.notificationId}-${notification.notificationCreatedAt}`}
                                                 ref={isLast ? lastItemRef : null}
                                                 className={`list-group-item list-group-item-action ${isUnread ? "bg-light" : ""}`}
                                             >
@@ -152,7 +134,8 @@ export default function NotificationView() {
                                                             className="btn btn-sm btn-success"
                                                             onClick={() => markAsRead(notification.notificationId)}
                                                         >
-                                                            Mark as Read
+                                                            <i className="bi bi-check-all"></i>
+                                                            &nbsp;Mark as Read
                                                         </button>
                                                     )}
 
@@ -160,7 +143,7 @@ export default function NotificationView() {
                                                         className="btn btn-sm btn-danger"
                                                         onClick={() => deleteNotification(notification.notificationId)}
                                                     >
-                                                        Delete
+                                                        <i className="bi bi-trash"></i>
                                                     </button>
                                                 </div>
                                             </div>

@@ -540,3 +540,10 @@ body.toggle-sidebar .toggle-heading {
 :root[data-theme="dark"] .bg-light {
   background-color: var(--badge-bg-admin) !important;
 }
+
+/* 03-03-2026 */
+:root[data-theme="dark"] .notifications,
+:root[data-theme="dark"] .noti {
+  background-color: var(--table-bg);
+  color: var(--text) !important;
+}
