@@ -163,10 +163,10 @@ export default function Navbar() {
                             <i className="bi bi-bell"></i>
                             {unreadCount > 9 && (
                                 <span className="badge bg-primary badge-number">
-                                    {unreadCount}+
+                                    {9 + '+'}
                                 </span>
                             )}
-                            {unreadCount > 0 ? (
+                            {unreadCount > 0 && unreadCount <= 9 ? (
                                 <span className="badge bg-primary badge-number">
                                     {unreadCount}
                                 </span>
@@ -188,7 +188,7 @@ export default function Navbar() {
                         >
                             {unreadCount > 0 &&
                                 <li className="dropdown-header noti">
-                                    You have {unreadCount > 9 ? unreadCount + '+' : unreadCount} unread notification{unreadCount > 1 ? 's.' : '.'}
+                                    You have {unreadCount > 9 ? 9 + '+' : unreadCount} unread notification{unreadCount > 1 ? 's.' : '.'}
                                     <Link to="/bms-book-store/admin/notification-service"><span className="badge rounded-pill bg-primary p-2 ms-2">View all</span></Link>
                                 </li>
                             }

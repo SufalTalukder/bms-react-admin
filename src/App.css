@@ -543,7 +543,8 @@ body.toggle-sidebar .toggle-heading {
 
 /* 03-03-2026 */
 :root[data-theme="dark"] .notifications,
-:root[data-theme="dark"] .noti {
-  background-color: var(--table-bg);
+:root[data-theme="dark"] .noti,
+:root[data-theme="dark"] .notificationAlert {
+  background-color: var(--table-bg) !important;
   color: var(--text) !important;
 }

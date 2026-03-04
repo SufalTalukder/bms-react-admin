@@ -14,6 +14,7 @@ import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
 import { PRODUCT_PAGE_TITLE } from "../../lang-dump/lang";
 import { useNotifications } from "../../context/NotificationContext";
+import { notify } from "./NotificationAlert";
 
 export default function ProductView() {
 
@@ -202,10 +203,12 @@ export default function ProductView() {
             if (isAddModal) {
                 await addProductApi(categoryId, subCategoryId, languageId, formData);
                 await fetchNotifications();
+                notify("You have a new notification!", "info");
                 toast.success("Product added successfully!");
             } else {
                 await updateProductApi(productId, categoryId, subCategoryId, languageId, formData);
                 await fetchNotifications();
+                notify("You have a new notification!", "info");
                 toast.success("Product updated successfully!");
             }
             setTimeout(() => {
@@ -220,6 +223,7 @@ export default function ProductView() {
             }, 1000);
         } catch (error) {
             console.error(error);
+            notify("Failed to notify.", "error");
             toast.error("Failed to save product.");
         } finally {
             setLoading(false);
