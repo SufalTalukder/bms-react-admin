@@ -73,6 +73,8 @@ export default defineConfig(({ mode }) => {
     base: '/bms-book-store/',
     plugins: [react()],
     server: {
+      host: true,
+      port: 5173,
       headers: {
         'Content-Security-Policy': csp(isLocal, isDev, isProd),
       },
